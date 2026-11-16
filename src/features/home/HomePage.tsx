@@ -2,6 +2,8 @@ import { useEffect, type CSSProperties } from 'react'
 import { Link } from 'react-router'
 import { BrandMark } from '@/components/BrandMark'
 import { CropRows } from '@/components/CropRows'
+import { useAuth } from '@/features/auth/authContext'
+import { homePathFor } from '@/features/auth/roles'
 import { sections } from '@/routes/sections'
 import type { Role } from '@/routes/types'
 
@@ -14,13 +16,35 @@ const fieldShape: Record<Role, { area: string; angle: string }> = {
 }
 
 export function HomePage() {
+  const { user, logout } = useAuth()
   useEffect(() => {
     document.title = 'Farm Platform'
   }, [])
 
   return (
     <div className="mx-auto min-h-dvh max-w-6xl px-4 pt-6 pb-12 sm:px-8 lg:pt-10">
-      <BrandMark />
+      <div className="flex items-center justify-between gap-4">
+        <BrandMark />
+        {user ? (
+          <p className="flex items-center gap-4">
+            <Link to={homePathFor(user)} className="font-semibold">
+              {user.name}
+            </Link>
+            <button type="button" onClick={() => void logout()} className="text-ink-soft underline">
+              Sign out
+            </button>
+          </p>
+        ) : (
+          <p className="flex items-center gap-4">
+            <Link to="/login" className="font-semibold">
+              Sign in
+            </Link>
+            <Link to="/register" className="rounded-lg bg-indigo px-3 py-1.5 font-semibold text-white">
+              Register
+            </Link>
+          </p>
+        )}
+      </div>
 
       <div className="mt-12 grid gap-10 lg:mt-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
         <header className="max-w-md lg:pt-4">
