@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+
+@import '@fontsource/young-serif/400.css';
+@import '@fontsource/mukta/400.css';
+@import '@fontsource/mukta/500.css';
+@import '@fontsource/mukta/600.css';
+@import '@fontsource/mukta/700.css';
+
+@theme {
+  --color-paper: #f5f6f1;
+  --color-paper-deep: #ebede4;
+  --color-ink: #1c2620;
+  --color-ink-soft: #4b5751;
+  --color-line: #d6dace;
+  --color-indigo: #2e3a87;
+  --color-mustard: #d9a404;
+  --color-leaf: #3d7a4a;
+  --color-soil: #7a5230;
+
+  --font-display: 'Young Serif', Georgia, serif;
+  --font-sans: 'Mukta', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    font-size: 106.25%; /* 17px: Mukta sets small */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    line-height: 1.55;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-indigo);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* Signature detail: furrowed field rows, seen from above, in the section's colour. */
+@utility crop-rows {
+  background-color: color-mix(in oklab, var(--role) 22%, var(--color-paper));
+  background-image: repeating-linear-gradient(
+    var(--rows-angle, -58deg),
+    var(--role) 0 5px,
+    transparent 5px 9px,
+    color-mix(in oklab, var(--role) 55%, var(--color-paper)) 9px 11px,
+    transparent 11px 16px
+  );
+}

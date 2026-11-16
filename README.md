@@ -30,4 +30,40 @@ src/
 
 ## Getting started
 
-Setup instructions are added by the Sprint 1 scaffold issue.
+Needs Node 22.13+ and pnpm 9 (`corepack enable` picks the version from `package.json`).
+
+```bash
+pnpm install
+cp .env.example .env      # VITE_API_BASE_URL points at the API gateway
+pnpm dev                  # http://localhost:5173
+```
+
+| Script | What it does |
+| --- | --- |
+| `pnpm dev` | Dev server with hot reload |
+| `pnpm lint` | ESLint |
+| `pnpm typecheck` | TypeScript, no emit |
+| `pnpm test` | Vitest (jsdom + Testing Library) |
+| `pnpm build` | Type-check and production build into `dist/` |
+
+CI runs lint, type-check, tests and build on every pull request. Vercel builds a preview of every pull request from `vercel.json`.
+
+### Sections and pages
+
+Every role section lives at `/<role>/<page>` and shares one layout shell (left rail on desktop, bottom tab bar on mobile).
+Each section's pages are declared in `src/features/<role>/section.ts`. Until a page has its own component it shows an empty state.
+To build a page, create the component in `src/features/<role>/` and set it as that page's `element`:
+
+```ts
+// src/features/farmer/section.ts
+{ path: 'listings', label: 'Listings', icon: 'tag', summary: '...', empty: { ... }, element: <ListingsPage /> }
+```
+
+(rename the file to `section.tsx` when it starts holding JSX). Role guards (issue #3) wrap each section's layout in `src/routes/routes.tsx`.
+
+### Design tokens
+
+Colours and fonts are Tailwind theme tokens in `src/index.css`: `paper`, `paper-deep`, `ink`, `ink-soft`, `line`, and one colour per section
+(`mustard` farmer, `indigo` customer, `leaf` inspector, `soil` admin). Headings use `font-display` (Young Serif); body text uses Mukta,
+which also covers Devanagari. Inside a section the CSS variable `--role` holds the section colour.
+Animations use Motion (`motion/react`) and respect the reduced-motion setting through `MotionConfig`.
