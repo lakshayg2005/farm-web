@@ -1,0 +1,59 @@
+import { useState, type FormEvent } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router'
+import { ApiError } from '@/api/http'
+import { useAuth } from './authContext'
+import { AuthShell, Field, primaryButton } from './AuthShell'
+import { toE164 } from './phone'
+import { homePathFor } from './roles'
+
+export function LoginPage() {
+  const { login } = useAuth()
+  const navigate = useNavigate()
+  const from = (useLocation().state as { from?: string } | null)?.from
+  const [phone, setPhone] = useState('')
+  const [password, setPassword] = useState('')
+  const [errors, setErrors] = useState<{ phone?: string; password?: string; form?: string }>({})
+  const [busy, setBusy] = useState(false)
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault()
+    const e164 = toE164(phone)
+    const next = {
+      phone: e164 ? undefined : 'Enter a 10-digit mobile number, or a number with country code like +91 98765 43210.',
+      password: password ? undefined : 'Enter your password.',
+    }
+    setErrors(next)
+    if (next.phone || next.password || !e164) return
+    setBusy(true)
+    try {
+      const user = await login(e164, password)
+      navigate(from && from !== '/login' ? from : homePathFor(user), { replace: true })
+    } catch (err) {
+      setErrors({ form: err instanceof ApiError ? err.message : 'Could not reach the server. Try again.' })
+      setBusy(false)
+    }
+  }
+
+  return (
+    <AuthShell title="Sign in" intro="Use the phone number and password you registered with.">
+      <form onSubmit={onSubmit} noValidate className="space-y-5">
+        <Field label="Phone number" name="phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} error={errors.phone} />
+        <Field label="Password" name="password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} />
+        {errors.form && (
+          <p role="alert" className="font-semibold text-red-700">
+            {errors.form}
+          </p>
+        )}
+        <button type="submit" disabled={busy} className={primaryButton}>
+          {busy ? 'Signing in…' : 'Sign in'}
+        </button>
+      </form>
+      <p className="mt-6 text-ink-soft">
+        New here?{' '}
+        <Link to="/register" className="font-semibold text-indigo underline">
+          Create an account
+        </Link>
+      </p>
+    </AuthShell>
+  )
+}

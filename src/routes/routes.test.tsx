@@ -1,14 +1,13 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { createMemoryRouter, RouterProvider } from 'react-router'
-import { routes } from './routes'
+import { session } from '@/features/auth/session'
+import { renderAt, signedInAs } from '@/test/auth'
 import { sections } from './sections'
 
-function renderAt(path: string) {
-  const router = createMemoryRouter(routes, { initialEntries: [path] })
-  render(<RouterProvider router={router} />)
-  return router
-}
+beforeEach(() => {
+  session.clear()
+  signedInAs(['farmer', 'customer', 'inspector', 'admin'])
+})
 
 describe('routes', () => {
   it('lists every section on the start page', () => {
@@ -29,6 +28,7 @@ describe('routes', () => {
 
   it('moves between pages from the section navigation', async () => {
     const router = renderAt('/farmer/listings')
+    await screen.findByRole('heading', { level: 1, name: 'Listings' })
     const [railNav] = screen.getAllByRole('navigation', { name: 'Farmer pages' })
     await userEvent.click(within(railNav!).getByRole('link', { name: 'Orders' }))
     expect(router.state.location.pathname).toBe('/farmer/orders')
