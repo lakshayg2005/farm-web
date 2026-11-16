@@ -1,4 +1,6 @@
+import { createElement } from 'react'
 import type { Section } from '@/routes/types'
+import { PlotListingPage } from './PlotListingPage'
 
 export const farmerSection: Section = {
   role: 'farmer',
@@ -35,6 +37,7 @@ export const farmerSection: Section = {
         title: 'No plots yet',
         body: 'Draw the boundary of a plot on the map and choose the seasons it is available.',
       },
+      element: createElement(PlotListingPage),
     },
     {
       path: 'reservations',
