@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import type { Section } from '@/routes/types'
 import { ListingsPage } from './ListingsPage'
 import { PlotListingPage } from './PlotListingPage'
+import { RequestsPage } from './RequestsPage'
 
 export const farmerSection: Section = {
   role: 'farmer',
@@ -45,11 +46,12 @@ export const farmerSection: Section = {
       path: 'reservations',
       label: 'Requests',
       icon: 'calendar',
-      summary: 'Reservation requests for your plots and the agreements you have signed.',
+      summary: 'Customers asking to reserve your plots, and the agreements you have accepted.',
       empty: {
         title: 'No reservation requests',
         body: 'Customers who want to reserve one of your plots show up here. Each request expires after 48 hours.',
       },
+      element: createElement(RequestsPage),
     },
     {
       path: 'crops',
