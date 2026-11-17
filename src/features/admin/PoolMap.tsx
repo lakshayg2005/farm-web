@@ -1,8 +1,20 @@
 import { useEffect, useRef } from 'react'
 import { getLeaflet, type LeafletLayer, type LeafletMapLike } from '@/features/customer/leaflet'
-import type { Pool } from './admin'
+import { orderedStops, type Pool } from './admin'
 
-/** Draws each pool's route and stops on an OpenStreetMap map and zooms to fit them. */
+/** The part of Leaflet this map needs on top of the shared typing: round stop markers. */
+interface PoolLeaflet {
+  circleMarker(latlng: [number, number], options: Record<string, unknown>): LeafletLayer
+}
+
+interface PoolFeature {
+  type: 'Feature'
+  id: string
+  properties: { kind?: 'PICKUP' | 'DROP'; sequence?: number }
+  geometry: unknown
+}
+
+/** Draws each pool's route and its pickups (mustard) and drops (indigo) on an OpenStreetMap map. */
 export function PoolMap({ pools, selectedId }: { pools: Pool[]; selectedId: string | null }) {
   const el = useRef<HTMLDivElement>(null)
   const map = useRef<LeafletMapLike | null>(null)
@@ -29,19 +41,41 @@ export function PoolMap({ pools, selectedId }: { pools: Pool[]; selectedId: stri
     const m = map.current
     if (!L || !m) return
     layer.current?.remove()
-    const features = pools.flatMap((pool) => [
-      ...(pool.route ? [{ type: 'Feature', id: pool.id, properties: {}, geometry: pool.route }] : []),
-      ...pool.stops.map((s) => ({ type: 'Feature', id: pool.id, properties: {}, geometry: s.location })),
+    const features: PoolFeature[] = pools.flatMap((pool) => [
+      ...(pool.route ? [{ type: 'Feature' as const, id: pool.id, properties: {}, geometry: pool.route }] : []),
+      ...orderedStops(pool).map((s) => ({
+        type: 'Feature' as const,
+        id: pool.id,
+        properties: { kind: s.kind, sequence: s.sequence },
+        geometry: s.location,
+      })),
     ])
-    const geo = L.geoJSON(
-      { type: 'FeatureCollection', features },
-      {
-        style: (f) => ({ color: f?.id === selectedId ? '#d9a404' : '#2e3a87', weight: f?.id === selectedId ? 5 : 3 }),
-      },
-    ).addTo(m)
+    const dim = (id?: string) => selectedId !== null && id !== selectedId
+    const geo = L.geoJSON({ type: 'FeatureCollection', features }, {
+      style: (f) => ({
+        color: f?.id === selectedId ? '#1c2620' : '#2e3a87',
+        weight: f?.id === selectedId ? 5 : 3,
+        opacity: dim(f?.id) ? 0.25 : 0.9,
+      }),
+      pointToLayer: (f: PoolFeature, latlng: [number, number]) =>
+        (L as unknown as PoolLeaflet).circleMarker(latlng, {
+          radius: f.properties.kind === 'PICKUP' ? 7 : 6,
+          color: '#ffffff',
+          weight: 2,
+          fillColor: f.properties.kind === 'PICKUP' ? '#d9a404' : '#2e3a87',
+          fillOpacity: dim(f.id) ? 0.3 : 1,
+        }),
+    } as Parameters<typeof L.geoJSON>[1]).addTo(m)
     layer.current = geo
     if (features.length > 0 && geo.getBounds) m.fitBounds(geo.getBounds(), { padding: [30, 30], maxZoom: 13 })
   }, [pools, selectedId])
 
-  return <div ref={el} className="h-80 w-full rounded-xl border border-line lg:h-[30rem]" role="region" aria-label="Map of delivery pools" />
+  return (
+    <div
+      ref={el}
+      className="isolate h-80 w-full rounded-xl border border-line bg-paper-deep lg:h-[30rem]"
+      role="region"
+      aria-label="Map of delivery pools: pickups in yellow, deliveries in blue"
+    />
+  )
 }

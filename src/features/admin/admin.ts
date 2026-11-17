@@ -43,7 +43,8 @@ export const adminApi = {
   verifyFarmer: (userId: string) => api<UserRow>(`/identity/users/${userId}/verify-farmer`, { method: 'POST' }),
   inspections: () => api<InspectionSummary[]>('/quality/inspections'),
   pools: (date: string) => api<Pool[]>(`/logistics/pools?date=${date}`),
-  runPooling: (date: string) => api<Pool[]>('/logistics/pools/run', { method: 'POST', body: { date } }),
+  /** HLD section 15: POST /logistics/pools/run?date (admin), answering with that date's pools. */
+  runPooling: (date: string) => api<Pool[]>(`/logistics/pools/run?date=${date}`, { method: 'POST' }),
 }
 
 /** Share of finished inspections that passed, as a whole percent; null until one is finished. */
@@ -55,6 +56,30 @@ export function passRate(inspections: InspectionSummary[]): number | null {
 
 export function totalSavedKm(pools: Pool[]): number {
   return Math.round(pools.reduce((sum, p) => sum + p.savedKm, 0) * 10) / 10
+}
+
+/** The day's totals. Separate trips would have driven totalKm + savedKm, so the share saved is savedKm of that. */
+export function poolSummary(pools: Pool[]) {
+  const routeKm = pools.reduce((sum, p) => sum + p.totalKm, 0)
+  const savedKm = pools.reduce((sum, p) => sum + p.savedKm, 0)
+  const separateKm = routeKm + savedKm
+  return {
+    pools: pools.length,
+    deliveries: pools.reduce((n, p) => n + p.stops.filter((s) => s.kind === 'DROP').length, 0),
+    routeKm: Math.round(routeKm * 10) / 10,
+    savedKm: Math.round(savedKm * 10) / 10,
+    savedPct: separateKm > 0 ? Math.round((savedKm / separateKm) * 100) : 0,
+  }
+}
+
+/** Stops in driving order; pickups come before the drops that depend on them (HLD section 14). */
+export const orderedStops = (pool: Pool) => [...pool.stops].sort((a, b) => a.sequence - b.sequence)
+
+export const POOL_STATUS: Record<string, string> = {
+  PLANNED: 'Planned',
+  ASSIGNED: 'Partner assigned',
+  IN_PROGRESS: 'On the road',
+  COMPLETED: 'Delivered',
 }
 
 export const todayISO = () => new Date().toISOString().slice(0, 10)
