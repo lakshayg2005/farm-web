@@ -5,10 +5,10 @@ type Polygon = { type: 'Polygon'; coordinates: number[][][] }
 type PlotCreated = { id: string; areaAcres: number }
 type SeasonInput = {
   season: string
-  start_date: string
-  end_date: string
+  startDate: string
+  endDate: string
   price: number
-  allowed_crops: string[]
+  allowedCrops: string[]
 }
 
 function errorMessage(error: unknown) {
@@ -99,17 +99,17 @@ export function PlotListingPage() {
         method: 'POST',
         body: {
           title: title.trim(),
-          soil_type: soilType.trim() || null,
-          water_source: waterSource.trim() || null,
+          soilType: soilType.trim() || null,
+          waterSource: waterSource.trim() || null,
           boundary,
         },
       })
       const seasonBody: SeasonInput = {
         season: season.trim(),
-        start_date: startDate,
-        end_date: endDate,
+        startDate,
+        endDate,
         price: Number(price),
-        allowed_crops: crops.split(',').map((crop) => crop.trim()).filter(Boolean),
+        allowedCrops: crops.split(',').map((crop) => crop.trim()).filter(Boolean),
       }
       await api('/land/plots/' + plot.id + '/seasons', {
         method: 'POST',
@@ -125,11 +125,11 @@ export function PlotListingPage() {
           const upload = await api<{ mediaId: string; uploadUrl: string; headers: Record<string, string> }>('/media/upload-url', {
             method: 'POST',
             body: {
-              owner_type: 'PLOT',
-              owner_id: plot.id,
-              content_type: photo.type,
-              size_bytes: photo.size,
-              file_name: photo.name,
+              ownerType: 'PLOT',
+              ownerId: plot.id,
+              contentType: photo.type,
+              sizeBytes: photo.size,
+              fileName: photo.name,
             },
           })
           const uploaded = await fetch(upload.uploadUrl, {
