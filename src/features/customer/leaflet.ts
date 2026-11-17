@@ -18,9 +18,9 @@ export interface LeafletLib {
   tileLayer(url: string, options: Record<string, unknown>): LeafletLayer
   geoJSON(
     data: unknown,
-    options: {
-      style: (feature?: { id?: string }) => Record<string, unknown>
-      onEachFeature: (feature: { id?: string }, layer: { on(events: Record<string, () => void>): void }) => void
+    options?: {
+      style?: (feature?: { id?: string }) => Record<string, unknown>
+      onEachFeature?: (feature: { id?: string }, layer: { on(events: Record<string, () => void>): void }) => void
     },
   ): LeafletLayer
 }

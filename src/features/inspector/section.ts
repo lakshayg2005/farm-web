@@ -1,4 +1,6 @@
+import { createElement } from 'react'
 import type { Section } from '@/routes/types'
+import { InspectionsPage } from './InspectionsPage'
 
 export const inspectorSection: Section = {
   role: 'inspector',
@@ -15,6 +17,7 @@ export const inspectorSection: Section = {
         title: 'Nothing to inspect',
         body: 'Packed orders and ready harvests are added here when they need a grade.',
       },
+      element: createElement(InspectionsPage),
     },
   ],
 }

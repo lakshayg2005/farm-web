@@ -1,4 +1,8 @@
+import { createElement } from 'react'
 import type { Section } from '@/routes/types'
+import { DashboardPage } from './DashboardPage'
+import { PoolingPage } from './PoolingPage'
+import { VerificationPage } from './VerificationPage'
 
 export const adminSection: Section = {
   role: 'admin',
@@ -15,6 +19,7 @@ export const adminSection: Section = {
         title: 'No activity yet',
         body: 'Orders, reservations and sign-ups are counted here as they come in.',
       },
+      element: createElement(DashboardPage),
     },
     {
       path: 'verification',
@@ -25,6 +30,7 @@ export const adminSection: Section = {
         title: 'No farmers waiting',
         body: 'New farmer sign-ups appear here for you to check and verify.',
       },
+      element: createElement(VerificationPage),
     },
     {
       path: 'pooling',
@@ -35,6 +41,7 @@ export const adminSection: Section = {
         title: 'No pools yet',
         body: 'Pick a delivery date and run pooling to group orders into shared routes.',
       },
+      element: createElement(PoolingPage),
     },
   ],
 }
