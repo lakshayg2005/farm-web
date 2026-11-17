@@ -81,6 +81,11 @@ export function HomePage() {
           </ul>
         </nav>
       </div>
+      <p className="mt-12 text-center text-ink-soft">
+        <Link to="/team" className="font-semibold text-indigo underline">
+          Meet the team
+        </Link>
+      </p>
     </div>
   )
 }
