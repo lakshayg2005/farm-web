@@ -1,5 +1,6 @@
 import { createElement } from 'react'
 import type { Section } from '@/routes/types'
+import { ListingsPage } from './ListingsPage'
 import { PlotListingPage } from './PlotListingPage'
 
 export const farmerSection: Section = {
@@ -17,6 +18,7 @@ export const farmerSection: Section = {
         title: 'No listings yet',
         body: 'Add your first produce listing with a photo, price and how much you have in stock.',
       },
+      element: createElement(ListingsPage),
     },
     {
       path: 'orders',

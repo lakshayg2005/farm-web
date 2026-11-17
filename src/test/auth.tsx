@@ -18,13 +18,23 @@ export function jsonResponse(body: unknown, status = 200) {
   return new Response(status === 204 ? null : JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
 }
 
+/** JSON bodies are parsed; anything else (a photo upload's File) is passed through as is. */
+function parseBody(body: BodyInit | null | undefined): unknown {
+  if (typeof body !== 'string') return body ?? undefined
+  try {
+    return JSON.parse(body)
+  } catch {
+    return body
+  }
+}
+
 /** Replaces fetch with a handler keyed by "METHOD /path" (the part after the API base URL). */
 export function mockApi(handlers: Record<string, (body: unknown) => Response | Promise<Response>>) {
   const calls: { key: string; body: unknown; auth: string | null }[] = []
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const path = new URL(String(input), 'http://x').pathname.replace(/^\/api\/v1/, '')
     const key = `${init?.method ?? 'GET'} ${path}`
-    const body = init?.body ? JSON.parse(String(init.body)) : undefined
+    const body = parseBody(init?.body)
     calls.push({ key, body, auth: new Headers(init?.headers).get('Authorization') })
     const handler = handlers[key]
     if (!handler) return jsonResponse({ error: { code: 'not_found', message: `unmocked ${key}` } }, 404)
