@@ -1,4 +1,7 @@
+import { createElement } from 'react'
 import type { Section } from '@/routes/types'
+import { PlotSearchPage } from './PlotSearchPage'
+import { ReservationsPage } from './ReservationsPage'
 
 export const customerSection: Section = {
   role: 'customer',
@@ -15,6 +18,7 @@ export const customerSection: Section = {
         title: 'Search for plots',
         body: 'Move the map to your area to see plots that are open for the coming season.',
       },
+      element: createElement(PlotSearchPage),
     },
     {
       path: 'reservations',
@@ -25,6 +29,7 @@ export const customerSection: Section = {
         title: 'No reservations yet',
         body: 'Reserve a plot to follow its crop here and choose home delivery or buy-back at harvest.',
       },
+      element: createElement(ReservationsPage),
     },
   ],
 }
