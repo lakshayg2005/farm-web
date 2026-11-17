@@ -11,6 +11,45 @@ type SeasonInput = {
   allowedCrops: string[]
 }
 
+export function plotCreatePayload(
+  title: string,
+  soilType: string,
+  waterSource: string,
+  boundary: Polygon,
+) {
+  return {
+    title: title.trim(),
+    soilType: soilType.trim() || null,
+    waterSource: waterSource.trim() || null,
+    boundary,
+  }
+}
+
+export function seasonCreatePayload(
+  season: string,
+  startDate: string,
+  endDate: string,
+  price: string,
+  crops: string,
+): SeasonInput {
+  return {
+    season: season.trim(),
+    startDate,
+    endDate,
+    price: Number(price),
+    allowedCrops: crops.split(',').map((crop) => crop.trim()).filter(Boolean),
+  }
+}
+
+export function mediaUploadPayload(
+  plotId: string,
+  contentType: string,
+  sizeBytes: number,
+  fileName: string,
+) {
+  return { ownerType: 'PLOT', ownerId: plotId, contentType, sizeBytes, fileName }
+}
+
 function errorMessage(error: unknown) {
   if (error instanceof ApiError) {
     const details = error.details as { plotId?: string } | undefined
@@ -97,20 +136,9 @@ export function PlotListingPage() {
     try {
       const plot = await api<PlotCreated>('/land/plots', {
         method: 'POST',
-        body: {
-          title: title.trim(),
-          soilType: soilType.trim() || null,
-          waterSource: waterSource.trim() || null,
-          boundary,
-        },
+        body: plotCreatePayload(title, soilType, waterSource, boundary),
       })
-      const seasonBody: SeasonInput = {
-        season: season.trim(),
-        startDate,
-        endDate,
-        price: Number(price),
-        allowedCrops: crops.split(',').map((crop) => crop.trim()).filter(Boolean),
-      }
+      const seasonBody = seasonCreatePayload(season, startDate, endDate, price, crops)
       await api('/land/plots/' + plot.id + '/seasons', {
         method: 'POST',
         body: seasonBody,
@@ -124,13 +152,7 @@ export function PlotListingPage() {
           }
           const upload = await api<{ mediaId: string; uploadUrl: string; headers: Record<string, string> }>('/media/upload-url', {
             method: 'POST',
-            body: {
-              ownerType: 'PLOT',
-              ownerId: plot.id,
-              contentType: photo.type,
-              sizeBytes: photo.size,
-              fileName: photo.name,
-            },
+            body: mediaUploadPayload(plot.id, photo.type, photo.size, photo.name),
           })
           const uploaded = await fetch(upload.uploadUrl, {
             method: 'PUT',
