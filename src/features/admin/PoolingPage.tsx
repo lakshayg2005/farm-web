@@ -1,8 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { ApiError } from '@/api/http'
-import { adminApi, tomorrowISO, totalSavedKm } from './admin'
+import { adminApi, orderedStops, POOL_STATUS, poolSummary, tomorrowISO, type Pool } from './admin'
 import { PoolMap } from './PoolMap'
+
+/** The gateway answers 404 for a route the logistics service does not have yet, 502/503 when it is down. */
+const isUnavailable = (e: unknown) => e instanceof ApiError && [404, 501, 502, 503].includes(e.status)
+const time = (iso: string | null) =>
+  iso ? new Date(iso).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : null
 
 export function PoolingPage() {
   const queryClient = useQueryClient()
@@ -11,12 +16,17 @@ export function PoolingPage() {
   const pools = useQuery({ queryKey: ['pools', date], queryFn: () => adminApi.pools(date), retry: false })
   const run = useMutation({
     mutationFn: () => adminApi.runPooling(date),
-    onSuccess: (data) => queryClient.setQueryData(['pools', date], data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['pools', date], data)
+      setSelected(data[0]?.id ?? null)
+    },
   })
 
   const list = pools.data ?? []
   const error = run.error ?? pools.error
-  const unavailable = error instanceof ApiError && (error.status === 404 || error.status === 501)
+  const summary = poolSummary(list)
+  const chosen = list.find((p) => p.id === selected) ?? null
+
   return (
     <div className="mt-8 space-y-6">
       <div className="flex flex-wrap items-end gap-3">
@@ -28,6 +38,7 @@ export function PoolingPage() {
             onChange={(e) => {
               setDate(e.target.value)
               setSelected(null)
+              run.reset()
             }}
             className="mt-1 rounded-lg border border-line bg-white px-3 py-2 font-normal"
           />
@@ -38,14 +49,17 @@ export function PoolingPage() {
           disabled={run.isPending || !date}
           className="rounded-lg bg-indigo px-4 py-2 font-semibold text-white disabled:opacity-60"
         >
-          {run.isPending ? 'Running…' : 'Run pooling'}
+          {run.isPending ? 'Running…' : list.length ? 'Run pooling again' : 'Run pooling'}
         </button>
+        <p className="basis-full text-sm text-ink-soft">
+          Groups orders due on this date whose drop points are within about 3 km into one route per vehicle.
+        </p>
       </div>
 
       {error && (
         <p role="alert" className="font-semibold text-red-700">
-          {unavailable
-            ? 'Pooling is not available yet: the logistics service is not running.'
+          {isUnavailable(error)
+            ? 'Pooling is not available yet: the logistics service is not running. Try again once it is deployed.'
             : error instanceof ApiError
               ? error.message
               : 'Could not reach the server. Try again.'}
@@ -56,34 +70,85 @@ export function PoolingPage() {
         <p className="text-ink-soft">Loading pools…</p>
       ) : (
         !error && (
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
-            <PoolMap pools={list} selectedId={selected} />
-            <div>
-              <p className="text-lg font-semibold" role="status">
-                {list.length === 0 ? 'No pools for this date yet.' : `${list.length} pools · ${totalSavedKm(list)} km saved`}
-              </p>
-              <ul className="mt-3 space-y-2">
-                {list.map((pool, i) => (
-                  <li key={pool.id}>
-                    <button
-                      type="button"
-                      onClick={() => setSelected(pool.id)}
-                      aria-pressed={selected === pool.id}
-                      className="w-full rounded-xl border border-line bg-white px-4 py-3 text-left hover:border-indigo aria-pressed:border-indigo"
-                    >
-                      <span className="font-semibold">Pool {i + 1}</span> · {pool.stops.length} stops
-                      <br />
-                      <span className="text-sm text-ink-soft">
-                        {pool.totalKm} km route · {pool.savedKm} km saved · {pool.status}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+          <>
+            <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4" aria-label="Pooling summary">
+              <Stat label="Pools" value={String(summary.pools)} />
+              <Stat label="Deliveries" value={String(summary.deliveries)} />
+              <Stat label="Route distance" value={`${summary.routeKm} km`} />
+              <Stat
+                label="Distance saved"
+                value={`${summary.savedKm} km`}
+                note={summary.pools ? `${summary.savedPct}% less than separate trips` : undefined}
+                strong
+              />
+            </dl>
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+              <PoolMap pools={list} selectedId={selected} />
+              <div>
+                {list.length === 0 ? (
+                  <p className="text-ink-soft">No pools for this date yet. Run pooling to group the day’s orders.</p>
+                ) : (
+                  <ul className="space-y-2" aria-label="Pools">
+                    {list.map((pool, i) => (
+                      <li key={pool.id}>
+                        <button
+                          type="button"
+                          onClick={() => setSelected(pool.id === selected ? null : pool.id)}
+                          aria-pressed={selected === pool.id}
+                          className="w-full rounded-xl border border-line bg-white px-4 py-3 text-left transition-colors duration-150 hover:border-indigo aria-pressed:border-indigo aria-pressed:bg-[color-mix(in_oklab,var(--role)_10%,white)]"
+                        >
+                          <span className="flex items-baseline justify-between gap-2">
+                            <span className="font-semibold">Pool {i + 1}</span>
+                            <span className="text-sm text-ink-soft">{POOL_STATUS[pool.status] ?? pool.status}</span>
+                          </span>
+                          <span className="block text-sm text-ink-soft">
+                            {pool.stops.filter((s) => s.kind === 'DROP').length} deliveries, {pool.totalKm} km route,{' '}
+                            <span className="font-semibold text-leaf">{pool.savedKm} km saved</span>
+                          </span>
+                        </button>
+                        {selected === pool.id && <StopList pool={pool} />}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {list.length > 0 && !chosen && <p className="mt-3 text-sm text-ink-soft">Choose a pool to see its stops in order.</p>}
+              </div>
             </div>
-          </div>
+          </>
         )
       )}
     </div>
+  )
+}
+
+function Stat({ label, value, note, strong }: { label: string; value: string; note?: string; strong?: boolean }) {
+  return (
+    <div className="rounded-xl border border-line bg-white px-4 py-3">
+      <dt className="text-sm text-ink-soft">{label}</dt>
+      <dd className={`font-display text-2xl ${strong ? 'text-leaf' : ''}`}>{value}</dd>
+      {note && <dd className="text-sm text-ink-soft">{note}</dd>}
+    </div>
+  )
+}
+
+function StopList({ pool }: { pool: Pool }) {
+  return (
+    <ol className="mt-2 mb-1 space-y-1 border-l-2 border-line pl-4 text-sm" aria-label="Stops in order">
+      {orderedStops(pool).map((stop) => (
+        <li key={`${stop.orderId}-${stop.kind}-${stop.sequence}`} className="flex items-baseline gap-2">
+          <span
+            aria-hidden="true"
+            className={`inline-block size-2.5 shrink-0 rounded-full ${stop.kind === 'PICKUP' ? 'bg-mustard' : 'bg-indigo'}`}
+          />
+          <span>
+            <span className="font-semibold">
+              {stop.sequence}. {stop.kind === 'PICKUP' ? 'Pick up' : 'Deliver'}
+            </span>{' '}
+            order {stop.orderId.slice(0, 8)}
+            {time(stop.eta) && <span className="text-ink-soft">, around {time(stop.eta)}</span>}
+          </span>
+        </li>
+      ))}
+    </ol>
   )
 }
