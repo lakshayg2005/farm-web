@@ -1,5 +1,6 @@
 import { createElement } from 'react'
 import type { Section } from '@/routes/types'
+import { CropsPage } from './CropsPage'
 import { ListingsPage } from './ListingsPage'
 import { PlotListingPage } from './PlotListingPage'
 import { RequestsPage } from './RequestsPage'
@@ -62,6 +63,7 @@ export const farmerSection: Section = {
         title: 'No crops growing',
         body: 'Once a reservation is accepted, post photos here as the crop grows and mark it ready to harvest.',
       },
+      element: createElement(CropsPage),
     },
   ],
 }

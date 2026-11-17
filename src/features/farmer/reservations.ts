@@ -1,5 +1,5 @@
 import { api } from '@/api/http'
-import type { Reservation } from '@/features/customer/land'
+import type { CropUpdate, Reservation } from '@/features/customer/land'
 
 export interface MyPlot {
   id: string
@@ -35,6 +35,35 @@ export const farmerLandApi = {
   seasons: (plotId: string) => api<Season[]>(`/land/plots/${plotId}/seasons`),
   accept: (id: string) => api<Reservation>(`/land/reservations/${id}/accept`, { method: 'POST' }),
   reject: (id: string) => api<Reservation>(`/land/reservations/${id}/reject`, { method: 'POST' }),
+  updates: (id: string) => api<CropUpdate[]>(`/land/reservations/${id}/updates`),
+  addUpdate: (id: string, body: CropUpdateInput) => api<CropUpdate>(`/land/reservations/${id}/updates`, { method: 'POST', body }),
+  harvestReady: (id: string) => api<Reservation>(`/land/reservations/${id}/harvest-ready`, { method: 'POST' }),
+}
+
+export type Stage = 'SOWN' | 'GROWING' | 'FLOWERING'
+
+export interface CropUpdateInput {
+  stage: Stage
+  note?: string
+  mediaIds: string[]
+  location?: { type: 'Point'; coordinates: [number, number] }
+}
+
+export const STAGES: { id: Stage; label: string }[] = [
+  { id: 'SOWN', label: 'Sown' },
+  { id: 'GROWING', label: 'Growing' },
+  { id: 'FLOWERING', label: 'Flowering' },
+]
+
+/** How far the crop has come: the latest stage posted, or harvest ready. */
+export function stageReached(status: string, updates: { stage: Stage }[]): number {
+  if (status === 'HARVEST_READY' || status === 'FULFILLING') return STAGES.length
+  return updates.reduce((max, u) => Math.max(max, STAGES.findIndex((s) => s.id === u.stage)), -1)
+}
+
+/** The stage a new update most likely reports: the latest one posted, or Sown for the first. */
+export function suggestedStage(updates: { stage: Stage }[]): Stage {
+  return updates.at(-1)?.stage ?? 'SOWN'
 }
 
 /** All the farmer's plot-seasons by id, so a reservation (which only has plotSeasonId) can be named. */
