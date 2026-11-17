@@ -1,0 +1,146 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "land service",
+    "version": "0.1.0",
+    "description": "Plots, growing seasons, reservations, crop updates and harvest lifecycle. JSON uses camelCase; geometry is GeoJSON in WGS84."
+  },
+  "servers": [{ "url": "/api/v1/land" }],
+  "components": {
+    "securitySchemes": { "BearerAuth": { "type": "http", "scheme": "bearer" } },
+    "schemas": {
+      "Point": {
+        "type": "object", "required": ["type", "coordinates"],
+        "properties": {
+          "type": { "const": "Point" },
+          "coordinates": { "type": "array", "minItems": 2, "maxItems": 2, "prefixItems": [
+            { "type": "number", "minimum": -180, "maximum": 180 },
+            { "type": "number", "minimum": -90, "maximum": 90 }
+          ]}
+        }
+      },
+      "Polygon": {
+        "type": "object", "required": ["type", "coordinates"],
+        "properties": {
+          "type": { "const": "Polygon" },
+          "coordinates": { "type": "array", "minItems": 1, "maxItems": 1, "items": {
+            "type": "array", "minItems": 4, "items": { "$ref": "#/components/schemas/Point/properties/coordinates" }
+          }}
+        }
+      },
+      "PlotCreate": {
+        "type": "object", "required": ["title", "boundary"],
+        "properties": {
+          "title": { "type": "string", "minLength": 2, "maxLength": 120 },
+          "description": { "type": ["string", "null"] },
+          "soilType": { "type": ["string", "null"], "maxLength": 60 },
+          "waterSource": { "type": ["string", "null"], "maxLength": 60 },
+          "boundary": { "$ref": "#/components/schemas/Polygon" }
+        }
+      },
+      "PlotUpdate": {
+        "type": "object",
+        "properties": {
+          "title": { "type": ["string", "null"], "minLength": 2, "maxLength": 120 },
+          "description": { "type": ["string", "null"] },
+          "soilType": { "type": ["string", "null"], "maxLength": 60 },
+          "waterSource": { "type": ["string", "null"], "maxLength": 60 },
+          "boundary": { "anyOf": [{ "$ref": "#/components/schemas/Polygon" }, { "type": "null" }] }
+        }
+      },
+      "SeasonCreate": {
+        "type": "object", "required": ["season", "startDate", "endDate", "price"],
+        "properties": {
+          "season": { "type": "string", "minLength": 2, "maxLength": 40 },
+          "startDate": { "type": "string", "format": "date" },
+          "endDate": { "type": "string", "format": "date" },
+          "price": { "type": "number", "exclusiveMinimum": 0 },
+          "allowedCrops": { "type": "array", "items": { "type": "string" }, "maxItems": 30 }
+        }
+      },
+      "ReservationCreate": {
+        "type": "object", "required": ["plotSeasonId", "cropId", "expectedQtyKg"],
+        "properties": {
+          "plotSeasonId": { "type": "string", "format": "uuid" },
+          "cropId": { "type": "string", "maxLength": 40 },
+          "expectedQtyKg": { "type": "number", "exclusiveMinimum": 0 }
+        }
+      },
+      "CropUpdateCreate": {
+        "type": "object", "required": ["stage"],
+        "properties": {
+          "stage": { "enum": ["SOWN", "GROWING", "FLOWERING"] },
+          "note": { "type": ["string", "null"] },
+          "mediaIds": { "type": "array", "items": { "type": "string", "format": "uuid" }, "maxItems": 10 },
+          "location": { "anyOf": [{ "$ref": "#/components/schemas/Point" }, { "type": "null" }] }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/plots": {
+      "post": {
+        "tags": ["plots"], "summary": "Create a plot from a GeoJSON polygon",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlotCreate" } } } },
+        "responses": { "201": { "description": "Created; response includes areaAcres, centroid and GeoJSON boundary" }, "409": { "description": "PLOT_OVERLAP" }, "422": { "description": "INVALID_PLOT_BOUNDARY" } }
+      }
+    },
+    "/plots/mine": {
+      "get": { "tags": ["plots"], "summary": "List the authenticated farmer's plots", "security": [{ "BearerAuth": [] }], "responses": { "200": { "description": "Plot array" } } }
+    },
+    "/plots/{plotId}": {
+      "get": { "tags": ["plots"], "summary": "Get a plot", "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "Plot" }, "404": { "description": "PLOT_NOT_FOUND" } } },
+      "patch": { "tags": ["plots"], "summary": "Update plot metadata or boundary", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlotUpdate" } } } }, "responses": { "200": { "description": "Updated plot" }, "409": { "description": "PLOT_OVERLAP" } } },
+      "delete": { "tags": ["plots"], "summary": "Soft-delete a plot with no live reservation", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "204": { "description": "Deleted" }, "409": { "description": "PLOT_HAS_LIVE_RESERVATION" } } }
+    },
+    "/plots/{plotId}/seasons": {
+      "post": { "tags": ["seasons"], "summary": "Add a growing season to a plot", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SeasonCreate" } } } }, "responses": { "201": { "description": "Created season" } } },
+      "get": { "tags": ["seasons"], "summary": "List a plot's seasons", "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "Season array" } } }
+    },
+    "/plots/{plotId}/seasons/{seasonId}": {
+      "patch": { "tags": ["seasons"], "summary": "Update a season with no live reservation", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "in": "path", "name": "seasonId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SeasonCreate" } } } }, "responses": { "200": { "description": "Updated season" }, "409": { "description": "SEASON_HAS_LIVE_RESERVATION" } } },
+      "delete": { "tags": ["seasons"], "summary": "Delete a season without reservation history", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "in": "path", "name": "seasonId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "204": { "description": "Deleted" }, "409": { "description": "SEASON_HAS_RESERVATION_HISTORY" } } }
+    },
+    "/plots/search": {
+      "get": { "tags": ["search"], "summary": "Search GeoJSON plots by bounding box or radius", "parameters": [
+        { "in": "query", "name": "lat", "schema": { "type": "number", "minimum": -90, "maximum": 90 } },
+        { "in": "query", "name": "lng", "schema": { "type": "number", "minimum": -180, "maximum": 180 } },
+        { "in": "query", "name": "radius_km", "schema": { "type": "number", "exclusiveMinimum": 0, "maximum": 200, "default": 20 } },
+        { "in": "query", "name": "west", "schema": { "type": "number" } },
+        { "in": "query", "name": "south", "schema": { "type": "number" } },
+        { "in": "query", "name": "east", "schema": { "type": "number" } },
+        { "in": "query", "name": "north", "schema": { "type": "number" } },
+        { "in": "query", "name": "season", "schema": { "type": "string" } },
+        { "in": "query", "name": "crop", "schema": { "type": "string" } }
+      ], "responses": { "200": { "description": "GeoJSON FeatureCollection; excludes booked plot-seasons" } } }
+    },
+    "/reservations": {
+      "post": { "tags": ["reservations"], "summary": "Reserve an available plot-season", "security": [{ "BearerAuth": [] }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReservationCreate" } } } }, "responses": { "201": { "description": "PENDING reservation; expires after 48 hours" }, "409": { "description": "PLOT_SEASON_ALREADY_RESERVED" } } }
+    },
+    "/reservations/mine": {
+      "get": { "tags": ["reservations"], "summary": "List the caller's reservations", "security": [{ "BearerAuth": [] }], "responses": { "200": { "description": "Reservation array" } } }
+    },
+    "/reservations/{reservationId}/accept": { "post": { "tags": ["reservations"], "summary": "Farmer accepts a pending reservation; publishes reservation.accepted", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "ACCEPTED reservation with deposit amount" } } } },
+    "/reservations/{reservationId}/reject": { "post": { "tags": ["reservations"], "summary": "Farmer rejects a pending reservation", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "REJECTED reservation" } } } },
+    "/reservations/{reservationId}/cancel": { "post": { "tags": ["reservations"], "summary": "Customer or farmer cancels a live reservation", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "CANCELLED reservation" } } } },
+    "/reservations/{reservationId}/updates": {
+      "get": {
+        "tags": ["crop updates"],
+        "summary": "Read the crop timeline for a reservation",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "Chronological crop update array including geotag and media IDs" } }
+      },
+      "post": {
+        "tags": ["crop updates"],
+        "summary": "Post a crop-stage update with photos and optional geotag",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CropUpdateCreate" } } } },
+        "responses": { "201": { "description": "Crop update created" } }
+      }
+    },
+    "/reservations/{reservationId}/harvest-ready": { "post": { "tags": ["harvest"], "summary": "Mark a crop harvest-ready and publish harvest.ready", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "HARVEST_READY reservation" } } } }
+  }
+}

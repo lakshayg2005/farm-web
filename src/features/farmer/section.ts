@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import type { Section } from '@/routes/types'
 import { CropsPage } from './CropsPage'
 import { ListingsPage } from './ListingsPage'
+import { OrdersPage } from './OrdersPage'
 import { PlotListingPage } from './PlotListingPage'
 import { RequestsPage } from './RequestsPage'
 
@@ -31,6 +32,7 @@ export const farmerSection: Section = {
         title: 'No orders yet',
         body: 'When a customer buys from your listings, the order shows here for you to accept and pack.',
       },
+      element: createElement(OrdersPage),
     },
     {
       path: 'plots',
