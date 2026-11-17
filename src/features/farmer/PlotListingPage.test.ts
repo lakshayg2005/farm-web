@@ -3,7 +3,7 @@ import {
   mediaUploadPayload,
   plotCreatePayload,
   seasonCreatePayload,
-} from './PlotListingPage'
+} from './plotPayloads'
 
 describe('plot listing API payloads', () => {
   const boundary = {
