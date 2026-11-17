@@ -1,0 +1,71 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "quality service",
+    "version": "0.1.0",
+    "description": "Inspector assignment and quality reports for packed orders and harvests. JSON uses camelCase."
+  },
+  "servers": [{ "url": "/api/v1/quality" }],
+  "components": {
+    "securitySchemes": { "BearerAuth": { "type": "http", "scheme": "bearer" } },
+    "schemas": {
+      "Point": {
+        "type": "object", "required": ["type", "coordinates"],
+        "properties": { "type": { "const": "Point" }, "coordinates": { "type": "array", "minItems": 2, "maxItems": 2, "prefixItems": [{ "type": "number", "minimum": -180, "maximum": 180 }, { "type": "number", "minimum": -90, "maximum": 90 }] } }
+      },
+      "InspectorLocationIn": {
+        "type": "object", "required": ["location"],
+        "properties": { "location": { "$ref": "#/components/schemas/Point" }, "available": { "type": "boolean", "default": true } }
+      },
+      "InspectionReport": {
+        "type": "object", "required": ["grade", "moisturePct", "pestFound", "weightKg", "result"],
+        "properties": {
+          "grade": { "enum": ["A", "B", "C"] },
+          "moisturePct": { "type": "number", "minimum": 0, "maximum": 100 },
+          "pestFound": { "type": "boolean" },
+          "weightKg": { "type": "number", "exclusiveMinimum": 0 },
+          "result": { "enum": ["PASS", "FAIL"] },
+          "resolution": { "enum": ["REHARVEST", "ACCEPT_LOWER_GRADE", null] },
+          "acceptedGrade": { "enum": ["A", "B", "C", null] },
+          "mediaIds": { "type": "array", "items": { "type": "string", "format": "uuid" }, "maxItems": 10 },
+          "location": { "anyOf": [{ "$ref": "#/components/schemas/Point" }, { "type": "null" }] },
+          "note": { "type": ["string", "null"], "maxLength": 2000 }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/inspectors/me/location": {
+      "put": {
+        "tags": ["inspectors"], "summary": "Set the inspector's current location and availability",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InspectorLocationIn" } } } },
+        "responses": { "200": { "description": "Inspector location saved" } }
+      }
+    },
+    "/inspections": {
+      "get": {
+        "tags": ["inspections"], "summary": "List assigned and unassigned inspections",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Inspection queue; inspector sees own and unassigned inspections, admin sees all" } }
+      }
+    },
+    "/inspections/{inspectionId}/claim": {
+      "post": {
+        "tags": ["inspections"], "summary": "Claim an unassigned inspection",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "inspectionId", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "Assigned inspection" }, "409": { "description": "INSPECTION_NOT_PENDING or INSPECTION_ASSIGNED" } }
+      }
+    },
+    "/inspections/{inspectionId}/report": {
+      "post": {
+        "tags": ["inspections"], "summary": "Submit grade, moisture, pest, weight and photo report; publishes quality.graded",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [{ "in": "path", "name": "inspectionId", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InspectionReport" } } } },
+        "responses": { "200": { "description": "Reported inspection" }, "409": { "description": "INSPECTION_ALREADY_REPORTED" } }
+      }
+    }
+  }
+}

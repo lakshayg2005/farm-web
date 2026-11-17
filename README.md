@@ -45,8 +45,23 @@ pnpm dev                  # http://localhost:5173
 | `pnpm typecheck` | TypeScript, no emit |
 | `pnpm test` | Vitest (jsdom + Testing Library) |
 | `pnpm build` | Type-check and production build into `dist/` |
+| `pnpm gen:api [ref]` | Download the backend's OpenAPI specs into `contracts/` and generate types in `src/api/generated/` |
+| `pnpm mock` | Prism mock of every service behind one gateway on `localhost:4000` |
 
 CI runs lint, type-check, tests and build on every pull request. Vercel builds a preview of every pull request from `vercel.json`.
+
+### API types and the mock server
+
+The backend publishes one OpenAPI spec per service (`farm-backend/contracts/openapi`). `pnpm gen:api` copies them from the `main` branch (or a tag: `pnpm gen:api v0.2.0`; or a local checkout: `pnpm gen:api --local ../farm-backend/contracts/openapi`) and writes types to `src/api/generated/`. Import them with `import type { OrderComponents } from '@/api/generated'`. Commit the result, and re-run it when a contract changes.
+
+To build a screen before its service exists, run `pnpm mock` and point the website at it:
+
+```bash
+pnpm mock                                                  # terminal 1
+VITE_API_BASE_URL=http://localhost:4000/api/v1 pnpm dev    # terminal 2
+```
+
+The mock returns the examples in each spec, so data is placeholder text and numbers. Set `MOCK_PORT` to use another port.
 
 ### Sections and pages
 

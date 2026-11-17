@@ -1,0 +1,2330 @@
+{
+  "components": {
+    "schemas": {
+      "CropOut": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "defaultUnit": {
+            "$ref": "#/components/schemas/Unit"
+          },
+          "id": {
+            "description": "Stable slug, e.g. 'tomato'; also used by the land service",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "category",
+          "defaultUnit"
+        ],
+        "title": "CropOut",
+        "type": "object"
+      },
+      "FarmIn": {
+        "properties": {
+          "boundary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "description": "GeoJSON Polygon or MultiPolygon ([lng, lat] rings); stored as a MultiPolygon",
+                "examples": [
+                  {
+                    "coordinates": [
+                      [
+                        [
+                          81.28,
+                          21.19
+                        ],
+                        [
+                          81.29,
+                          21.19
+                        ],
+                        [
+                          81.29,
+                          21.2
+                        ],
+                        [
+                          81.28,
+                          21.2
+                        ],
+                        [
+                          81.28,
+                          21.19
+                        ]
+                      ]
+                    ],
+                    "type": "Polygon"
+                  }
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary"
+          },
+          "district": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "District",
+            "type": "string"
+          },
+          "location": {
+            "$ref": "#/components/schemas/GeoPoint",
+            "description": "Farm gate / main pickup point"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "village": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Village"
+          }
+        },
+        "required": [
+          "name",
+          "district",
+          "location"
+        ],
+        "title": "FarmIn",
+        "type": "object"
+      },
+      "FarmOut": {
+        "properties": {
+          "boundary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "GeoJSON MultiPolygon, if drawn",
+            "title": "Boundary"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "district": {
+            "title": "District",
+            "type": "string"
+          },
+          "farmerId": {
+            "format": "uuid",
+            "title": "Farmerid",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "location": {
+            "$ref": "#/components/schemas/GeoPoint"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "title": "Updatedat",
+            "type": "string"
+          },
+          "village": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Village"
+          }
+        },
+        "required": [
+          "id",
+          "farmerId",
+          "name",
+          "village",
+          "district",
+          "state",
+          "location",
+          "boundary",
+          "createdAt",
+          "updatedAt"
+        ],
+        "title": "FarmOut",
+        "type": "object"
+      },
+      "FarmPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FarmOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "title": "FarmPage",
+        "type": "object"
+      },
+      "FarmUpdate": {
+        "properties": {
+          "boundary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "description": "GeoJSON Polygon or MultiPolygon ([lng, lat] rings); stored as a MultiPolygon",
+                "examples": [
+                  {
+                    "coordinates": [
+                      [
+                        [
+                          81.28,
+                          21.19
+                        ],
+                        [
+                          81.29,
+                          21.19
+                        ],
+                        [
+                          81.29,
+                          21.2
+                        ],
+                        [
+                          81.28,
+                          21.2
+                        ],
+                        [
+                          81.28,
+                          21.19
+                        ]
+                      ]
+                    ],
+                    "type": "Polygon"
+                  }
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary"
+          },
+          "district": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GeoPoint"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "village": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Village"
+          }
+        },
+        "title": "FarmUpdate",
+        "type": "object"
+      },
+      "GeoPoint": {
+        "description": "A GeoJSON Point: `{\"type\": \"Point\", \"coordinates\": [lng, lat]}`.",
+        "properties": {
+          "coordinates": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "maximum": 180.0,
+                "minimum": -180.0,
+                "type": "number"
+              },
+              {
+                "maximum": 90.0,
+                "minimum": -90.0,
+                "type": "number"
+              }
+            ],
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "type": {
+            "const": "Point",
+            "default": "Point",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "coordinates"
+        ],
+        "title": "GeoPoint",
+        "type": "object"
+      },
+      "GeoRef": {
+        "description": "Where something is on the ground: a point and, if known, its boundary (internal use).",
+        "properties": {
+          "boundary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary"
+          },
+          "point": {
+            "$ref": "#/components/schemas/GeoPoint"
+          }
+        },
+        "required": [
+          "point"
+        ],
+        "title": "GeoRef",
+        "type": "object"
+      },
+      "Grade": {
+        "description": "Set by the quality service (quality.graded); A is best.",
+        "enum": [
+          "A",
+          "B",
+          "C"
+        ],
+        "title": "Grade",
+        "type": "string"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "ListingFeature": {
+        "description": "One search hit as a GeoJSON Feature: the pickup point is the geometry (HLD section 13).",
+        "properties": {
+          "geometry": {
+            "$ref": "#/components/schemas/GeoPoint",
+            "description": "Pickup location"
+          },
+          "id": {
+            "description": "Listing id",
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/ListingSearchProperties"
+          },
+          "type": {
+            "const": "Feature",
+            "default": "Feature",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "geometry",
+          "properties"
+        ],
+        "title": "ListingFeature",
+        "type": "object"
+      },
+      "ListingFeatureCollection": {
+        "description": "GeoJSON FeatureCollection, drawable as-is by Leaflet and react-native-maps.\n\n`nextCursor` is an extra (foreign) member for cursor pagination.",
+        "properties": {
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/ListingFeature"
+            },
+            "title": "Features",
+            "type": "array"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          },
+          "type": {
+            "const": "FeatureCollection",
+            "default": "FeatureCollection",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "features",
+          "nextCursor"
+        ],
+        "title": "ListingFeatureCollection",
+        "type": "object"
+      },
+      "ListingIn": {
+        "properties": {
+          "cropId": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Cropid",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "farmId": {
+            "format": "uuid",
+            "title": "Farmid",
+            "type": "string"
+          },
+          "harvestDate": {
+            "format": "date",
+            "title": "Harvestdate",
+            "type": "string"
+          },
+          "isOrganic": {
+            "default": false,
+            "title": "Isorganic",
+            "type": "boolean"
+          },
+          "mediaIds": {
+            "description": "Photos uploaded through media",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Mediaids",
+            "type": "array"
+          },
+          "pickupLocation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GeoPoint"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Defaults to the farm's location"
+          },
+          "pricePerUnit": {
+            "description": "Rupees per unit",
+            "exclusiveMinimum": 0.0,
+            "maximum": 1000000.0,
+            "title": "Priceperunit",
+            "type": "number"
+          },
+          "qtyAvailable": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1000000.0,
+            "title": "Qtyavailable",
+            "type": "number"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/Unit",
+            "default": "kg"
+          },
+          "variety": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variety"
+          }
+        },
+        "required": [
+          "farmId",
+          "cropId",
+          "qtyAvailable",
+          "pricePerUnit",
+          "harvestDate"
+        ],
+        "title": "ListingIn",
+        "type": "object"
+      },
+      "ListingOut": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "cropId": {
+            "title": "Cropid",
+            "type": "string"
+          },
+          "cropName": {
+            "title": "Cropname",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "district": {
+            "title": "District",
+            "type": "string"
+          },
+          "farmId": {
+            "format": "uuid",
+            "title": "Farmid",
+            "type": "string"
+          },
+          "farmName": {
+            "title": "Farmname",
+            "type": "string"
+          },
+          "farmerId": {
+            "format": "uuid",
+            "title": "Farmerid",
+            "type": "string"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Grade"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null until the quality service grades a batch"
+          },
+          "harvestDate": {
+            "format": "date",
+            "title": "Harvestdate",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "isOrganic": {
+            "title": "Isorganic",
+            "type": "boolean"
+          },
+          "mediaIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Mediaids",
+            "type": "array"
+          },
+          "pickupLocation": {
+            "$ref": "#/components/schemas/GeoPoint"
+          },
+          "pricePerUnit": {
+            "title": "Priceperunit",
+            "type": "number"
+          },
+          "qtyAvailable": {
+            "title": "Qtyavailable",
+            "type": "number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ListingStatus"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/Unit"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "title": "Updatedat",
+            "type": "string"
+          },
+          "variety": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variety"
+          },
+          "village": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Village"
+          }
+        },
+        "required": [
+          "id",
+          "farmId",
+          "farmerId",
+          "farmName",
+          "district",
+          "village",
+          "cropId",
+          "cropName",
+          "variety",
+          "description",
+          "qtyAvailable",
+          "unit",
+          "pricePerUnit",
+          "harvestDate",
+          "grade",
+          "isOrganic",
+          "status",
+          "mediaIds",
+          "createdAt",
+          "updatedAt",
+          "pickupLocation"
+        ],
+        "title": "ListingOut",
+        "type": "object"
+      },
+      "ListingPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ListingOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "title": "ListingPage",
+        "type": "object"
+      },
+      "ListingSearchProperties": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "cropId": {
+            "title": "Cropid",
+            "type": "string"
+          },
+          "cropName": {
+            "title": "Cropname",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "distanceM": {
+            "description": "Distance from the search point, in metres",
+            "title": "Distancem",
+            "type": "number"
+          },
+          "district": {
+            "title": "District",
+            "type": "string"
+          },
+          "farmId": {
+            "format": "uuid",
+            "title": "Farmid",
+            "type": "string"
+          },
+          "farmName": {
+            "title": "Farmname",
+            "type": "string"
+          },
+          "farmerId": {
+            "format": "uuid",
+            "title": "Farmerid",
+            "type": "string"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Grade"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null until the quality service grades a batch"
+          },
+          "harvestDate": {
+            "format": "date",
+            "title": "Harvestdate",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "isOrganic": {
+            "title": "Isorganic",
+            "type": "boolean"
+          },
+          "mediaIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Mediaids",
+            "type": "array"
+          },
+          "pricePerUnit": {
+            "title": "Priceperunit",
+            "type": "number"
+          },
+          "qtyAvailable": {
+            "title": "Qtyavailable",
+            "type": "number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ListingStatus"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/Unit"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "title": "Updatedat",
+            "type": "string"
+          },
+          "variety": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variety"
+          },
+          "village": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Village"
+          }
+        },
+        "required": [
+          "id",
+          "farmId",
+          "farmerId",
+          "farmName",
+          "district",
+          "village",
+          "cropId",
+          "cropName",
+          "variety",
+          "description",
+          "qtyAvailable",
+          "unit",
+          "pricePerUnit",
+          "harvestDate",
+          "grade",
+          "isOrganic",
+          "status",
+          "mediaIds",
+          "createdAt",
+          "updatedAt",
+          "distanceM"
+        ],
+        "title": "ListingSearchProperties",
+        "type": "object"
+      },
+      "ListingStatus": {
+        "enum": [
+          "ACTIVE",
+          "PAUSED",
+          "SOLD_OUT",
+          "ARCHIVED"
+        ],
+        "title": "ListingStatus",
+        "type": "string"
+      },
+      "ListingUpdate": {
+        "description": "Send only the fields to change. `qtyAvailable` sets the stock to this value.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "harvestDate": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Harvestdate"
+          },
+          "isOrganic": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Isorganic"
+          },
+          "mediaIds": {
+            "anyOf": [
+              {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mediaids"
+          },
+          "pickupLocation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GeoPoint"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pricePerUnit": {
+            "anyOf": [
+              {
+                "description": "Rupees per unit",
+                "exclusiveMinimum": 0.0,
+                "maximum": 1000000.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priceperunit"
+          },
+          "qtyAvailable": {
+            "anyOf": [
+              {
+                "maximum": 1000000.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qtyavailable"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ACTIVE",
+                  "PAUSED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pause or resume the listing",
+            "title": "Status"
+          },
+          "variety": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variety"
+          }
+        },
+        "title": "ListingUpdate",
+        "type": "object"
+      },
+      "ReleasedItem": {
+        "properties": {
+          "listingId": {
+            "format": "uuid",
+            "title": "Listingid",
+            "type": "string"
+          },
+          "qty": {
+            "title": "Qty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "listingId",
+          "qty"
+        ],
+        "title": "ReleasedItem",
+        "type": "object"
+      },
+      "ReservedItem": {
+        "description": "Everything order needs to write an order_item without another call.",
+        "properties": {
+          "cropId": {
+            "title": "Cropid",
+            "type": "string"
+          },
+          "cropName": {
+            "title": "Cropname",
+            "type": "string"
+          },
+          "farmId": {
+            "format": "uuid",
+            "title": "Farmid",
+            "type": "string"
+          },
+          "farmerId": {
+            "format": "uuid",
+            "title": "Farmerid",
+            "type": "string"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Grade"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "listingId": {
+            "format": "uuid",
+            "title": "Listingid",
+            "type": "string"
+          },
+          "pickupLocation": {
+            "$ref": "#/components/schemas/GeoPoint"
+          },
+          "qty": {
+            "title": "Qty",
+            "type": "number"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/Unit"
+          },
+          "unitPrice": {
+            "title": "Unitprice",
+            "type": "number"
+          },
+          "variety": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variety"
+          }
+        },
+        "required": [
+          "listingId",
+          "farmId",
+          "farmerId",
+          "cropId",
+          "cropName",
+          "variety",
+          "unit",
+          "qty",
+          "unitPrice",
+          "grade",
+          "pickupLocation"
+        ],
+        "title": "ReservedItem",
+        "type": "object"
+      },
+      "SearchSort": {
+        "enum": [
+          "distance",
+          "price",
+          "newest"
+        ],
+        "title": "SearchSort",
+        "type": "string"
+      },
+      "StockItemIn": {
+        "properties": {
+          "listingId": {
+            "format": "uuid",
+            "title": "Listingid",
+            "type": "string"
+          },
+          "qty": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1000000.0,
+            "title": "Qty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "listingId",
+          "qty"
+        ],
+        "title": "StockItemIn",
+        "type": "object"
+      },
+      "StockReleaseIn": {
+        "properties": {
+          "orderId": {
+            "format": "uuid",
+            "title": "Orderid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "orderId"
+        ],
+        "title": "StockReleaseIn",
+        "type": "object"
+      },
+      "StockReleaseOut": {
+        "properties": {
+          "items": {
+            "description": "Empty if nothing was reserved or already released",
+            "items": {
+              "$ref": "#/components/schemas/ReleasedItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "orderId": {
+            "format": "uuid",
+            "title": "Orderid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "orderId",
+          "items"
+        ],
+        "title": "StockReleaseOut",
+        "type": "object"
+      },
+      "StockReserveIn": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StockItemIn"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Items",
+            "type": "array"
+          },
+          "orderId": {
+            "format": "uuid",
+            "title": "Orderid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "orderId",
+          "items"
+        ],
+        "title": "StockReserveIn",
+        "type": "object"
+      },
+      "StockReserveOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReservedItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "orderId": {
+            "format": "uuid",
+            "title": "Orderid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "orderId",
+          "items"
+        ],
+        "title": "StockReserveOut",
+        "type": "object"
+      },
+      "Unit": {
+        "enum": [
+          "kg",
+          "quintal",
+          "dozen",
+          "piece",
+          "bunch",
+          "litre"
+        ],
+        "title": "Unit",
+        "type": "string"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "catalog service",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/crops": {
+      "get": {
+        "description": "The crop reference list for listing forms and search filters.",
+        "operationId": "list_crops_crops_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CropOut"
+                  },
+                  "title": "Response List Crops Crops Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Crops",
+        "tags": [
+          "crops"
+        ]
+      }
+    },
+    "/farms": {
+      "post": {
+        "operationId": "create_farm_farms_post",
+        "parameters": [
+          {
+            "description": "Optional. Repeating a request with the same key returns the first response; the same key with a different body gives 409 IDEMPOTENCY_KEY_REUSED.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "minLength": 8,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional. Repeating a request with the same key returns the first response; the same key with a different body gives 409 IDEMPOTENCY_KEY_REUSED.",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FarmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Farm",
+        "tags": [
+          "farms"
+        ]
+      }
+    },
+    "/farms/mine": {
+      "get": {
+        "description": "The calling farmer's farms, newest first.",
+        "operationId": "my_farms_farms_mine_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "My Farms",
+        "tags": [
+          "farms"
+        ]
+      }
+    },
+    "/farms/{farm_id}": {
+      "get": {
+        "operationId": "get_farm_farms__farm_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "farm_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Farm Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Farm",
+        "tags": [
+          "farms"
+        ]
+      },
+      "patch": {
+        "description": "Owner (or admin) only. Changing the location does not move existing listings.",
+        "operationId": "update_farm_farms__farm_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "farm_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Farm Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FarmUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Farm",
+        "tags": [
+          "farms"
+        ]
+      }
+    },
+    "/farms/{farm_id}/listings": {
+      "get": {
+        "description": "A farm's ACTIVE listings (a farm's public page).",
+        "operationId": "farm_listings_farms__farm_id__listings_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "farm_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Farm Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListingPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Farm Listings",
+        "tags": [
+          "listings"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/internal/geo/{kind}/{ref_id}": {
+      "get": {
+        "description": "Where a farm or listing is, so media can check a photo was taken there (within 2 km).",
+        "operationId": "geo_reference_internal_geo__kind___ref_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "farm",
+                "listing"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "ref_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Ref Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoRef"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Geo Reference",
+        "tags": [
+          "internal"
+        ]
+      }
+    },
+    "/internal/stock/release": {
+      "post": {
+        "description": "Give back everything still reserved for an order (saga compensation). Idempotent.\n\nCatalog also does this by itself when it receives `order.cancelled`.",
+        "operationId": "release_stock_internal_stock_release_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StockReleaseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockReleaseOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Release Stock",
+        "tags": [
+          "internal"
+        ]
+      }
+    },
+    "/internal/stock/reserve": {
+      "post": {
+        "description": "Reserve stock for an order, all items or none (called by order at checkout).\n\nIdempotent per `orderId`: repeating the call returns the same reservation. Errors:\n409 STOCK_UNAVAILABLE (`details` lists each short item), 404 LISTING_NOT_FOUND,\n409 LISTING_NOT_AVAILABLE (paused or archived), 409 ORDER_RELEASED (already released).",
+        "operationId": "reserve_stock_internal_stock_reserve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StockReserveIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockReserveOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reserve Stock",
+        "tags": [
+          "internal"
+        ]
+      }
+    },
+    "/listings": {
+      "post": {
+        "description": "Publish produce on one of your farms. Publishes `listing.published`.\n\nErrors: 404 FARM_NOT_FOUND, 403 NOT_FARM_OWNER, 422 UNKNOWN_CROP,\n409 IDEMPOTENCY_KEY_REUSED.",
+        "operationId": "create_listing_listings_post",
+        "parameters": [
+          {
+            "description": "Optional. Repeating a request with the same key returns the first response; the same key with a different body gives 409 IDEMPOTENCY_KEY_REUSED.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "minLength": 8,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional. Repeating a request with the same key returns the first response; the same key with a different body gives 409 IDEMPOTENCY_KEY_REUSED.",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListingIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Listing",
+        "tags": [
+          "listings"
+        ]
+      }
+    },
+    "/listings/mine": {
+      "get": {
+        "description": "The calling farmer's listings in every status (ARCHIVED only if asked for), newest first.",
+        "operationId": "my_listings_listings_mine_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ListingStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "farm_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Farm Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListingPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "My Listings",
+        "tags": [
+          "listings"
+        ]
+      }
+    },
+    "/listings/search": {
+      "get": {
+        "description": "Produce near a point (V1), as a GeoJSON FeatureCollection (HLD sections 13 and 15).\n\nEach feature's geometry is the pickup point and its properties are the listing plus\n`distanceM` (metres). Only ACTIVE listings with stock.",
+        "operationId": "search_listings_listings_search_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lat",
+            "required": true,
+            "schema": {
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Lat",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lng",
+            "required": true,
+            "schema": {
+              "maximum": 180,
+              "minimum": -180,
+              "title": "Lng",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "radius_km",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "exclusiveMinimum": 0,
+              "maximum": 100,
+              "title": "Radius Km",
+              "type": "number"
+            }
+          },
+          {
+            "description": "Crop id, e.g. 'tomato'",
+            "in": "query",
+            "name": "crop",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Crop id, e.g. 'tomato'",
+              "title": "Crop"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_price",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Price"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_price",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Max Price"
+            }
+          },
+          {
+            "description": "Minimum grade: B returns A and B (ungraded listings excluded)",
+            "in": "query",
+            "name": "grade",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Grade"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Minimum grade: B returns A and B (ungraded listings excluded)",
+              "title": "Grade"
+            }
+          },
+          {
+            "in": "query",
+            "name": "organic",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Organic"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SearchSort",
+              "default": "distance"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListingFeatureCollection"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Listings",
+        "tags": [
+          "listings"
+        ]
+      }
+    },
+    "/listings/{listing_id}": {
+      "delete": {
+        "description": "Archive the listing (kept for order history). Owner (or admin) only.",
+        "operationId": "delete_listing_listings__listing_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "listing_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Listing Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Listing",
+        "tags": [
+          "listings"
+        ]
+      },
+      "get": {
+        "operationId": "get_listing_listings__listing_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "listing_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Listing Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Listing",
+        "tags": [
+          "listings"
+        ]
+      },
+      "patch": {
+        "description": "Edit price or stock, pause or resume. Owner (or admin) only. Publishes `listing.updated`.\n\n`qtyAvailable` sets the stock; the row is locked so it can't race a checkout.",
+        "operationId": "update_listing_listings__listing_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "listing_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Listing Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListingUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Listing",
+        "tags": [
+          "listings"
+        ]
+      }
+    }
+  }
+}
