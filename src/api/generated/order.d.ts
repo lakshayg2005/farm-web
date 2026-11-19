@@ -21,6 +21,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/internal/orders/ready-for-dispatch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Orders logistics can pool (called by the logistics pooling job)
+         * @description Orders in READY_FOR_DISPATCH whose delivery date is `date` or earlier.
+         *
+         *     The shape is what the logistics pooling job reads (snake_case keys, not the public camelCase):
+         *     `order_id`, `hub_lat`/`hub_lng` (where the farm hands the produce over), `drop_lat`/`drop_lng`
+         *     (the customer's address), `weight_kg` and `address`. Once logistics publishes `pool.assigned`
+         *     the order moves to POOLED and no longer shows up here.
+         *     TODO(M1): `weight_kg` adds up the quantities of all items whatever their unit.
+         */
+        get: operations["ready_for_dispatch_internal_orders_ready_for_dispatch_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List orders, newest first (cursor pagination)
+         * @description role=customer lists what I bought, role=farmer the orders of my farms. Without role, customers get their own orders, farmers the orders of their farms, admins all orders.
+         */
+        get: operations["list_orders_orders_get"];
+        put?: never;
+        /**
+         * Checkout: place one order per farm
+         * @description The cart lives in the app; its items are sent here. The Idempotency-Key header is required: repeating a request with the same key and body returns the first result instead of creating new orders. After a PAYMENT_FAILED (402) use a new key to retry.
+         */
+        post: operations["checkout_orders_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/harvest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Customer: choose delivery or buy-back for a graded harvest
+         * @description The harvest order is created when the quality check passes (status PLACED, no option). DELIVERY needs `deliveryAddress` (and optionally `deliveryDate`): the order becomes READY_FOR_DISPATCH and is pooled like any order; the balance (total minus deposit) is charged when it is delivered. BUYBACK: the farmer buys the harvest, the customer is credited and the order is COMPLETED. Repeating the same choice returns the order.
+         */
+        post: operations["choose_harvest_option_orders_harvest_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/orders/payments/intent": {
         parameters: {
             query?: never;
@@ -61,50 +131,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/orders/harvest": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Customer: choose delivery or buy-back for a graded harvest
-         * @description The harvest order is created when the quality check passes (status PLACED, no option). DELIVERY needs `deliveryAddress` (and optionally `deliveryDate`): the order becomes READY_FOR_DISPATCH and is pooled like any order; the balance (total minus deposit) is charged when it is delivered. BUYBACK: the farmer buys the harvest, the customer is credited and the order is COMPLETED. Repeating the same choice returns the order.
-         */
-        post: operations["choose_harvest_option_orders_harvest_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orders": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List orders, newest first (cursor pagination)
-         * @description role=customer lists what I bought, role=farmer the orders of my farms. Without role, customers get their own orders, farmers the orders of their farms, admins all orders.
-         */
-        get: operations["list_orders_orders_get"];
-        put?: never;
-        /**
-         * Checkout: place one order per farm
-         * @description The cart lives in the app; its items are sent here. The Idempotency-Key header is required: repeating a request with the same key and body returns the first result instead of creating new orders. After a PAYMENT_FAILED (402) use a new key to retry.
-         */
-        post: operations["checkout_orders_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/orders/{order_id}": {
         parameters: {
             query?: never;
@@ -116,26 +142,6 @@ export interface paths {
         get: operations["get_order_orders__order_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orders/{order_id}/pack": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Farmer: mark a confirmed order as packed
-         * @description Moves CONFIRMED to PACKED and publishes order.packed, which starts the inspection.
-         */
-        post: operations["pack_order_orders__order_id__pack_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -156,6 +162,26 @@ export interface paths {
          * @description The customer, the farm's owner or an admin can cancel. Publishes order.cancelled (catalog releases the stock) and records a REFUND payment.
          */
         post: operations["cancel_order_orders__order_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{order_id}/pack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Farmer: mark a confirmed order as packed
+         * @description Moves CONFIRMED to PACKED and publishes order.packed, which starts the inspection.
+         */
+        post: operations["pack_order_orders__order_id__pack_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -197,15 +223,29 @@ export interface components {
          */
         Checkout: {
             /**
-             * Id
-             * Format: uuid
+             * Createdat
+             * Format: date-time
              */
-            id: string;
+            createdAt: string;
+            /**
+             * Currency
+             * @default INR
+             */
+            currency: string;
             /**
              * Customerid
              * Format: uuid
              */
             customerId: string;
+            /** Deliveryfee */
+            deliveryFee: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Orders */
+            orders: components["schemas"]["Order"][];
             /**
              * Paymentintentid
              * Format: uuid
@@ -214,49 +254,45 @@ export interface components {
             paymentStatus: components["schemas"]["PaymentStatus"];
             /** Subtotal */
             subtotal: number;
-            /** Deliveryfee */
-            deliveryFee: number;
             /** Total */
             total: number;
-            /**
-             * Currency
-             * @default INR
-             */
-            currency: string;
-            /** Orders */
-            orders: components["schemas"]["Order"][];
-            /**
-             * Createdat
-             * Format: date-time
-             */
-            createdAt: string;
         };
         /**
          * CheckoutRequest
          * @description Body of POST /orders. The cart lives only in the app; items are sent here.
          */
         CheckoutRequest: {
-            /** Items */
-            items: components["schemas"]["OrderItemIn"][];
             deliveryAddress: components["schemas"]["DeliveryAddress"];
             /**
              * Deliverydate
              * @description Day the customer wants the delivery. Defaults to tomorrow. Orders due the same day are pooled into one route.
              */
             deliveryDate?: string | null;
+            /** Items */
+            items: components["schemas"]["OrderItemIn"][];
+            /** Notes */
+            notes?: string | null;
             /**
              * Paymentintentid
              * Format: uuid
              */
             paymentIntentId: string;
-            /** Notes */
-            notes?: string | null;
         };
         /**
          * DeliveryAddress
          * @description Where the order is delivered. `location` is required: logistics pools drops that are close.
          */
         DeliveryAddress: {
+            /**
+             * City
+             * @example Jaipur
+             */
+            city: string;
+            /**
+             * Contactphone
+             * @example +919999999999
+             */
+            contactPhone?: string | null;
             /**
              * Label
              * @example Home
@@ -269,22 +305,12 @@ export interface components {
             line1: string;
             /** Line2 */
             line2?: string | null;
-            /**
-             * City
-             * @example Jaipur
-             */
-            city: string;
+            location: components["schemas"]["GeoPoint"];
             /**
              * Pincode
              * @example 302001
              */
             pincode: string;
-            location: components["schemas"]["GeoPoint"];
-            /**
-             * Contactphone
-             * @example +919999999999
-             */
-            contactPhone?: string | null;
         };
         /** ErrorBody */
         ErrorBody: {
@@ -293,12 +319,12 @@ export interface components {
              * @example STOCK_UNAVAILABLE
              */
             code: string;
-            /** Message */
-            message: string;
             /** Correlationid */
             correlationId?: string | null;
             /** Details */
             details?: unknown | null;
+            /** Message */
+            message: string;
         };
         /** ErrorResponse */
         ErrorResponse: {
@@ -310,12 +336,6 @@ export interface components {
          */
         GeoPoint: {
             /**
-             * Type
-             * @default Point
-             * @constant
-             */
-            type: "Point";
-            /**
              * Coordinates
              * @example [
              *       75.7873,
@@ -326,6 +346,12 @@ export interface components {
                 number,
                 number
             ];
+            /**
+             * Type
+             * @default Point
+             * @constant
+             */
+            type: "Point";
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -343,12 +369,6 @@ export interface components {
          * @description Body of POST /orders/harvest: what to do with the graded harvest of a reservation.
          */
         HarvestOrderChoice: {
-            /**
-             * Reservationid
-             * Format: uuid
-             */
-            reservationId: string;
-            option: components["schemas"]["HarvestOption"];
             /** @description Required for DELIVERY, ignored for BUYBACK */
             deliveryAddress?: components["schemas"]["DeliveryAddress"] | null;
             /**
@@ -356,6 +376,12 @@ export interface components {
              * @description DELIVERY only. Defaults to tomorrow, like checkout.
              */
             deliveryDate?: string | null;
+            option: components["schemas"]["HarvestOption"];
+            /**
+             * Reservationid
+             * Format: uuid
+             */
+            reservationId: string;
         };
         /**
          * Order
@@ -363,38 +389,15 @@ export interface components {
          */
         Order: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Checkoutid
              * Format: uuid
              */
             checkoutId: string;
-            /** @default PRODUCE */
-            orderType: components["schemas"]["OrderType"];
             /**
-             * Farmid
-             * @description Empty on a harvest order
+             * Createdat
+             * Format: date-time
              */
-            farmId?: string | null;
-            /**
-             * Reservationid
-             * @description The land reservation a HARVEST order comes from
-             */
-            reservationId?: string | null;
-            /** @description HARVEST orders: empty until the customer chooses */
-            harvestOption?: components["schemas"]["HarvestOption"] | null;
-            status: components["schemas"]["OrderStatus"];
-            /** Items */
-            items: components["schemas"]["OrderItem"][];
-            /** Subtotal */
-            subtotal: number;
-            /** Deliveryfee */
-            deliveryFee: number;
-            /** Total */
-            total: number;
+            createdAt: string;
             /**
              * Currency
              * @default INR
@@ -404,11 +407,34 @@ export interface components {
             deliveryAddress?: components["schemas"]["DeliveryAddress"] | null;
             /** Deliverydate */
             deliveryDate?: string | null;
+            /** Deliveryfee */
+            deliveryFee: number;
             /**
-             * Createdat
-             * Format: date-time
+             * Farmid
+             * @description Empty on a harvest order
              */
-            createdAt: string;
+            farmId?: string | null;
+            /** @description HARVEST orders: empty until the customer chooses */
+            harvestOption?: components["schemas"]["HarvestOption"] | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items */
+            items: components["schemas"]["OrderItem"][];
+            /** @default PRODUCE */
+            orderType: components["schemas"]["OrderType"];
+            /**
+             * Reservationid
+             * @description The land reservation a HARVEST order comes from
+             */
+            reservationId?: string | null;
+            status: components["schemas"]["OrderStatus"];
+            /** Subtotal */
+            subtotal: number;
+            /** Total */
+            total: number;
             /**
              * Updatedat
              * Format: date-time
@@ -421,38 +447,21 @@ export interface components {
          */
         OrderDetail: {
             /**
-             * Id
-             * Format: uuid
+             * Balancedue
+             * @description HARVEST DELIVERY: what is still to be paid, settled when the order completes
+             * @default 0
              */
-            id: string;
+            balanceDue: number;
             /**
              * Checkoutid
              * Format: uuid
              */
             checkoutId: string;
-            /** @default PRODUCE */
-            orderType: components["schemas"]["OrderType"];
             /**
-             * Farmid
-             * @description Empty on a harvest order
+             * Createdat
+             * Format: date-time
              */
-            farmId?: string | null;
-            /**
-             * Reservationid
-             * @description The land reservation a HARVEST order comes from
-             */
-            reservationId?: string | null;
-            /** @description HARVEST orders: empty until the customer chooses */
-            harvestOption?: components["schemas"]["HarvestOption"] | null;
-            status: components["schemas"]["OrderStatus"];
-            /** Items */
-            items: components["schemas"]["OrderItem"][];
-            /** Subtotal */
-            subtotal: number;
-            /** Deliveryfee */
-            deliveryFee: number;
-            /** Total */
-            total: number;
+            createdAt: string;
             /**
              * Currency
              * @default INR
@@ -462,44 +471,61 @@ export interface components {
             deliveryAddress?: components["schemas"]["DeliveryAddress"] | null;
             /** Deliverydate */
             deliveryDate?: string | null;
-            /**
-             * Createdat
-             * Format: date-time
-             */
-            createdAt: string;
-            /**
-             * Updatedat
-             * Format: date-time
-             */
-            updatedAt: string;
+            /** Deliveryfee */
+            deliveryFee: number;
             /** Events */
             events: components["schemas"]["OrderEvent"][];
-            rating?: components["schemas"]["OrderRating"] | null;
+            /**
+             * Farmid
+             * @description Empty on a harvest order
+             */
+            farmId?: string | null;
+            /** @description HARVEST orders: empty until the customer chooses */
+            harvestOption?: components["schemas"]["HarvestOption"] | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items */
+            items: components["schemas"]["OrderItem"][];
+            /** @default PRODUCE */
+            orderType: components["schemas"]["OrderType"];
             /**
              * Payments
              * @description Payments and refunds of this order, oldest first
              */
             payments: components["schemas"]["PaymentRecord"][];
+            rating?: components["schemas"]["OrderRating"] | null;
             /**
-             * Balancedue
-             * @description HARVEST DELIVERY: what is still to be paid, settled when the order completes
-             * @default 0
+             * Reservationid
+             * @description The land reservation a HARVEST order comes from
              */
-            balanceDue: number;
+            reservationId?: string | null;
+            status: components["schemas"]["OrderStatus"];
+            /** Subtotal */
+            subtotal: number;
+            /** Total */
+            total: number;
+            /**
+             * Updatedat
+             * Format: date-time
+             */
+            updatedAt: string;
         };
         /**
          * OrderEvent
          * @description One entry of the status timeline (order_events).
          */
         OrderEvent: {
-            status: components["schemas"]["OrderStatus"];
+            /** Note */
+            note?: string | null;
             /**
              * Occurredat
              * Format: date-time
              */
             occurredAt: string;
-            /** Note */
-            note?: string | null;
+            status: components["schemas"]["OrderStatus"];
         };
         /**
          * OrderItem
@@ -507,33 +533,33 @@ export interface components {
          */
         OrderItem: {
             /**
+             * Farmid
+             * @description Empty on a harvest order
+             */
+            farmId?: string | null;
+            /** Linetotal */
+            lineTotal: number;
+            /**
              * Listingid
              * @description Empty on a harvest order
              */
             listingId?: string | null;
             /**
-             * Farmid
-             * @description Empty on a harvest order
-             */
-            farmId?: string | null;
-            /**
              * Name
              * @example Tomato
              */
             name: string;
+            /** @description Where the farm hands the produce over */
+            pickupLocation: components["schemas"]["GeoPoint"];
+            /** Qty */
+            qty: number;
             /**
              * Unit
              * @example kg
              */
             unit: string;
-            /** Qty */
-            qty: number;
             /** Unitprice */
             unitPrice: number;
-            /** Linetotal */
-            lineTotal: number;
-            /** @description Where the farm hands the produce over */
-            pickupLocation: components["schemas"]["GeoPoint"];
         };
         /** OrderItemIn */
         OrderItemIn: {
@@ -560,13 +586,6 @@ export interface components {
         };
         /** OrderRating */
         OrderRating: {
-            /**
-             * Orderid
-             * Format: uuid
-             */
-            orderId: string;
-            /** Score */
-            score: number;
             /** Comment */
             comment?: string | null;
             /**
@@ -574,16 +593,23 @@ export interface components {
              * Format: date-time
              */
             createdAt: string;
+            /**
+             * Orderid
+             * Format: uuid
+             */
+            orderId: string;
+            /** Score */
+            score: number;
         };
         /** OrderRatingCreate */
         OrderRatingCreate: {
+            /** Comment */
+            comment?: string | null;
             /**
              * Score
              * @example 5
              */
             score: number;
-            /** Comment */
-            comment?: string | null;
         };
         /**
          * OrderStatus
@@ -600,37 +626,37 @@ export interface components {
          */
         OrderSummary: {
             /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
              * Checkoutid
              * Format: uuid
              */
             checkoutId: string;
-            /** @default PRODUCE */
-            orderType: components["schemas"]["OrderType"];
-            /** Farmid */
-            farmId?: string | null;
-            /** Reservationid */
-            reservationId?: string | null;
-            harvestOption?: components["schemas"]["HarvestOption"] | null;
-            status: components["schemas"]["OrderStatus"];
-            /** Itemcount */
-            itemCount: number;
-            /** Total */
-            total: number;
-            /**
-             * Currency
-             * @default INR
-             */
-            currency: string;
             /**
              * Createdat
              * Format: date-time
              */
             createdAt: string;
+            /**
+             * Currency
+             * @default INR
+             */
+            currency: string;
+            /** Farmid */
+            farmId?: string | null;
+            harvestOption?: components["schemas"]["HarvestOption"] | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Itemcount */
+            itemCount: number;
+            /** @default PRODUCE */
+            orderType: components["schemas"]["OrderType"];
+            /** Reservationid */
+            reservationId?: string | null;
+            status: components["schemas"]["OrderStatus"];
+            /** Total */
+            total: number;
             /**
              * Updatedat
              * Format: date-time
@@ -651,27 +677,27 @@ export interface components {
          *     intent is created, so `status` is already SUCCEEDED or FAILED in the response.
          */
         PaymentIntent: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
             /** Amount */
             amount: number;
-            /**
-             * Currency
-             * @default INR
-             */
-            currency: string;
-            kind: components["schemas"]["PaymentKind"];
-            /** Referenceid */
-            referenceId?: string | null;
-            status: components["schemas"]["PaymentStatus"];
             /**
              * Createdat
              * Format: date-time
              */
             createdAt: string;
+            /**
+             * Currency
+             * @default INR
+             */
+            currency: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            kind: components["schemas"]["PaymentKind"];
+            /** Referenceid */
+            referenceId?: string | null;
+            status: components["schemas"]["PaymentStatus"];
         };
         /** PaymentIntentCreate */
         PaymentIntentCreate: {
@@ -698,25 +724,25 @@ export interface components {
          * @description A payment or refund that belongs to an order.
          */
         PaymentRecord: {
+            /** Amount */
+            amount: number;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /**
+             * Currency
+             * @default INR
+             */
+            currency: string;
             /**
              * Id
              * Format: uuid
              */
             id: string;
             kind: components["schemas"]["PaymentKind"];
-            /** Amount */
-            amount: number;
-            /**
-             * Currency
-             * @default INR
-             */
-            currency: string;
             status: components["schemas"]["PaymentStatus"];
-            /**
-             * Createdat
-             * Format: date-time
-             */
-            createdAt: string;
         };
         /**
          * PaymentStatus
@@ -741,16 +767,16 @@ export interface components {
         };
         /** ValidationError */
         ValidationError: {
+            /** Context */
+            ctx?: Record<string, never>;
+            /** Input */
+            input?: unknown;
             /** Location */
             loc: (string | number)[];
             /** Message */
             msg: string;
             /** Error Type */
             type: string;
-            /** Input */
-            input?: unknown;
-            /** Context */
-            ctx?: Record<string, never>;
         };
     };
     responses: never;
@@ -783,89 +809,17 @@ export interface operations {
             };
         };
     };
-    create_payment_intent_orders_payments_intent_post: {
+    ready_for_dispatch_internal_orders_ready_for_dispatch_get: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Pool orders due on or before this day */
+                date: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PaymentIntentCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentIntent"];
-                };
-            };
-            /** @description Missing or invalid access token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description The token does not have the required role */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description RESERVATION_NOT_FOUND (DEPOSIT) */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description DEPOSIT_ALREADY_PAID or RESERVATION_NOT_PAYABLE (DEPOSIT) */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description DEPOSIT_AMOUNT_MISMATCH (DEPOSIT) */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    payment_webhook_orders_payments_webhook_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Webhook-Secret"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PaymentWebhook"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -873,103 +827,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaymentIntent"];
-                };
-            };
-            /** @description INVALID_WEBHOOK_SECRET */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description PAYMENT_INTENT_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description PAYMENT_ALREADY_SETTLED, PAYMENT_NOT_SETTLEABLE or DEPOSIT_ALREADY_PAID */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    choose_harvest_option_orders_harvest_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["HarvestOrderChoice"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrderDetail"];
-                };
-            };
-            /** @description Missing or invalid access token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description The token does not have the required role */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description RESERVATION_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description HARVEST_NOT_READY, HARVEST_OPTION_CHOSEN or HARVEST_ORDER_CLOSED */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
                 };
             };
             /** @description Validation Error */
@@ -1124,6 +984,206 @@ export interface operations {
             };
         };
     };
+    choose_harvest_option_orders_harvest_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HarvestOrderChoice"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderDetail"];
+                };
+            };
+            /** @description Missing or invalid access token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The token does not have the required role */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESERVATION_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description HARVEST_NOT_READY, HARVEST_OPTION_CHOSEN or HARVEST_ORDER_CLOSED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_payment_intent_orders_payments_intent_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentIntentCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentIntent"];
+                };
+            };
+            /** @description Missing or invalid access token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The token does not have the required role */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESERVATION_NOT_FOUND (DEPOSIT) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description DEPOSIT_ALREADY_PAID or RESERVATION_NOT_PAYABLE (DEPOSIT) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description DEPOSIT_AMOUNT_MISMATCH (DEPOSIT) */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    payment_webhook_orders_payments_webhook_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Webhook-Secret"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentWebhook"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentIntent"];
+                };
+            };
+            /** @description INVALID_WEBHOOK_SECRET */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description PAYMENT_INTENT_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description PAYMENT_ALREADY_SETTLED, PAYMENT_NOT_SETTLEABLE or DEPOSIT_ALREADY_PAID */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_order_orders__order_id__get: {
         parameters: {
             query?: never;
@@ -1164,73 +1224,6 @@ export interface operations {
             };
             /** @description ORDER_NOT_FOUND */
             404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    pack_order_orders__order_id__pack_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                order_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrderDetail"];
-                };
-            };
-            /** @description Missing or invalid access token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description The token does not have the required role */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description ORDER_NOT_FOUND */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description INVALID_STATUS_TRANSITION */
-            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1301,6 +1294,73 @@ export interface operations {
                 };
             };
             /** @description ORDER_NOT_CANCELLABLE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pack_order_orders__order_id__pack_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderDetail"];
+                };
+            };
+            /** @description Missing or invalid access token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The token does not have the required role */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description ORDER_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description INVALID_STATUS_TRANSITION */
             409: {
                 headers: {
                     [name: string]: unknown;

@@ -1,146 +1,1701 @@
 {
-  "openapi": "3.1.0",
-  "info": {
-    "title": "land service",
-    "version": "0.1.0",
-    "description": "Plots, growing seasons, reservations, crop updates and harvest lifecycle. JSON uses camelCase; geometry is GeoJSON in WGS84."
-  },
-  "servers": [{ "url": "/api/v1/land" }],
   "components": {
-    "securitySchemes": { "BearerAuth": { "type": "http", "scheme": "bearer" } },
     "schemas": {
-      "Point": {
-        "type": "object", "required": ["type", "coordinates"],
+      "CropUpdateCreate": {
         "properties": {
-          "type": { "const": "Point" },
-          "coordinates": { "type": "array", "minItems": 2, "maxItems": 2, "prefixItems": [
-            { "type": "number", "minimum": -180, "maximum": 180 },
-            { "type": "number", "minimum": -90, "maximum": 90 }
-          ]}
-        }
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Point"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mediaIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Mediaids",
+            "type": "array"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "stage": {
+            "enum": [
+              "SOWN",
+              "GROWING",
+              "FLOWERING"
+            ],
+            "title": "Stage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stage"
+        ],
+        "title": "CropUpdateCreate",
+        "type": "object"
       },
-      "Polygon": {
-        "type": "object", "required": ["type", "coordinates"],
+      "HTTPValidationError": {
         "properties": {
-          "type": { "const": "Polygon" },
-          "coordinates": { "type": "array", "minItems": 1, "maxItems": 1, "items": {
-            "type": "array", "minItems": 4, "items": { "$ref": "#/components/schemas/Point/properties/coordinates" }
-          }}
-        }
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
       },
       "PlotCreate": {
-        "type": "object", "required": ["title", "boundary"],
         "properties": {
-          "title": { "type": "string", "minLength": 2, "maxLength": 120 },
-          "description": { "type": ["string", "null"] },
-          "soilType": { "type": ["string", "null"], "maxLength": 60 },
-          "waterSource": { "type": ["string", "null"], "maxLength": 60 },
-          "boundary": { "$ref": "#/components/schemas/Polygon" }
-        }
+          "boundary": {
+            "$ref": "#/components/schemas/Polygon"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "soilType": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soiltype"
+          },
+          "title": {
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Title",
+            "type": "string"
+          },
+          "waterSource": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Watersource"
+          }
+        },
+        "required": [
+          "title",
+          "boundary"
+        ],
+        "title": "PlotCreate",
+        "type": "object"
+      },
+      "PlotOut": {
+        "properties": {
+          "areaAcres": {
+            "title": "Areaacres",
+            "type": "number"
+          },
+          "boundary": {
+            "additionalProperties": true,
+            "title": "Boundary",
+            "type": "object"
+          },
+          "centroid": {
+            "additionalProperties": true,
+            "title": "Centroid",
+            "type": "object"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "farmerId": {
+            "format": "uuid",
+            "title": "Farmerid",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "soilType": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soiltype"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "waterSource": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Watersource"
+          }
+        },
+        "required": [
+          "id",
+          "farmerId",
+          "title",
+          "description",
+          "areaAcres",
+          "soilType",
+          "waterSource",
+          "status",
+          "boundary",
+          "centroid",
+          "createdAt"
+        ],
+        "title": "PlotOut",
+        "type": "object"
       },
       "PlotUpdate": {
-        "type": "object",
         "properties": {
-          "title": { "type": ["string", "null"], "minLength": 2, "maxLength": 120 },
-          "description": { "type": ["string", "null"] },
-          "soilType": { "type": ["string", "null"], "maxLength": 60 },
-          "waterSource": { "type": ["string", "null"], "maxLength": 60 },
-          "boundary": { "anyOf": [{ "$ref": "#/components/schemas/Polygon" }, { "type": "null" }] }
-        }
+          "boundary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Polygon"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "soilType": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soiltype"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "waterSource": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Watersource"
+          }
+        },
+        "title": "PlotUpdate",
+        "type": "object"
       },
-      "SeasonCreate": {
-        "type": "object", "required": ["season", "startDate", "endDate", "price"],
+      "Point": {
         "properties": {
-          "season": { "type": "string", "minLength": 2, "maxLength": 40 },
-          "startDate": { "type": "string", "format": "date" },
-          "endDate": { "type": "string", "format": "date" },
-          "price": { "type": "number", "exclusiveMinimum": 0 },
-          "allowedCrops": { "type": "array", "items": { "type": "string" }, "maxItems": 30 }
-        }
+          "coordinates": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "type": {
+            "const": "Point",
+            "default": "Point",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "coordinates"
+        ],
+        "title": "Point",
+        "type": "object"
+      },
+      "Polygon": {
+        "properties": {
+          "coordinates": {
+            "items": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "type": {
+            "const": "Polygon",
+            "default": "Polygon",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "coordinates"
+        ],
+        "title": "Polygon",
+        "type": "object"
       },
       "ReservationCreate": {
-        "type": "object", "required": ["plotSeasonId", "cropId", "expectedQtyKg"],
         "properties": {
-          "plotSeasonId": { "type": "string", "format": "uuid" },
-          "cropId": { "type": "string", "maxLength": 40 },
-          "expectedQtyKg": { "type": "number", "exclusiveMinimum": 0 }
-        }
+          "cropId": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Cropid",
+            "type": "string"
+          },
+          "expectedQtyKg": {
+            "exclusiveMinimum": 0.0,
+            "title": "Expectedqtykg",
+            "type": "number"
+          },
+          "plotSeasonId": {
+            "format": "uuid",
+            "title": "Plotseasonid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "plotSeasonId",
+          "cropId",
+          "expectedQtyKg"
+        ],
+        "title": "ReservationCreate",
+        "type": "object"
       },
-      "CropUpdateCreate": {
-        "type": "object", "required": ["stage"],
+      "ReservationOut": {
         "properties": {
-          "stage": { "enum": ["SOWN", "GROWING", "FLOWERING"] },
-          "note": { "type": ["string", "null"] },
-          "mediaIds": { "type": "array", "items": { "type": "string", "format": "uuid" }, "maxItems": 10 },
-          "location": { "anyOf": [{ "$ref": "#/components/schemas/Point" }, { "type": "null" }] }
-        }
+          "cropId": {
+            "title": "Cropid",
+            "type": "string"
+          },
+          "customerId": {
+            "format": "uuid",
+            "title": "Customerid",
+            "type": "string"
+          },
+          "deposit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deposit"
+          },
+          "expectedQtyKg": {
+            "title": "Expectedqtykg",
+            "type": "number"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "title": "Expiresat",
+            "type": "string"
+          },
+          "farmerId": {
+            "format": "uuid",
+            "title": "Farmerid",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "plotSeasonId": {
+            "format": "uuid",
+            "title": "Plotseasonid",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          }
+        },
+        "required": [
+          "id",
+          "plotSeasonId",
+          "customerId",
+          "farmerId",
+          "cropId",
+          "expectedQtyKg",
+          "deposit",
+          "total",
+          "status",
+          "expiresAt"
+        ],
+        "title": "ReservationOut",
+        "type": "object"
+      },
+      "SeasonCreate": {
+        "properties": {
+          "allowedCrops": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30,
+            "title": "Allowedcrops",
+            "type": "array"
+          },
+          "endDate": {
+            "format": "date",
+            "title": "Enddate",
+            "type": "string"
+          },
+          "price": {
+            "exclusiveMinimum": 0.0,
+            "title": "Price",
+            "type": "number"
+          },
+          "season": {
+            "maxLength": 40,
+            "minLength": 2,
+            "title": "Season",
+            "type": "string"
+          },
+          "startDate": {
+            "format": "date",
+            "title": "Startdate",
+            "type": "string"
+          }
+        },
+        "required": [
+          "season",
+          "startDate",
+          "endDate",
+          "price"
+        ],
+        "title": "SeasonCreate",
+        "type": "object"
+      },
+      "SeasonOut": {
+        "properties": {
+          "allowedCrops": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Allowedcrops",
+            "type": "array"
+          },
+          "endDate": {
+            "format": "date",
+            "title": "Enddate",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "plotId": {
+            "format": "uuid",
+            "title": "Plotid",
+            "type": "string"
+          },
+          "price": {
+            "title": "Price",
+            "type": "number"
+          },
+          "season": {
+            "title": "Season",
+            "type": "string"
+          },
+          "startDate": {
+            "format": "date",
+            "title": "Startdate",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "plotId",
+          "season",
+          "startDate",
+          "endDate",
+          "price",
+          "allowedCrops"
+        ],
+        "title": "SeasonOut",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
       }
     }
   },
+  "info": {
+    "title": "land service",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
   "paths": {
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/internal/geo/plot/{plot_id}": {
+      "get": {
+        "operationId": "plot_geo_internal_geo_plot__plot_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plot Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Plot Geo",
+        "tags": [
+          "internal"
+        ]
+      }
+    },
+    "/internal/geo/reservation/{reservation_id}": {
+      "get": {
+        "operationId": "reservation_geo_internal_geo_reservation__reservation_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reservation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reservation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reservation Geo",
+        "tags": [
+          "internal"
+        ]
+      }
+    },
     "/plots": {
       "post": {
-        "tags": ["plots"], "summary": "Create a plot from a GeoJSON polygon",
-        "security": [{ "BearerAuth": [] }],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlotCreate" } } } },
-        "responses": { "201": { "description": "Created; response includes areaAcres, centroid and GeoJSON boundary" }, "409": { "description": "PLOT_OVERLAP" }, "422": { "description": "INVALID_PLOT_BOUNDARY" } }
+        "operationId": "create_plot_plots_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlotCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlotOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Plot",
+        "tags": [
+          "plots"
+        ]
       }
     },
     "/plots/mine": {
-      "get": { "tags": ["plots"], "summary": "List the authenticated farmer's plots", "security": [{ "BearerAuth": [] }], "responses": { "200": { "description": "Plot array" } } }
-    },
-    "/plots/{plotId}": {
-      "get": { "tags": ["plots"], "summary": "Get a plot", "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "Plot" }, "404": { "description": "PLOT_NOT_FOUND" } } },
-      "patch": { "tags": ["plots"], "summary": "Update plot metadata or boundary", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlotUpdate" } } } }, "responses": { "200": { "description": "Updated plot" }, "409": { "description": "PLOT_OVERLAP" } } },
-      "delete": { "tags": ["plots"], "summary": "Soft-delete a plot with no live reservation", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "204": { "description": "Deleted" }, "409": { "description": "PLOT_HAS_LIVE_RESERVATION" } } }
-    },
-    "/plots/{plotId}/seasons": {
-      "post": { "tags": ["seasons"], "summary": "Add a growing season to a plot", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SeasonCreate" } } } }, "responses": { "201": { "description": "Created season" } } },
-      "get": { "tags": ["seasons"], "summary": "List a plot's seasons", "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "Season array" } } }
-    },
-    "/plots/{plotId}/seasons/{seasonId}": {
-      "patch": { "tags": ["seasons"], "summary": "Update a season with no live reservation", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "in": "path", "name": "seasonId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SeasonCreate" } } } }, "responses": { "200": { "description": "Updated season" }, "409": { "description": "SEASON_HAS_LIVE_RESERVATION" } } },
-      "delete": { "tags": ["seasons"], "summary": "Delete a season without reservation history", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "plotId", "required": true, "schema": { "type": "string", "format": "uuid" } }, { "in": "path", "name": "seasonId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "204": { "description": "Deleted" }, "409": { "description": "SEASON_HAS_RESERVATION_HISTORY" } } }
-    },
-    "/plots/search": {
-      "get": { "tags": ["search"], "summary": "Search GeoJSON plots by bounding box or radius", "parameters": [
-        { "in": "query", "name": "lat", "schema": { "type": "number", "minimum": -90, "maximum": 90 } },
-        { "in": "query", "name": "lng", "schema": { "type": "number", "minimum": -180, "maximum": 180 } },
-        { "in": "query", "name": "radius_km", "schema": { "type": "number", "exclusiveMinimum": 0, "maximum": 200, "default": 20 } },
-        { "in": "query", "name": "west", "schema": { "type": "number" } },
-        { "in": "query", "name": "south", "schema": { "type": "number" } },
-        { "in": "query", "name": "east", "schema": { "type": "number" } },
-        { "in": "query", "name": "north", "schema": { "type": "number" } },
-        { "in": "query", "name": "season", "schema": { "type": "string" } },
-        { "in": "query", "name": "crop", "schema": { "type": "string" } }
-      ], "responses": { "200": { "description": "GeoJSON FeatureCollection; excludes booked plot-seasons" } } }
-    },
-    "/reservations": {
-      "post": { "tags": ["reservations"], "summary": "Reserve an available plot-season", "security": [{ "BearerAuth": [] }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReservationCreate" } } } }, "responses": { "201": { "description": "PENDING reservation; expires after 48 hours" }, "409": { "description": "PLOT_SEASON_ALREADY_RESERVED" } } }
-    },
-    "/reservations/mine": {
-      "get": { "tags": ["reservations"], "summary": "List the caller's reservations", "security": [{ "BearerAuth": [] }], "responses": { "200": { "description": "Reservation array" } } }
-    },
-    "/reservations/{reservationId}/accept": { "post": { "tags": ["reservations"], "summary": "Farmer accepts a pending reservation; publishes reservation.accepted", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "ACCEPTED reservation with deposit amount" } } } },
-    "/reservations/{reservationId}/reject": { "post": { "tags": ["reservations"], "summary": "Farmer rejects a pending reservation", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "REJECTED reservation" } } } },
-    "/reservations/{reservationId}/cancel": { "post": { "tags": ["reservations"], "summary": "Customer or farmer cancels a live reservation", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "CANCELLED reservation" } } } },
-    "/reservations/{reservationId}/updates": {
       "get": {
-        "tags": ["crop updates"],
-        "summary": "Read the crop timeline for a reservation",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }],
-        "responses": { "200": { "description": "Chronological crop update array including geotag and media IDs" } }
-      },
-      "post": {
-        "tags": ["crop updates"],
-        "summary": "Post a crop-stage update with photos and optional geotag",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CropUpdateCreate" } } } },
-        "responses": { "201": { "description": "Crop update created" } }
+        "operationId": "my_plots_plots_mine_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PlotOut"
+                  },
+                  "title": "Response My Plots Plots Mine Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "My Plots",
+        "tags": [
+          "plots"
+        ]
       }
     },
-    "/reservations/{reservationId}/harvest-ready": { "post": { "tags": ["harvest"], "summary": "Mark a crop harvest-ready and publish harvest.ready", "security": [{ "BearerAuth": [] }], "parameters": [{ "in": "path", "name": "reservationId", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "HARVEST_READY reservation" } } } }
+    "/plots/search": {
+      "get": {
+        "operationId": "search_plots_plots_search_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lat",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lat"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lng",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lng"
+            }
+          },
+          {
+            "in": "query",
+            "name": "radius_km",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "exclusiveMinimum": 0,
+              "maximum": 200,
+              "title": "Radius Km",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "west",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "West"
+            }
+          },
+          {
+            "in": "query",
+            "name": "south",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "South"
+            }
+          },
+          {
+            "in": "query",
+            "name": "east",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "East"
+            }
+          },
+          {
+            "in": "query",
+            "name": "north",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "North"
+            }
+          },
+          {
+            "in": "query",
+            "name": "season",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Season"
+            }
+          },
+          {
+            "in": "query",
+            "name": "crop",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Crop"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Plots",
+        "tags": [
+          "search"
+        ]
+      }
+    },
+    "/plots/{plot_id}": {
+      "delete": {
+        "operationId": "delete_plot_plots__plot_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plot Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Plot",
+        "tags": [
+          "plots"
+        ]
+      },
+      "get": {
+        "operationId": "get_plot_plots__plot_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plot Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlotOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Plot",
+        "tags": [
+          "plots"
+        ]
+      },
+      "patch": {
+        "operationId": "update_plot_plots__plot_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plot Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlotUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlotOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Plot",
+        "tags": [
+          "plots"
+        ]
+      }
+    },
+    "/plots/{plot_id}/seasons": {
+      "get": {
+        "operationId": "list_seasons_plots__plot_id__seasons_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plot Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SeasonOut"
+                  },
+                  "title": "Response List Seasons Plots  Plot Id  Seasons Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Seasons",
+        "tags": [
+          "seasons"
+        ]
+      },
+      "post": {
+        "operationId": "create_season_plots__plot_id__seasons_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plot Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeasonCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Season",
+        "tags": [
+          "seasons"
+        ]
+      }
+    },
+    "/plots/{plot_id}/seasons/{season_id}": {
+      "delete": {
+        "operationId": "delete_season_plots__plot_id__seasons__season_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "season_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Season Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Season",
+        "tags": [
+          "seasons"
+        ]
+      },
+      "patch": {
+        "operationId": "update_season_plots__plot_id__seasons__season_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Plot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "season_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Season Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeasonCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Season",
+        "tags": [
+          "seasons"
+        ]
+      }
+    },
+    "/reservations": {
+      "post": {
+        "operationId": "reserve_plot_reservations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservationCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reserve Plot",
+        "tags": [
+          "reservations"
+        ]
+      }
+    },
+    "/reservations/mine": {
+      "get": {
+        "operationId": "my_reservations_reservations_mine_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReservationOut"
+                  },
+                  "title": "Response My Reservations Reservations Mine Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "My Reservations",
+        "tags": [
+          "reservations"
+        ]
+      }
+    },
+    "/reservations/{reservation_id}/accept": {
+      "post": {
+        "operationId": "accept_reservation_reservations__reservation_id__accept_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reservation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reservation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Accept Reservation",
+        "tags": [
+          "reservations"
+        ]
+      }
+    },
+    "/reservations/{reservation_id}/cancel": {
+      "post": {
+        "operationId": "cancel_reservation_reservations__reservation_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reservation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reservation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Cancel Reservation",
+        "tags": [
+          "reservations"
+        ]
+      }
+    },
+    "/reservations/{reservation_id}/harvest-ready": {
+      "post": {
+        "operationId": "harvest_ready_reservations__reservation_id__harvest_ready_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reservation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reservation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Harvest Ready",
+        "tags": [
+          "harvest"
+        ]
+      }
+    },
+    "/reservations/{reservation_id}/reject": {
+      "post": {
+        "operationId": "reject_reservation_reservations__reservation_id__reject_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reservation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reservation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Reject Reservation",
+        "tags": [
+          "reservations"
+        ]
+      }
+    },
+    "/reservations/{reservation_id}/updates": {
+      "get": {
+        "operationId": "list_crop_updates_reservations__reservation_id__updates_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reservation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reservation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Crop Updates",
+        "tags": [
+          "crop updates"
+        ]
+      },
+      "post": {
+        "operationId": "add_crop_update_reservations__reservation_id__updates_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reservation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reservation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CropUpdateCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Add Crop Update",
+        "tags": [
+          "crop updates"
+        ]
+      }
+    }
   }
 }

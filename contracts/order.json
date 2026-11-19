@@ -1,428 +1,1311 @@
 {
-  "openapi": "3.1.0",
+  "components": {
+    "schemas": {
+      "CancelRequest": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "Ordered by mistake"
+            ],
+            "title": "Reason"
+          }
+        },
+        "title": "CancelRequest",
+        "type": "object"
+      },
+      "Checkout": {
+        "description": "Result of POST /orders: one checkout holding one order per farm.",
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "currency": {
+            "default": "INR",
+            "title": "Currency",
+            "type": "string"
+          },
+          "customerId": {
+            "format": "uuid",
+            "title": "Customerid",
+            "type": "string"
+          },
+          "deliveryFee": {
+            "title": "Deliveryfee",
+            "type": "number"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "orders": {
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            },
+            "title": "Orders",
+            "type": "array"
+          },
+          "paymentIntentId": {
+            "format": "uuid",
+            "title": "Paymentintentid",
+            "type": "string"
+          },
+          "paymentStatus": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          },
+          "subtotal": {
+            "title": "Subtotal",
+            "type": "number"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "customerId",
+          "paymentIntentId",
+          "paymentStatus",
+          "subtotal",
+          "deliveryFee",
+          "total",
+          "orders",
+          "createdAt"
+        ],
+        "title": "Checkout",
+        "type": "object"
+      },
+      "CheckoutRequest": {
+        "description": "Body of POST /orders. The cart lives only in the app; items are sent here.",
+        "properties": {
+          "deliveryAddress": {
+            "$ref": "#/components/schemas/DeliveryAddress"
+          },
+          "deliveryDate": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Day the customer wants the delivery. Defaults to tomorrow. Orders due the same day are pooled into one route.",
+            "title": "Deliverydate"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItemIn"
+            },
+            "minItems": 1,
+            "title": "Items",
+            "type": "array"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "paymentIntentId": {
+            "format": "uuid",
+            "title": "Paymentintentid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items",
+          "deliveryAddress",
+          "paymentIntentId"
+        ],
+        "title": "CheckoutRequest",
+        "type": "object"
+      },
+      "DeliveryAddress": {
+        "description": "Where the order is delivered. `location` is required: logistics pools drops that are close.",
+        "properties": {
+          "city": {
+            "examples": [
+              "Jaipur"
+            ],
+            "title": "City",
+            "type": "string"
+          },
+          "contactPhone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "+919999999999"
+            ],
+            "title": "Contactphone"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "Home"
+            ],
+            "title": "Label"
+          },
+          "line1": {
+            "examples": [
+              "12 Green Park"
+            ],
+            "title": "Line1",
+            "type": "string"
+          },
+          "line2": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line2"
+          },
+          "location": {
+            "$ref": "#/components/schemas/GeoPoint"
+          },
+          "pincode": {
+            "examples": [
+              "302001"
+            ],
+            "pattern": "^\\d{6}$",
+            "title": "Pincode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "line1",
+          "city",
+          "pincode",
+          "location"
+        ],
+        "title": "DeliveryAddress",
+        "type": "object"
+      },
+      "ErrorBody": {
+        "properties": {
+          "code": {
+            "examples": [
+              "STOCK_UNAVAILABLE"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "correlationId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correlationid"
+          },
+          "details": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorBody",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "GeoPoint": {
+        "description": "A GeoJSON Point, the same JSON the catalog uses: `{\"type\": \"Point\", \"coordinates\": [lng, lat]}`.",
+        "properties": {
+          "coordinates": {
+            "examples": [
+              [
+                75.7873,
+                26.9124
+              ]
+            ],
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "maximum": 180.0,
+                "minimum": -180.0,
+                "type": "number"
+              },
+              {
+                "maximum": 90.0,
+                "minimum": -90.0,
+                "type": "number"
+              }
+            ],
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "type": {
+            "const": "Point",
+            "default": "Point",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "coordinates"
+        ],
+        "title": "GeoPoint",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HarvestOption": {
+        "description": "What a customer does with a graded harvest (HLD section 12).",
+        "enum": [
+          "DELIVERY",
+          "BUYBACK"
+        ],
+        "title": "HarvestOption",
+        "type": "string"
+      },
+      "HarvestOrderChoice": {
+        "description": "Body of POST /orders/harvest: what to do with the graded harvest of a reservation.",
+        "properties": {
+          "deliveryAddress": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeliveryAddress"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Required for DELIVERY, ignored for BUYBACK"
+          },
+          "deliveryDate": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "DELIVERY only. Defaults to tomorrow, like checkout.",
+            "title": "Deliverydate"
+          },
+          "option": {
+            "$ref": "#/components/schemas/HarvestOption"
+          },
+          "reservationId": {
+            "format": "uuid",
+            "title": "Reservationid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reservationId",
+          "option"
+        ],
+        "title": "HarvestOrderChoice",
+        "type": "object"
+      },
+      "Order": {
+        "description": "One order per farm, inside a checkout. A HARVEST order is one order from one reservation.",
+        "properties": {
+          "checkoutId": {
+            "format": "uuid",
+            "title": "Checkoutid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "currency": {
+            "default": "INR",
+            "title": "Currency",
+            "type": "string"
+          },
+          "deliveryAddress": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeliveryAddress"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Empty on a harvest order that is not delivered"
+          },
+          "deliveryDate": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deliverydate"
+          },
+          "deliveryFee": {
+            "title": "Deliveryfee",
+            "type": "number"
+          },
+          "farmId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Empty on a harvest order",
+            "title": "Farmid"
+          },
+          "harvestOption": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HarvestOption"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "HARVEST orders: empty until the customer chooses"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "orderType": {
+            "$ref": "#/components/schemas/OrderType",
+            "default": "PRODUCE"
+          },
+          "reservationId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The land reservation a HARVEST order comes from",
+            "title": "Reservationid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "subtotal": {
+            "title": "Subtotal",
+            "type": "number"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "title": "Updatedat",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "checkoutId",
+          "status",
+          "items",
+          "subtotal",
+          "deliveryFee",
+          "total",
+          "createdAt",
+          "updatedAt"
+        ],
+        "title": "Order",
+        "type": "object"
+      },
+      "OrderDetail": {
+        "description": "GET /orders/{id}: the order plus its status timeline, oldest first.",
+        "properties": {
+          "balanceDue": {
+            "default": 0,
+            "description": "HARVEST DELIVERY: what is still to be paid, settled when the order completes",
+            "title": "Balancedue",
+            "type": "number"
+          },
+          "checkoutId": {
+            "format": "uuid",
+            "title": "Checkoutid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "currency": {
+            "default": "INR",
+            "title": "Currency",
+            "type": "string"
+          },
+          "deliveryAddress": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeliveryAddress"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Empty on a harvest order that is not delivered"
+          },
+          "deliveryDate": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deliverydate"
+          },
+          "deliveryFee": {
+            "title": "Deliveryfee",
+            "type": "number"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/OrderEvent"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "farmId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Empty on a harvest order",
+            "title": "Farmid"
+          },
+          "harvestOption": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HarvestOption"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "HARVEST orders: empty until the customer chooses"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "orderType": {
+            "$ref": "#/components/schemas/OrderType",
+            "default": "PRODUCE"
+          },
+          "payments": {
+            "description": "Payments and refunds of this order, oldest first",
+            "items": {
+              "$ref": "#/components/schemas/PaymentRecord"
+            },
+            "title": "Payments",
+            "type": "array"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrderRating"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reservationId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The land reservation a HARVEST order comes from",
+            "title": "Reservationid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "subtotal": {
+            "title": "Subtotal",
+            "type": "number"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "title": "Updatedat",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "checkoutId",
+          "status",
+          "items",
+          "subtotal",
+          "deliveryFee",
+          "total",
+          "createdAt",
+          "updatedAt",
+          "events",
+          "payments"
+        ],
+        "title": "OrderDetail",
+        "type": "object"
+      },
+      "OrderEvent": {
+        "description": "One entry of the status timeline (order_events).",
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "occurredAt": {
+            "format": "date-time",
+            "title": "Occurredat",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          }
+        },
+        "required": [
+          "status",
+          "occurredAt"
+        ],
+        "title": "OrderEvent",
+        "type": "object"
+      },
+      "OrderItem": {
+        "description": "A line of an order. Name and price are copied from the listing at checkout time.",
+        "properties": {
+          "farmId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Empty on a harvest order",
+            "title": "Farmid"
+          },
+          "lineTotal": {
+            "title": "Linetotal",
+            "type": "number"
+          },
+          "listingId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Empty on a harvest order",
+            "title": "Listingid"
+          },
+          "name": {
+            "examples": [
+              "Tomato"
+            ],
+            "title": "Name",
+            "type": "string"
+          },
+          "pickupLocation": {
+            "$ref": "#/components/schemas/GeoPoint",
+            "description": "Where the farm hands the produce over"
+          },
+          "qty": {
+            "title": "Qty",
+            "type": "number"
+          },
+          "unit": {
+            "examples": [
+              "kg"
+            ],
+            "title": "Unit",
+            "type": "string"
+          },
+          "unitPrice": {
+            "title": "Unitprice",
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "unit",
+          "qty",
+          "unitPrice",
+          "lineTotal",
+          "pickupLocation"
+        ],
+        "title": "OrderItem",
+        "type": "object"
+      },
+      "OrderItemIn": {
+        "properties": {
+          "listingId": {
+            "format": "uuid",
+            "title": "Listingid",
+            "type": "string"
+          },
+          "qty": {
+            "examples": [
+              2.5
+            ],
+            "exclusiveMinimum": 0.0,
+            "title": "Qty",
+            "type": "number"
+          }
+        },
+        "required": [
+          "listingId",
+          "qty"
+        ],
+        "title": "OrderItemIn",
+        "type": "object"
+      },
+      "OrderList": {
+        "description": "Cursor pagination, like the catalog: pass `next_cursor` back as `cursor` for the next page.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "OrderList",
+        "type": "object"
+      },
+      "OrderRating": {
+        "properties": {
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "orderId": {
+            "format": "uuid",
+            "title": "Orderid",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "orderId",
+          "score",
+          "createdAt"
+        ],
+        "title": "OrderRating",
+        "type": "object"
+      },
+      "OrderRatingCreate": {
+        "properties": {
+          "comment": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "score": {
+            "examples": [
+              5
+            ],
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Score",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "score"
+        ],
+        "title": "OrderRatingCreate",
+        "type": "object"
+      },
+      "OrderStatus": {
+        "description": "Lifecycle of a per-farm order (HLD section 11).\n\nPLACED -> CONFIRMED -> PACKED -> QC_PASSED -> READY_FOR_DISPATCH is issue #13. After that\nlogistics drives it: POOLED (pool assigned), IN_TRANSIT (picked up), DELIVERED, COMPLETED.",
+        "enum": [
+          "PLACED",
+          "CONFIRMED",
+          "PACKED",
+          "QC_PASSED",
+          "READY_FOR_DISPATCH",
+          "POOLED",
+          "IN_TRANSIT",
+          "DELIVERED",
+          "COMPLETED",
+          "CANCELLED"
+        ],
+        "title": "OrderStatus",
+        "type": "string"
+      },
+      "OrderSummary": {
+        "description": "A row of GET /orders.",
+        "properties": {
+          "checkoutId": {
+            "format": "uuid",
+            "title": "Checkoutid",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "currency": {
+            "default": "INR",
+            "title": "Currency",
+            "type": "string"
+          },
+          "farmId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Farmid"
+          },
+          "harvestOption": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HarvestOption"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "itemCount": {
+            "title": "Itemcount",
+            "type": "integer"
+          },
+          "orderType": {
+            "$ref": "#/components/schemas/OrderType",
+            "default": "PRODUCE"
+          },
+          "reservationId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reservationid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "title": "Updatedat",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "checkoutId",
+          "status",
+          "itemCount",
+          "total",
+          "createdAt",
+          "updatedAt"
+        ],
+        "title": "OrderSummary",
+        "type": "object"
+      },
+      "OrderType": {
+        "description": "PRODUCE is the V1 purchase of listed produce. HARVEST is added by the V2 harvest flow.",
+        "enum": [
+          "PRODUCE",
+          "HARVEST"
+        ],
+        "title": "OrderType",
+        "type": "string"
+      },
+      "PaymentIntent": {
+        "description": "A mock payment. In this project it always succeeds unless the amount is a test value.\n\nA FULL intent stays PENDING until it is used by POST /orders. A DEPOSIT is taken as soon as the\nintent is created, so `status` is already SUCCEEDED or FAILED in the response.",
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "currency": {
+            "default": "INR",
+            "title": "Currency",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/PaymentKind"
+          },
+          "referenceId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referenceid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          }
+        },
+        "required": [
+          "id",
+          "amount",
+          "kind",
+          "status",
+          "createdAt"
+        ],
+        "title": "PaymentIntent",
+        "type": "object"
+      },
+      "PaymentIntentCreate": {
+        "properties": {
+          "amount": {
+            "examples": [
+              499.0
+            ],
+            "exclusiveMinimum": 0.0,
+            "title": "Amount",
+            "type": "number"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/PaymentKind",
+            "default": "FULL"
+          },
+          "referenceId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referenceid"
+          }
+        },
+        "required": [
+          "amount"
+        ],
+        "title": "PaymentIntentCreate",
+        "type": "object"
+      },
+      "PaymentKind": {
+        "description": "What a payment is for (HLD section 10). The land service pays reservation deposits through\nthis API too. BALANCE and REFUND rows are written by the order service, never requested by a\nclient.",
+        "enum": [
+          "FULL",
+          "DEPOSIT",
+          "BALANCE",
+          "REFUND"
+        ],
+        "title": "PaymentKind",
+        "type": "string"
+      },
+      "PaymentRecord": {
+        "description": "A payment or refund that belongs to an order.",
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "currency": {
+            "default": "INR",
+            "title": "Currency",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/PaymentKind"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "amount",
+          "status",
+          "createdAt"
+        ],
+        "title": "PaymentRecord",
+        "type": "object"
+      },
+      "PaymentStatus": {
+        "enum": [
+          "PENDING",
+          "SUCCEEDED",
+          "FAILED",
+          "REFUNDED"
+        ],
+        "title": "PaymentStatus",
+        "type": "string"
+      },
+      "PaymentWebhook": {
+        "description": "Body of POST /orders/payments/webhook: the mock gateway reports the result of an intent.",
+        "properties": {
+          "paymentIntentId": {
+            "format": "uuid",
+            "title": "Paymentintentid",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "SUCCEEDED",
+              "FAILED"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "paymentIntentId",
+          "status"
+        ],
+        "title": "PaymentWebhook",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
   "info": {
     "title": "order service",
     "version": "0.1.0"
   },
+  "openapi": "3.1.0",
   "paths": {
     "/health": {
       "get": {
-        "tags": [
-          "ops"
-        ],
-        "summary": "Health",
         "operationId": "health_health_get",
         "responses": {
           "200": {
-            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
                   "additionalProperties": {
                     "type": "string"
                   },
-                  "type": "object",
-                  "title": "Response Health Health Get"
+                  "title": "Response Health Health Get",
+                  "type": "object"
                 }
               }
-            }
+            },
+            "description": "Successful Response"
           }
-        }
-      }
-    },
-    "/orders/payments/intent": {
-      "post": {
+        },
+        "summary": "Health",
         "tags": [
-          "orders"
-        ],
-        "summary": "Create a mock payment intent",
-        "description": "kind FULL (default): pay for a checkout; the intent stays PENDING until POST /orders uses it. kind DEPOSIT: pay the deposit of an accepted land reservation (`referenceId` is the reservation id, `amount` must equal its deposit); the mock gateway takes it at once, so `status` in the response is SUCCEEDED (or FAILED for the test amount) and the land service activates the reservation. BALANCE and REFUND are created by the order service.",
-        "operationId": "create_payment_intent_orders_payments_intent_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentIntentCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentIntent"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "The token does not have the required role",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "RESERVATION_NOT_FOUND (DEPOSIT)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "DEPOSIT_ALREADY_PAID or RESERVATION_NOT_PAYABLE (DEPOSIT)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "DEPOSIT_AMOUNT_MISMATCH (DEPOSIT)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
+          "ops"
         ]
       }
     },
-    "/orders/payments/webhook": {
-      "post": {
-        "tags": [
-          "orders"
-        ],
-        "summary": "Mock gateway: report the result of a payment intent",
-        "description": "Called by the (mock) payment gateway, not by an app. Authenticated with the shared secret in the X-Webhook-Secret header. Settles a PENDING DEPOSIT intent; repeating the same result is harmless. Only needed when the deposit was not taken at once.",
-        "operationId": "payment_webhook_orders_payments_webhook_post",
+    "/internal/orders/ready-for-dispatch": {
+      "get": {
+        "description": "Orders in READY_FOR_DISPATCH whose delivery date is `date` or earlier.\n\nThe shape is what the logistics pooling job reads (snake_case keys, not the public camelCase):\n`order_id`, `hub_lat`/`hub_lng` (where the farm hands the produce over), `drop_lat`/`drop_lng`\n(the customer's address), `weight_kg` and `address`. Once logistics publishes `pool.assigned`\nthe order moves to POOLED and no longer shows up here.\nTODO(M1): `weight_kg` adds up the quantities of all items whatever their unit.",
+        "operationId": "ready_for_dispatch_internal_orders_ready_for_dispatch_get",
         "parameters": [
           {
-            "name": "X-Webhook-Secret",
-            "in": "header",
-            "required": false,
+            "description": "Pool orders due on or before this day",
+            "in": "query",
+            "name": "date",
+            "required": true,
             "schema": {
-              "type": "string",
-              "default": "",
-              "title": "X-Webhook-Secret"
+              "description": "Pool orders due on or before this day",
+              "format": "date",
+              "title": "Date",
+              "type": "string"
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentWebhook"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
-            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaymentIntent"
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Ready For Dispatch Internal Orders Ready For Dispatch Get",
+                  "type": "array"
                 }
               }
-            }
-          },
-          "401": {
-            "description": "INVALID_WEBHOOK_SECRET",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "PAYMENT_INTENT_NOT_FOUND",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "PAYMENT_ALREADY_SETTLED, PAYMENT_NOT_SETTLEABLE or DEPOSIT_ALREADY_PAID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+            },
+            "description": "Successful Response"
           },
           "422": {
-            "description": "Validation Error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
-            }
+            },
+            "description": "Validation Error"
           }
-        }
-      }
-    },
-    "/orders/harvest": {
-      "post": {
+        },
+        "summary": "Orders logistics can pool (called by the logistics pooling job)",
         "tags": [
-          "orders"
-        ],
-        "summary": "Customer: choose delivery or buy-back for a graded harvest",
-        "description": "The harvest order is created when the quality check passes (status PLACED, no option). DELIVERY needs `deliveryAddress` (and optionally `deliveryDate`): the order becomes READY_FOR_DISPATCH and is pooled like any order; the balance (total minus deposit) is charged when it is delivered. BUYBACK: the farmer buys the harvest, the customer is credited and the order is COMPLETED. Repeating the same choice returns the order.",
-        "operationId": "choose_harvest_option_orders_harvest_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HarvestOrderChoice"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrderDetail"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "The token does not have the required role",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "RESERVATION_NOT_FOUND",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "HARVEST_NOT_READY, HARVEST_OPTION_CHOSEN or HARVEST_ORDER_CLOSED",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
+          "internal"
         ]
       }
     },
     "/orders": {
-      "post": {
-        "tags": [
-          "orders"
-        ],
-        "summary": "Checkout: place one order per farm",
-        "description": "The cart lives in the app; its items are sent here. The Idempotency-Key header is required: repeating a request with the same key and body returns the first result instead of creating new orders. After a PAYMENT_FAILED (402) use a new key to retry.",
-        "operationId": "checkout_orders_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 8,
-              "maxLength": 128,
-              "title": "Idempotency-Key"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CheckoutRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Checkout"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "The token does not have the required role",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "PAYMENT_FAILED",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "PAYMENT_INTENT_NOT_FOUND or LISTING_NOT_FOUND",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "STOCK_UNAVAILABLE (details: listingId, requested, available), LISTING_NOT_AVAILABLE, PAYMENT_INTENT_USED, IDEMPOTENCY_KEY_REUSED or IDEMPOTENCY_IN_PROGRESS",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "CATALOG_UNAVAILABLE",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
       "get": {
-        "tags": [
-          "orders"
-        ],
-        "summary": "List orders, newest first (cursor pagination)",
         "description": "role=customer lists what I bought, role=farmer the orders of my farms. Without role, customers get their own orders, farmers the orders of their farms, admins all orders.",
         "operationId": "list_orders_orders_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "parameters": [
           {
-            "name": "status",
             "in": "query",
+            "name": "status",
             "required": false,
             "schema": {
               "anyOf": [
@@ -437,8 +1320,8 @@
             }
           },
           {
-            "name": "role",
             "in": "query",
+            "name": "role",
             "required": false,
             "schema": {
               "anyOf": [
@@ -457,8 +1340,8 @@
             }
           },
           {
-            "name": "cursor",
             "in": "query",
+            "name": "cursor",
             "required": false,
             "schema": {
               "anyOf": [
@@ -473,251 +1356,538 @@
             }
           },
           {
-            "name": "limit",
             "in": "query",
+            "name": "limit",
             "required": false,
             "schema": {
-              "type": "integer",
+              "default": 20,
               "maximum": 100,
               "minimum": 1,
-              "default": 20,
-              "title": "Limit"
+              "title": "Limit",
+              "type": "integer"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OrderList"
                 }
               }
-            }
+            },
+            "description": "Successful Response"
           },
           "401": {
-            "description": "Missing or invalid access token",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            }
+            },
+            "description": "Missing or invalid access token"
           },
           "403": {
-            "description": "The token does not have the required role",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            }
+            },
+            "description": "The token does not have the required role"
           },
           "422": {
-            "description": "Validation Error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List orders, newest first (cursor pagination)",
+        "tags": [
+          "orders"
+        ]
+      },
+      "post": {
+        "description": "The cart lives in the app; its items are sent here. The Idempotency-Key header is required: repeating a request with the same key and body returns the first result instead of creating new orders. After a PAYMENT_FAILED (402) use a new key to retry.",
+        "operationId": "checkout_orders_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 8,
+              "title": "Idempotency-Key",
+              "type": "string"
             }
           }
-        }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Checkout"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid access token"
+          },
+          "402": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "PAYMENT_FAILED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The token does not have the required role"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "PAYMENT_INTENT_NOT_FOUND or LISTING_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "STOCK_UNAVAILABLE (details: listingId, requested, available), LISTING_NOT_AVAILABLE, PAYMENT_INTENT_USED, IDEMPOTENCY_KEY_REUSED or IDEMPOTENCY_IN_PROGRESS"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "CATALOG_UNAVAILABLE"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Checkout: place one order per farm",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/orders/harvest": {
+      "post": {
+        "description": "The harvest order is created when the quality check passes (status PLACED, no option). DELIVERY needs `deliveryAddress` (and optionally `deliveryDate`): the order becomes READY_FOR_DISPATCH and is pooled like any order; the balance (total minus deposit) is charged when it is delivered. BUYBACK: the farmer buys the harvest, the customer is credited and the order is COMPLETED. Repeating the same choice returns the order.",
+        "operationId": "choose_harvest_option_orders_harvest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HarvestOrderChoice"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid access token"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The token does not have the required role"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "RESERVATION_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "HARVEST_NOT_READY, HARVEST_OPTION_CHOSEN or HARVEST_ORDER_CLOSED"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Customer: choose delivery or buy-back for a graded harvest",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/orders/payments/intent": {
+      "post": {
+        "description": "kind FULL (default): pay for a checkout; the intent stays PENDING until POST /orders uses it. kind DEPOSIT: pay the deposit of an accepted land reservation (`referenceId` is the reservation id, `amount` must equal its deposit); the mock gateway takes it at once, so `status` in the response is SUCCEEDED (or FAILED for the test amount) and the land service activates the reservation. BALANCE and REFUND are created by the order service.",
+        "operationId": "create_payment_intent_orders_payments_intent_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentIntentCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntent"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid access token"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The token does not have the required role"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "RESERVATION_NOT_FOUND (DEPOSIT)"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "DEPOSIT_ALREADY_PAID or RESERVATION_NOT_PAYABLE (DEPOSIT)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "DEPOSIT_AMOUNT_MISMATCH (DEPOSIT)"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create a mock payment intent",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/orders/payments/webhook": {
+      "post": {
+        "description": "Called by the (mock) payment gateway, not by an app. Authenticated with the shared secret in the X-Webhook-Secret header. Settles a PENDING DEPOSIT intent; repeating the same result is harmless. Only needed when the deposit was not taken at once.",
+        "operationId": "payment_webhook_orders_payments_webhook_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Webhook-Secret",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Webhook-Secret",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentWebhook"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntent"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "INVALID_WEBHOOK_SECRET"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "PAYMENT_INTENT_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "PAYMENT_ALREADY_SETTLED, PAYMENT_NOT_SETTLEABLE or DEPOSIT_ALREADY_PAID"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mock gateway: report the result of a payment intent",
+        "tags": [
+          "orders"
+        ]
       }
     },
     "/orders/{order_id}": {
       "get": {
-        "tags": [
-          "orders"
+        "operationId": "get_order_orders__order_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Order Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid access token"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The token does not have the required role"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "ORDER_NOT_FOUND"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
         ],
         "summary": "Order with its status timeline",
-        "operationId": "get_order_orders__order_id__get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "order_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Order Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrderDetail"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "The token does not have the required role",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "ORDER_NOT_FOUND",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/orders/{order_id}/pack": {
-      "post": {
         "tags": [
           "orders"
-        ],
-        "summary": "Farmer: mark a confirmed order as packed",
-        "description": "Moves CONFIRMED to PACKED and publishes order.packed, which starts the inspection.",
-        "operationId": "pack_order_orders__order_id__pack_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "order_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Order Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrderDetail"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "The token does not have the required role",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "ORDER_NOT_FOUND",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "INVALID_STATUS_TRANSITION",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
+        ]
       }
     },
     "/orders/{order_id}/cancel": {
       "post": {
-        "tags": [
-          "orders"
-        ],
-        "summary": "Cancel an order before it is handed to logistics",
         "description": "The customer, the farm's owner or an admin can cancel. Publishes order.cancelled (catalog releases the stock) and records a REFUND payment.",
         "operationId": "cancel_order_orders__order_id__cancel_post",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "parameters": [
           {
-            "name": "order_id",
             "in": "path",
+            "name": "order_id",
             "required": true,
             "schema": {
-              "type": "string",
               "format": "uuid",
-              "title": "Order Id"
+              "title": "Order Id",
+              "type": "string"
             }
           }
         ],
@@ -740,1381 +1910,262 @@
         },
         "responses": {
           "200": {
-            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OrderDetail"
                 }
               }
-            }
+            },
+            "description": "Successful Response"
           },
           "401": {
-            "description": "Missing or invalid access token",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            }
+            },
+            "description": "Missing or invalid access token"
           },
           "403": {
-            "description": "The token does not have the required role",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            }
+            },
+            "description": "The token does not have the required role"
           },
           "404": {
-            "description": "ORDER_NOT_FOUND",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            }
+            },
+            "description": "ORDER_NOT_FOUND"
           },
           "409": {
-            "description": "ORDER_NOT_CANCELLABLE",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            }
+            },
+            "description": "ORDER_NOT_CANCELLABLE"
           },
           "422": {
-            "description": "Validation Error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
-            }
+            },
+            "description": "Validation Error"
           }
-        }
-      }
-    },
-    "/orders/{order_id}/rating": {
-      "post": {
-        "tags": [
-          "orders"
-        ],
-        "summary": "Rate a completed order's delivery",
-        "operationId": "rate_order_orders__order_id__rating_post",
+        },
         "security": [
           {
             "HTTPBearer": []
           }
         ],
+        "summary": "Cancel an order before it is handed to logistics",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/orders/{order_id}/pack": {
+      "post": {
+        "description": "Moves CONFIRMED to PACKED and publishes order.packed, which starts the inspection.",
+        "operationId": "pack_order_orders__order_id__pack_post",
         "parameters": [
           {
-            "name": "order_id",
             "in": "path",
+            "name": "order_id",
             "required": true,
             "schema": {
-              "type": "string",
               "format": "uuid",
-              "title": "Order Id"
+              "title": "Order Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid access token"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The token does not have the required role"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "ORDER_NOT_FOUND"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "INVALID_STATUS_TRANSITION"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Farmer: mark a confirmed order as packed",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/orders/{order_id}/rating": {
+      "post": {
+        "operationId": "rate_order_orders__order_id__rating_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Order Id",
+              "type": "string"
             }
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/OrderRatingCreate"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "201": {
-            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OrderRating"
                 }
               }
-            }
+            },
+            "description": "Successful Response"
           },
           "401": {
-            "description": "Missing or invalid access token",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            }
+            },
+            "description": "Missing or invalid access token"
           },
           "403": {
-            "description": "The token does not have the required role",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            }
+            },
+            "description": "The token does not have the required role"
           },
           "404": {
-            "description": "ORDER_NOT_FOUND",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            }
+            },
+            "description": "ORDER_NOT_FOUND"
           },
           "409": {
-            "description": "ORDER_NOT_COMPLETED or ALREADY_RATED",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
-            }
+            },
+            "description": "ORDER_NOT_COMPLETED or ALREADY_RATED"
           },
           "422": {
-            "description": "Validation Error",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "CancelRequest": {
-        "properties": {
-          "reason": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 500
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Reason",
-            "examples": [
-              "Ordered by mistake"
-            ]
-          }
-        },
-        "type": "object",
-        "title": "CancelRequest"
-      },
-      "Checkout": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "customerId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Customerid"
-          },
-          "paymentIntentId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Paymentintentid"
-          },
-          "paymentStatus": {
-            "$ref": "#/components/schemas/PaymentStatus"
-          },
-          "subtotal": {
-            "type": "number",
-            "title": "Subtotal"
-          },
-          "deliveryFee": {
-            "type": "number",
-            "title": "Deliveryfee"
-          },
-          "total": {
-            "type": "number",
-            "title": "Total"
-          },
-          "currency": {
-            "type": "string",
-            "title": "Currency",
-            "default": "INR"
-          },
-          "orders": {
-            "items": {
-              "$ref": "#/components/schemas/Order"
             },
-            "type": "array",
-            "title": "Orders"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
+            "description": "Validation Error"
           }
         },
-        "type": "object",
-        "required": [
-          "id",
-          "customerId",
-          "paymentIntentId",
-          "paymentStatus",
-          "subtotal",
-          "deliveryFee",
-          "total",
-          "orders",
-          "createdAt"
-        ],
-        "title": "Checkout",
-        "description": "Result of POST /orders: one checkout holding one order per farm."
-      },
-      "CheckoutRequest": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/OrderItemIn"
-            },
-            "type": "array",
-            "minItems": 1,
-            "title": "Items"
-          },
-          "deliveryAddress": {
-            "$ref": "#/components/schemas/DeliveryAddress"
-          },
-          "deliveryDate": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Deliverydate",
-            "description": "Day the customer wants the delivery. Defaults to tomorrow. Orders due the same day are pooled into one route."
-          },
-          "paymentIntentId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Paymentintentid"
-          },
-          "notes": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 500
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Notes"
+        "security": [
+          {
+            "HTTPBearer": []
           }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "deliveryAddress",
-          "paymentIntentId"
         ],
-        "title": "CheckoutRequest",
-        "description": "Body of POST /orders. The cart lives only in the app; items are sent here."
-      },
-      "DeliveryAddress": {
-        "properties": {
-          "label": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Label",
-            "examples": [
-              "Home"
-            ]
-          },
-          "line1": {
-            "type": "string",
-            "title": "Line1",
-            "examples": [
-              "12 Green Park"
-            ]
-          },
-          "line2": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Line2"
-          },
-          "city": {
-            "type": "string",
-            "title": "City",
-            "examples": [
-              "Jaipur"
-            ]
-          },
-          "pincode": {
-            "type": "string",
-            "pattern": "^\\d{6}$",
-            "title": "Pincode",
-            "examples": [
-              "302001"
-            ]
-          },
-          "location": {
-            "$ref": "#/components/schemas/GeoPoint"
-          },
-          "contactPhone": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Contactphone",
-            "examples": [
-              "+919999999999"
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "line1",
-          "city",
-          "pincode",
-          "location"
-        ],
-        "title": "DeliveryAddress",
-        "description": "Where the order is delivered. `location` is required: logistics pools drops that are close."
-      },
-      "ErrorBody": {
-        "properties": {
-          "code": {
-            "type": "string",
-            "title": "Code",
-            "examples": [
-              "STOCK_UNAVAILABLE"
-            ]
-          },
-          "message": {
-            "type": "string",
-            "title": "Message"
-          },
-          "correlationId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Correlationid"
-          },
-          "details": {
-            "anyOf": [
-              {},
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Details"
-          }
-        },
-        "type": "object",
-        "required": [
-          "code",
-          "message"
-        ],
-        "title": "ErrorBody"
-      },
-      "ErrorResponse": {
-        "properties": {
-          "error": {
-            "$ref": "#/components/schemas/ErrorBody"
-          }
-        },
-        "type": "object",
-        "required": [
-          "error"
-        ],
-        "title": "ErrorResponse"
-      },
-      "GeoPoint": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "Point",
-            "title": "Type",
-            "default": "Point"
-          },
-          "coordinates": {
-            "prefixItems": [
-              {
-                "type": "number",
-                "maximum": 180.0,
-                "minimum": -180.0
-              },
-              {
-                "type": "number",
-                "maximum": 90.0,
-                "minimum": -90.0
-              }
-            ],
-            "type": "array",
-            "maxItems": 2,
-            "minItems": 2,
-            "title": "Coordinates",
-            "examples": [
-              [
-                75.7873,
-                26.9124
-              ]
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "coordinates"
-        ],
-        "title": "GeoPoint",
-        "description": "A GeoJSON Point, the same JSON the catalog uses: `{\"type\": \"Point\", \"coordinates\": [lng, lat]}`."
-      },
-      "HTTPValidationError": {
-        "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
-            "type": "array",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "title": "HTTPValidationError"
-      },
-      "HarvestOption": {
-        "type": "string",
-        "enum": [
-          "DELIVERY",
-          "BUYBACK"
-        ],
-        "title": "HarvestOption",
-        "description": "What a customer does with a graded harvest (HLD section 12)."
-      },
-      "HarvestOrderChoice": {
-        "properties": {
-          "reservationId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Reservationid"
-          },
-          "option": {
-            "$ref": "#/components/schemas/HarvestOption"
-          },
-          "deliveryAddress": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DeliveryAddress"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Required for DELIVERY, ignored for BUYBACK"
-          },
-          "deliveryDate": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Deliverydate",
-            "description": "DELIVERY only. Defaults to tomorrow, like checkout."
-          }
-        },
-        "type": "object",
-        "required": [
-          "reservationId",
-          "option"
-        ],
-        "title": "HarvestOrderChoice",
-        "description": "Body of POST /orders/harvest: what to do with the graded harvest of a reservation."
-      },
-      "Order": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "checkoutId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Checkoutid"
-          },
-          "orderType": {
-            "$ref": "#/components/schemas/OrderType",
-            "default": "PRODUCE"
-          },
-          "farmId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Farmid",
-            "description": "Empty on a harvest order"
-          },
-          "reservationId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Reservationid",
-            "description": "The land reservation a HARVEST order comes from"
-          },
-          "harvestOption": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/HarvestOption"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "HARVEST orders: empty until the customer chooses"
-          },
-          "status": {
-            "$ref": "#/components/schemas/OrderStatus"
-          },
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/OrderItem"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "subtotal": {
-            "type": "number",
-            "title": "Subtotal"
-          },
-          "deliveryFee": {
-            "type": "number",
-            "title": "Deliveryfee"
-          },
-          "total": {
-            "type": "number",
-            "title": "Total"
-          },
-          "currency": {
-            "type": "string",
-            "title": "Currency",
-            "default": "INR"
-          },
-          "deliveryAddress": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DeliveryAddress"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Empty on a harvest order that is not delivered"
-          },
-          "deliveryDate": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Deliverydate"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updatedat"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "checkoutId",
-          "status",
-          "items",
-          "subtotal",
-          "deliveryFee",
-          "total",
-          "createdAt",
-          "updatedAt"
-        ],
-        "title": "Order",
-        "description": "One order per farm, inside a checkout. A HARVEST order is one order from one reservation."
-      },
-      "OrderDetail": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "checkoutId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Checkoutid"
-          },
-          "orderType": {
-            "$ref": "#/components/schemas/OrderType",
-            "default": "PRODUCE"
-          },
-          "farmId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Farmid",
-            "description": "Empty on a harvest order"
-          },
-          "reservationId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Reservationid",
-            "description": "The land reservation a HARVEST order comes from"
-          },
-          "harvestOption": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/HarvestOption"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "HARVEST orders: empty until the customer chooses"
-          },
-          "status": {
-            "$ref": "#/components/schemas/OrderStatus"
-          },
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/OrderItem"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "subtotal": {
-            "type": "number",
-            "title": "Subtotal"
-          },
-          "deliveryFee": {
-            "type": "number",
-            "title": "Deliveryfee"
-          },
-          "total": {
-            "type": "number",
-            "title": "Total"
-          },
-          "currency": {
-            "type": "string",
-            "title": "Currency",
-            "default": "INR"
-          },
-          "deliveryAddress": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DeliveryAddress"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Empty on a harvest order that is not delivered"
-          },
-          "deliveryDate": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Deliverydate"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updatedat"
-          },
-          "events": {
-            "items": {
-              "$ref": "#/components/schemas/OrderEvent"
-            },
-            "type": "array",
-            "title": "Events"
-          },
-          "rating": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/OrderRating"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "payments": {
-            "items": {
-              "$ref": "#/components/schemas/PaymentRecord"
-            },
-            "type": "array",
-            "title": "Payments",
-            "description": "Payments and refunds of this order, oldest first"
-          },
-          "balanceDue": {
-            "type": "number",
-            "title": "Balancedue",
-            "description": "HARVEST DELIVERY: what is still to be paid, settled when the order completes",
-            "default": 0
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "checkoutId",
-          "status",
-          "items",
-          "subtotal",
-          "deliveryFee",
-          "total",
-          "createdAt",
-          "updatedAt",
-          "events",
-          "payments"
-        ],
-        "title": "OrderDetail",
-        "description": "GET /orders/{id}: the order plus its status timeline, oldest first."
-      },
-      "OrderEvent": {
-        "properties": {
-          "status": {
-            "$ref": "#/components/schemas/OrderStatus"
-          },
-          "occurredAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Occurredat"
-          },
-          "note": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Note"
-          }
-        },
-        "type": "object",
-        "required": [
-          "status",
-          "occurredAt"
-        ],
-        "title": "OrderEvent",
-        "description": "One entry of the status timeline (order_events)."
-      },
-      "OrderItem": {
-        "properties": {
-          "listingId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Listingid",
-            "description": "Empty on a harvest order"
-          },
-          "farmId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Farmid",
-            "description": "Empty on a harvest order"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "examples": [
-              "Tomato"
-            ]
-          },
-          "unit": {
-            "type": "string",
-            "title": "Unit",
-            "examples": [
-              "kg"
-            ]
-          },
-          "qty": {
-            "type": "number",
-            "title": "Qty"
-          },
-          "unitPrice": {
-            "type": "number",
-            "title": "Unitprice"
-          },
-          "lineTotal": {
-            "type": "number",
-            "title": "Linetotal"
-          },
-          "pickupLocation": {
-            "$ref": "#/components/schemas/GeoPoint",
-            "description": "Where the farm hands the produce over"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "unit",
-          "qty",
-          "unitPrice",
-          "lineTotal",
-          "pickupLocation"
-        ],
-        "title": "OrderItem",
-        "description": "A line of an order. Name and price are copied from the listing at checkout time."
-      },
-      "OrderItemIn": {
-        "properties": {
-          "listingId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Listingid"
-          },
-          "qty": {
-            "type": "number",
-            "exclusiveMinimum": 0.0,
-            "title": "Qty",
-            "examples": [
-              2.5
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "listingId",
-          "qty"
-        ],
-        "title": "OrderItemIn"
-      },
-      "OrderList": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/OrderSummary"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "nextCursor": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Nextcursor"
-          }
-        },
-        "type": "object",
-        "required": [
-          "items"
-        ],
-        "title": "OrderList",
-        "description": "Cursor pagination, like the catalog: pass `next_cursor` back as `cursor` for the next page."
-      },
-      "OrderRating": {
-        "properties": {
-          "orderId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Orderid"
-          },
-          "score": {
-            "type": "integer",
-            "title": "Score"
-          },
-          "comment": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Comment"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
-          }
-        },
-        "type": "object",
-        "required": [
-          "orderId",
-          "score",
-          "createdAt"
-        ],
-        "title": "OrderRating"
-      },
-      "OrderRatingCreate": {
-        "properties": {
-          "score": {
-            "type": "integer",
-            "maximum": 5.0,
-            "minimum": 1.0,
-            "title": "Score",
-            "examples": [
-              5
-            ]
-          },
-          "comment": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 500
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Comment"
-          }
-        },
-        "type": "object",
-        "required": [
-          "score"
-        ],
-        "title": "OrderRatingCreate"
-      },
-      "OrderStatus": {
-        "type": "string",
-        "enum": [
-          "PLACED",
-          "CONFIRMED",
-          "PACKED",
-          "QC_PASSED",
-          "READY_FOR_DISPATCH",
-          "POOLED",
-          "IN_TRANSIT",
-          "DELIVERED",
-          "COMPLETED",
-          "CANCELLED"
-        ],
-        "title": "OrderStatus",
-        "description": "Lifecycle of a per-farm order (HLD section 11).\n\nPLACED -> CONFIRMED -> PACKED -> QC_PASSED -> READY_FOR_DISPATCH is issue #13. After that\nlogistics drives it: POOLED (pool assigned), IN_TRANSIT (picked up), DELIVERED, COMPLETED."
-      },
-      "OrderSummary": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "checkoutId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Checkoutid"
-          },
-          "orderType": {
-            "$ref": "#/components/schemas/OrderType",
-            "default": "PRODUCE"
-          },
-          "farmId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Farmid"
-          },
-          "reservationId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Reservationid"
-          },
-          "harvestOption": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/HarvestOption"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "status": {
-            "$ref": "#/components/schemas/OrderStatus"
-          },
-          "itemCount": {
-            "type": "integer",
-            "title": "Itemcount"
-          },
-          "total": {
-            "type": "number",
-            "title": "Total"
-          },
-          "currency": {
-            "type": "string",
-            "title": "Currency",
-            "default": "INR"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updatedat"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "checkoutId",
-          "status",
-          "itemCount",
-          "total",
-          "createdAt",
-          "updatedAt"
-        ],
-        "title": "OrderSummary",
-        "description": "A row of GET /orders."
-      },
-      "OrderType": {
-        "type": "string",
-        "enum": [
-          "PRODUCE",
-          "HARVEST"
-        ],
-        "title": "OrderType",
-        "description": "PRODUCE is the V1 purchase of listed produce. HARVEST is added by the V2 harvest flow."
-      },
-      "PaymentIntent": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "amount": {
-            "type": "number",
-            "title": "Amount"
-          },
-          "currency": {
-            "type": "string",
-            "title": "Currency",
-            "default": "INR"
-          },
-          "kind": {
-            "$ref": "#/components/schemas/PaymentKind"
-          },
-          "referenceId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Referenceid"
-          },
-          "status": {
-            "$ref": "#/components/schemas/PaymentStatus"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "amount",
-          "kind",
-          "status",
-          "createdAt"
-        ],
-        "title": "PaymentIntent",
-        "description": "A mock payment. In this project it always succeeds unless the amount is a test value.\n\nA FULL intent stays PENDING until it is used by POST /orders. A DEPOSIT is taken as soon as the\nintent is created, so `status` is already SUCCEEDED or FAILED in the response."
-      },
-      "PaymentIntentCreate": {
-        "properties": {
-          "amount": {
-            "type": "number",
-            "exclusiveMinimum": 0.0,
-            "title": "Amount",
-            "examples": [
-              499.0
-            ]
-          },
-          "kind": {
-            "$ref": "#/components/schemas/PaymentKind",
-            "default": "FULL"
-          },
-          "referenceId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Referenceid"
-          }
-        },
-        "type": "object",
-        "required": [
-          "amount"
-        ],
-        "title": "PaymentIntentCreate"
-      },
-      "PaymentKind": {
-        "type": "string",
-        "enum": [
-          "FULL",
-          "DEPOSIT",
-          "BALANCE",
-          "REFUND"
-        ],
-        "title": "PaymentKind",
-        "description": "What a payment is for (HLD section 10). The land service pays reservation deposits through\nthis API too. BALANCE and REFUND rows are written by the order service, never requested by a\nclient."
-      },
-      "PaymentRecord": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "kind": {
-            "$ref": "#/components/schemas/PaymentKind"
-          },
-          "amount": {
-            "type": "number",
-            "title": "Amount"
-          },
-          "currency": {
-            "type": "string",
-            "title": "Currency",
-            "default": "INR"
-          },
-          "status": {
-            "$ref": "#/components/schemas/PaymentStatus"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "kind",
-          "amount",
-          "status",
-          "createdAt"
-        ],
-        "title": "PaymentRecord",
-        "description": "A payment or refund that belongs to an order."
-      },
-      "PaymentStatus": {
-        "type": "string",
-        "enum": [
-          "PENDING",
-          "SUCCEEDED",
-          "FAILED",
-          "REFUNDED"
-        ],
-        "title": "PaymentStatus"
-      },
-      "PaymentWebhook": {
-        "properties": {
-          "paymentIntentId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Paymentintentid"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "SUCCEEDED",
-              "FAILED"
-            ],
-            "title": "Status"
-          }
-        },
-        "type": "object",
-        "required": [
-          "paymentIntentId",
-          "status"
-        ],
-        "title": "PaymentWebhook",
-        "description": "Body of POST /orders/payments/webhook: the mock gateway reports the result of an intent."
-      },
-      "ValidationError": {
-        "properties": {
-          "loc": {
-            "items": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "integer"
-                }
-              ]
-            },
-            "type": "array",
-            "title": "Location"
-          },
-          "msg": {
-            "type": "string",
-            "title": "Message"
-          },
-          "type": {
-            "type": "string",
-            "title": "Error Type"
-          },
-          "input": {
-            "title": "Input"
-          },
-          "ctx": {
-            "type": "object",
-            "title": "Context"
-          }
-        },
-        "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
-        "title": "ValidationError"
-      }
-    },
-    "securitySchemes": {
-      "HTTPBearer": {
-        "type": "http",
-        "scheme": "bearer"
+        "summary": "Rate a completed order's delivery",
+        "tags": [
+          "orders"
+        ]
       }
     }
   }

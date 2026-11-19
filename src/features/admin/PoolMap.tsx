@@ -67,7 +67,7 @@ export function PoolMap({ pools, selectedId }: { pools: Pool[]; selectedId: stri
         }),
     } as Parameters<typeof L.geoJSON>[1]).addTo(m)
     layer.current = geo
-    if (features.length > 0 && geo.getBounds) m.fitBounds(geo.getBounds(), { padding: [30, 30], maxZoom: 13 })
+    if (features.length > 0 && geo.getBounds) m.fitBounds(geo.getBounds(), { padding: [30, 30], maxZoom: 13, animate: false })
   }, [pools, selectedId])
 
   return (

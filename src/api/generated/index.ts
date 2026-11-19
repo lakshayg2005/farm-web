@@ -2,6 +2,8 @@
 export type { components as CatalogComponents, paths as CatalogPaths } from './catalog'
 export type { components as IdentityComponents, paths as IdentityPaths } from './identity'
 export type { components as LandComponents, paths as LandPaths } from './land'
+export type { components as LogisticsComponents, paths as LogisticsPaths } from './logistics'
 export type { components as MediaComponents, paths as MediaPaths } from './media'
+export type { components as NotificationComponents, paths as NotificationPaths } from './notification'
 export type { components as OrderComponents, paths as OrderPaths } from './order'
 export type { components as QualityComponents, paths as QualityPaths } from './quality'

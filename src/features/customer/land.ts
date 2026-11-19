@@ -108,12 +108,12 @@ export const landApi = {
   cancel: (id: string) => api<Reservation>(`/land/reservations/${id}/cancel`, { method: 'POST' }),
   updates: (id: string) => api<CropUpdate[]>(`/land/reservations/${id}/updates`),
   payDeposit: (reservationId: string, amount: number) =>
-    api<PaymentIntent>('/orders/payments/intent', {
+    api<PaymentIntent>('/order/orders/payments/intent', {
       method: 'POST',
       body: { amount, kind: 'DEPOSIT', referenceId: reservationId },
     }),
   chooseHarvest: (reservationId: string, option: 'DELIVERY' | 'BUYBACK', deliveryAddress?: DeliveryAddress) =>
-    api('/orders/harvest', {
+    api('/order/orders/harvest', {
       method: 'POST',
       body: { reservationId, option, ...(option === 'DELIVERY' ? { deliveryAddress } : {}) },
     }),

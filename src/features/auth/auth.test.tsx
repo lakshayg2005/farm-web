@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { jsonResponse, mockApi, renderAt, signedInAs, tokens } from '@/test/auth'
+import { jsonResponse, makeUser, mockApi, renderAt, signedInAs, tokens } from '@/test/auth'
 import { session } from './session'
 
 beforeEach(() => {
@@ -76,7 +76,7 @@ describe('login', () => {
 describe('register and verify', () => {
   it('registers, requests an OTP and shows the dev code on the verify page', async () => {
     const calls = mockApi({
-      'POST /identity/register': () => jsonResponse(tokens(['customer']), 201),
+      'POST /identity/register': () => jsonResponse(makeUser(['customer']), 201), // UserOut: no tokens
       'POST /identity/otp/request': () => jsonResponse({ devCode: '123456', expiresIn: 300, resendAfter: 30 }, 202),
       'POST /identity/otp/verify': () => jsonResponse(tokens(['customer'])),
     })

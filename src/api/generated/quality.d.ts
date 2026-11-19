@@ -4,37 +4,16 @@
  */
 
 export interface paths {
-    "/inspectors/me/location": {
+    "/health": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        /** Set the inspector's current location and availability */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["InspectorLocationIn"];
-                };
-            };
-            responses: {
-                /** @description Inspector location saved */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** Health */
+        get: operations["health_health_get"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -49,25 +28,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List assigned and unassigned inspections */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Inspection queue; inspector sees own and unassigned inspections, admin sees all */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** List Inspections */
+        get: operations["list_inspections_inspections_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -76,7 +38,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/inspections/{inspectionId}/claim": {
+    "/inspections/{inspection_id}/claim": {
         parameters: {
             query?: never;
             header?: never;
@@ -85,41 +47,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Claim an unassigned inspection */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    inspectionId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Assigned inspection */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description INSPECTION_NOT_PENDING or INSPECTION_ASSIGNED */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** Claim Inspection */
+        post: operations["claim_inspection_inspections__inspection_id__claim_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/inspections/{inspectionId}/report": {
+    "/inspections/{inspection_id}/report": {
         parameters: {
             query?: never;
             header?: never;
@@ -128,38 +64,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Submit grade, moisture, pest, weight and photo report; publishes quality.graded */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    inspectionId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["InspectionReport"];
-                };
-            };
-            responses: {
-                /** @description Reported inspection */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description INSPECTION_ALREADY_REPORTED */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** Submit Report */
+        post: operations["submit_report_inspections__inspection_id__report_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inspectors/me/location": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
+        get?: never;
+        /** Update My Location */
+        put: operations["update_my_location_inspectors_me_location_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -170,34 +93,116 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /** InspectionOut */
+        InspectionOut: {
+            /** Attempt */
+            attempt: number;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /** Grade */
+            grade: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Inspectorid */
+            inspectorId: string | null;
+            /** Mediaids */
+            mediaIds: string[];
+            /** Moisturepct */
+            moisturePct: number | null;
+            /** Pestfound */
+            pestFound: boolean | null;
+            /** Reportedat */
+            reportedAt: string | null;
+            /** Resolution */
+            resolution: string | null;
+            /** Result */
+            result: string | null;
+            /** Status */
+            status: string;
+            /**
+             * Subjectid
+             * Format: uuid
+             */
+            subjectId: string;
+            /** Subjecttype */
+            subjectType: string;
+            /** Weightkg */
+            weightKg: number | null;
+        };
+        /** InspectionReport */
+        InspectionReport: {
+            /** Acceptedgrade */
+            acceptedGrade?: ("A" | "B" | "C") | null;
+            /**
+             * Grade
+             * @enum {string}
+             */
+            grade: "A" | "B" | "C";
+            location?: components["schemas"]["Point"] | null;
+            /** Mediaids */
+            mediaIds?: string[];
+            /** Moisturepct */
+            moisturePct: number;
+            /** Note */
+            note?: string | null;
+            /** Pestfound */
+            pestFound: boolean;
+            /** Resolution */
+            resolution?: ("REHARVEST" | "ACCEPT_LOWER_GRADE") | null;
+            /**
+             * Result
+             * @enum {string}
+             */
+            result: "PASS" | "FAIL";
+            /** Weightkg */
+            weightKg: number;
+        };
+        /** InspectorLocationIn */
+        InspectorLocationIn: {
+            /**
+             * Available
+             * @default true
+             */
+            available: boolean;
+            location: components["schemas"]["Point"];
+        };
+        /** Point */
         Point: {
-            /** @constant */
-            type: "Point";
+            /** Coordinates */
             coordinates: [
                 number,
                 number
             ];
+            /**
+             * Type
+             * @default Point
+             * @constant
+             */
+            type: "Point";
         };
-        InspectorLocationIn: {
-            location: components["schemas"]["Point"];
-            /** @default true */
-            available: boolean;
-        };
-        InspectionReport: {
-            /** @enum {unknown} */
-            grade: "A" | "B" | "C";
-            moisturePct: number;
-            pestFound: boolean;
-            weightKg: number;
-            /** @enum {unknown} */
-            result: "PASS" | "FAIL";
-            /** @enum {unknown} */
-            resolution?: "REHARVEST" | "ACCEPT_LOWER_GRADE" | null;
-            /** @enum {unknown} */
-            acceptedGrade?: "A" | "B" | "C" | null;
-            mediaIds?: string[];
-            location?: components["schemas"]["Point"] | null;
-            note?: string | null;
+        /** ValidationError */
+        ValidationError: {
+            /** Context */
+            ctx?: Record<string, never>;
+            /** Input */
+            input?: unknown;
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
         };
     };
     responses: never;
@@ -207,4 +212,146 @@ export interface components {
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export interface operations {
+    health_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    list_inspections_inspections_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionOut"][];
+                };
+            };
+        };
+    };
+    claim_inspection_inspections__inspection_id__claim_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                inspection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_report_inspections__inspection_id__report_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                inspection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectionReport"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_my_location_inspectors_me_location_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectorLocationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+}

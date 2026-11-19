@@ -4,6 +4,57 @@
  */
 
 export interface paths {
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Health */
+        get: operations["health_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal/geo/plot/{plot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Plot Geo */
+        get: operations["plot_geo_internal_geo_plot__plot_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal/geo/reservation/{reservation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reservation Geo */
+        get: operations["reservation_geo_internal_geo_reservation__reservation_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/plots": {
         parameters: {
             query?: never;
@@ -13,43 +64,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a plot from a GeoJSON polygon */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["PlotCreate"];
-                };
-            };
-            responses: {
-                /** @description Created; response includes areaAcres, centroid and GeoJSON boundary */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description PLOT_OVERLAP */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description INVALID_PLOT_BOUNDARY */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** Create Plot */
+        post: operations["create_plot_plots_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -63,268 +79,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List the authenticated farmer's plots */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Plot array */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** My Plots */
+        get: operations["my_plots_plots_mine_get"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
-        trace?: never;
-    };
-    "/plots/{plotId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a plot */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    plotId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Plot */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description PLOT_NOT_FOUND */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        /** Soft-delete a plot with no live reservation */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    plotId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Deleted */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description PLOT_HAS_LIVE_RESERVATION */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        /** Update plot metadata or boundary */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    plotId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["PlotUpdate"];
-                };
-            };
-            responses: {
-                /** @description Updated plot */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description PLOT_OVERLAP */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        trace?: never;
-    };
-    "/plots/{plotId}/seasons": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List a plot's seasons */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    plotId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Season array */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        /** Add a growing season to a plot */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    plotId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["SeasonCreate"];
-                };
-            };
-            responses: {
-                /** @description Created season */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/plots/{plotId}/seasons/{seasonId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete a season without reservation history */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    plotId: string;
-                    seasonId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Deleted */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description SEASON_HAS_RESERVATION_HISTORY */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        /** Update a season with no live reservation */
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    plotId: string;
-                    seasonId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["SeasonCreate"];
-                };
-            };
-            responses: {
-                /** @description Updated season */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description SEASON_HAS_LIVE_RESERVATION */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
         trace?: never;
     };
     "/plots/search": {
@@ -334,41 +96,69 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Search GeoJSON plots by bounding box or radius */
-        get: {
-            parameters: {
-                query?: {
-                    lat?: number;
-                    lng?: number;
-                    radius_km?: number;
-                    west?: number;
-                    south?: number;
-                    east?: number;
-                    north?: number;
-                    season?: string;
-                    crop?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description GeoJSON FeatureCollection; excludes booked plot-seasons */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** Search Plots */
+        get: operations["search_plots_plots_search_get"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/plots/{plot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Plot */
+        get: operations["get_plot_plots__plot_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Plot */
+        delete: operations["delete_plot_plots__plot_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Plot */
+        patch: operations["update_plot_plots__plot_id__patch"];
+        trace?: never;
+    };
+    "/plots/{plot_id}/seasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Seasons */
+        get: operations["list_seasons_plots__plot_id__seasons_get"];
+        put?: never;
+        /** Create Season */
+        post: operations["create_season_plots__plot_id__seasons_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/plots/{plot_id}/seasons/{season_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Season */
+        delete: operations["delete_season_plots__plot_id__seasons__season_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Season */
+        patch: operations["update_season_plots__plot_id__seasons__season_id__patch"];
         trace?: never;
     };
     "/reservations": {
@@ -380,36 +170,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Reserve an available plot-season */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ReservationCreate"];
-                };
-            };
-            responses: {
-                /** @description PENDING reservation; expires after 48 hours */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description PLOT_SEASON_ALREADY_RESERVED */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** Reserve Plot */
+        post: operations["reserve_plot_reservations_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -423,25 +185,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List the caller's reservations */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Reservation array */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** My Reservations */
+        get: operations["my_reservations_reservations_mine_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -450,7 +195,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/reservations/{reservationId}/accept": {
+    "/reservations/{reservation_id}/accept": {
         parameters: {
             query?: never;
             header?: never;
@@ -459,34 +204,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Farmer accepts a pending reservation; publishes reservation.accepted */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    reservationId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description ACCEPTED reservation with deposit amount */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** Accept Reservation */
+        post: operations["accept_reservation_reservations__reservation_id__accept_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/reservations/{reservationId}/reject": {
+    "/reservations/{reservation_id}/cancel": {
         parameters: {
             query?: never;
             header?: never;
@@ -495,34 +221,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Farmer rejects a pending reservation */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    reservationId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description REJECTED reservation */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** Cancel Reservation */
+        post: operations["cancel_reservation_reservations__reservation_id__cancel_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/reservations/{reservationId}/cancel": {
+    "/reservations/{reservation_id}/harvest-ready": {
         parameters: {
             query?: never;
             header?: never;
@@ -531,94 +238,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Customer or farmer cancels a live reservation */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    reservationId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description CANCELLED reservation */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /** Harvest Ready */
+        post: operations["harvest_ready_reservations__reservation_id__harvest_ready_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/reservations/{reservationId}/updates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Read the crop timeline for a reservation */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    reservationId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Chronological crop update array including geotag and media IDs */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        /** Post a crop-stage update with photos and optional geotag */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    reservationId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CropUpdateCreate"];
-                };
-            };
-            responses: {
-                /** @description Crop update created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/reservations/{reservationId}/harvest-ready": {
+    "/reservations/{reservation_id}/reject": {
         parameters: {
             query?: never;
             header?: never;
@@ -627,27 +255,26 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Mark a crop harvest-ready and publish harvest.ready */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    reservationId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description HARVEST_READY reservation */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** Reject Reservation */
+        post: operations["reject_reservation_reservations__reservation_id__reject_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reservations/{reservation_id}/updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
+        /** List Crop Updates */
+        get: operations["list_crop_updates_reservations__reservation_id__updates_get"];
+        put?: never;
+        /** Add Crop Update */
+        post: operations["add_crop_update_reservations__reservation_id__updates_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -658,54 +285,224 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CropUpdateCreate */
+        CropUpdateCreate: {
+            location?: components["schemas"]["Point"] | null;
+            /** Mediaids */
+            mediaIds?: string[];
+            /** Note */
+            note?: string | null;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "SOWN" | "GROWING" | "FLOWERING";
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /** PlotCreate */
+        PlotCreate: {
+            boundary: components["schemas"]["Polygon"];
+            /** Description */
+            description?: string | null;
+            /** Soiltype */
+            soilType?: string | null;
+            /** Title */
+            title: string;
+            /** Watersource */
+            waterSource?: string | null;
+        };
+        /** PlotOut */
+        PlotOut: {
+            /** Areaacres */
+            areaAcres: number;
+            /** Boundary */
+            boundary: {
+                [key: string]: unknown;
+            };
+            /** Centroid */
+            centroid: {
+                [key: string]: unknown;
+            };
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /** Description */
+            description: string | null;
+            /**
+             * Farmerid
+             * Format: uuid
+             */
+            farmerId: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Soiltype */
+            soilType: string | null;
+            /** Status */
+            status: string;
+            /** Title */
+            title: string;
+            /** Watersource */
+            waterSource: string | null;
+        };
+        /** PlotUpdate */
+        PlotUpdate: {
+            boundary?: components["schemas"]["Polygon"] | null;
+            /** Description */
+            description?: string | null;
+            /** Soiltype */
+            soilType?: string | null;
+            /** Title */
+            title?: string | null;
+            /** Watersource */
+            waterSource?: string | null;
+        };
+        /** Point */
         Point: {
-            /** @constant */
-            type: "Point";
+            /** Coordinates */
             coordinates: [
                 number,
                 number
             ];
+            /**
+             * Type
+             * @default Point
+             * @constant
+             */
+            type: "Point";
         };
+        /** Polygon */
         Polygon: {
-            /** @constant */
+            /** Coordinates */
+            coordinates: [
+                number,
+                number
+            ][][];
+            /**
+             * Type
+             * @default Polygon
+             * @constant
+             */
             type: "Polygon";
-            coordinates: components["schemas"]["Point"]["coordinates"][][];
         };
-        PlotCreate: {
-            title: string;
-            description?: string | null;
-            soilType?: string | null;
-            waterSource?: string | null;
-            boundary: components["schemas"]["Polygon"];
-        };
-        PlotUpdate: {
-            title?: string | null;
-            description?: string | null;
-            soilType?: string | null;
-            waterSource?: string | null;
-            boundary?: components["schemas"]["Polygon"] | null;
-        };
-        SeasonCreate: {
-            season: string;
-            /** Format: date */
-            startDate: string;
-            /** Format: date */
-            endDate: string;
-            price: number;
-            allowedCrops?: string[];
-        };
+        /** ReservationCreate */
         ReservationCreate: {
-            /** Format: uuid */
-            plotSeasonId: string;
+            /** Cropid */
             cropId: string;
+            /** Expectedqtykg */
             expectedQtyKg: number;
+            /**
+             * Plotseasonid
+             * Format: uuid
+             */
+            plotSeasonId: string;
         };
-        CropUpdateCreate: {
-            /** @enum {unknown} */
-            stage: "SOWN" | "GROWING" | "FLOWERING";
-            note?: string | null;
-            mediaIds?: string[];
-            location?: components["schemas"]["Point"] | null;
+        /** ReservationOut */
+        ReservationOut: {
+            /** Cropid */
+            cropId: string;
+            /**
+             * Customerid
+             * Format: uuid
+             */
+            customerId: string;
+            /** Deposit */
+            deposit: number | null;
+            /** Expectedqtykg */
+            expectedQtyKg: number;
+            /**
+             * Expiresat
+             * Format: date-time
+             */
+            expiresAt: string;
+            /**
+             * Farmerid
+             * Format: uuid
+             */
+            farmerId: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Plotseasonid
+             * Format: uuid
+             */
+            plotSeasonId: string;
+            /** Status */
+            status: string;
+            /** Total */
+            total: number | null;
+        };
+        /** SeasonCreate */
+        SeasonCreate: {
+            /** Allowedcrops */
+            allowedCrops?: string[];
+            /**
+             * Enddate
+             * Format: date
+             */
+            endDate: string;
+            /** Price */
+            price: number;
+            /** Season */
+            season: string;
+            /**
+             * Startdate
+             * Format: date
+             */
+            startDate: string;
+        };
+        /** SeasonOut */
+        SeasonOut: {
+            /** Allowedcrops */
+            allowedCrops: string[];
+            /**
+             * Enddate
+             * Format: date
+             */
+            endDate: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Plotid
+             * Format: uuid
+             */
+            plotId: string;
+            /** Price */
+            price: number;
+            /** Season */
+            season: string;
+            /**
+             * Startdate
+             * Format: date
+             */
+            startDate: string;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Context */
+            ctx?: Record<string, never>;
+            /** Input */
+            input?: unknown;
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
         };
     };
     responses: never;
@@ -715,4 +512,653 @@ export interface components {
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export interface operations {
+    health_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    plot_geo_internal_geo_plot__plot_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reservation_geo_internal_geo_reservation__reservation_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_plot_plots_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlotCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlotOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_plots_plots_mine_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlotOut"][];
+                };
+            };
+        };
+    };
+    search_plots_plots_search_get: {
+        parameters: {
+            query?: {
+                lat?: number | null;
+                lng?: number | null;
+                radius_km?: number;
+                west?: number | null;
+                south?: number | null;
+                east?: number | null;
+                north?: number | null;
+                season?: string | null;
+                crop?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_plot_plots__plot_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlotOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_plot_plots__plot_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_plot_plots__plot_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlotUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlotOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_seasons_plots__plot_id__seasons_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_season_plots__plot_id__seasons_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeasonCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_season_plots__plot_id__seasons__season_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plot_id: string;
+                season_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_season_plots__plot_id__seasons__season_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plot_id: string;
+                season_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeasonCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reserve_plot_reservations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReservationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_reservations_reservations_mine_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationOut"][];
+                };
+            };
+        };
+    };
+    accept_reservation_reservations__reservation_id__accept_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_reservation_reservations__reservation_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    harvest_ready_reservations__reservation_id__harvest_ready_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reject_reservation_reservations__reservation_id__reject_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_crop_updates_reservations__reservation_id__updates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_crop_update_reservations__reservation_id__updates_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CropUpdateCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+}
