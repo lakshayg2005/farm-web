@@ -114,12 +114,12 @@ describe('my reservations', () => {
   it('lets the customer pay the deposit after the farmer accepts', async () => {
     const calls = customerSession({
       'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'ACCEPTED', deposit: 800 }]),
-      'POST /orders/payments/intent': () => jsonResponse({ id: 'pi1', amount: 800, status: 'SUCCEEDED' }, 201),
+      'POST /order/orders/payments/intent': () => jsonResponse({ id: 'pi1', amount: 800, status: 'SUCCEEDED' }, 201),
     })
     renderAt('/customer/reservations')
     await userEvent.click(await screen.findByRole('button', { name: 'Pay deposit ₹800' }))
-    await waitFor(() => expect(calls.some((c) => c.key === 'POST /orders/payments/intent')).toBe(true))
-    expect(calls.find((c) => c.key === 'POST /orders/payments/intent')!.body).toEqual({ amount: 800, kind: 'DEPOSIT', referenceId: 'r1' })
+    await waitFor(() => expect(calls.some((c) => c.key === 'POST /order/orders/payments/intent')).toBe(true))
+    expect(calls.find((c) => c.key === 'POST /order/orders/payments/intent')!.body).toEqual({ amount: 800, kind: 'DEPOSIT', referenceId: 'r1' })
   })
 
   it('shows the farmer’s crop updates for a growing crop', async () => {
@@ -141,13 +141,13 @@ describe('my reservations', () => {
     const calls = customerSession({
       'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'HARVEST_READY', deposit: 800 }]),
       'GET /land/reservations/r1/updates': () => jsonResponse([]),
-      'POST /orders/harvest': () => jsonResponse({ id: 'o1' }, 201),
+      'POST /order/orders/harvest': () => jsonResponse({ id: 'o1' }, 201),
     })
     renderAt('/customer/reservations')
     await userEvent.click(await screen.findByLabelText(/Let the farmer buy it back/))
     await userEvent.click(screen.getByRole('button', { name: 'Confirm my choice' }))
-    await waitFor(() => expect(calls.some((c) => c.key === 'POST /orders/harvest')).toBe(true))
-    expect(calls.find((c) => c.key === 'POST /orders/harvest')!.body).toEqual({ reservationId: 'r1', option: 'BUYBACK' })
+    await waitFor(() => expect(calls.some((c) => c.key === 'POST /order/orders/harvest')).toBe(true))
+    expect(calls.find((c) => c.key === 'POST /order/orders/harvest')!.body).toEqual({ reservationId: 'r1', option: 'BUYBACK' })
   })
 
   it('asks for a valid address before choosing delivery', async () => {
@@ -158,7 +158,7 @@ describe('my reservations', () => {
     renderAt('/customer/reservations')
     await userEvent.click(await screen.findByRole('button', { name: 'Confirm my choice' }))
     expect(screen.getByText('Enter the delivery address.')).toBeInTheDocument()
-    expect(calls.some((c) => c.key === 'POST /orders/harvest')).toBe(false)
+    expect(calls.some((c) => c.key === 'POST /order/orders/harvest')).toBe(false)
   })
 
   it('cancels a pending request', async () => {

@@ -1,0 +1,1184 @@
+{
+  "components": {
+    "schemas": {
+      "DeliverIn": {
+        "properties": {
+          "deliveredAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deliveredat"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "otp": {
+            "description": "4-digit OTP entered by customer",
+            "maxLength": 6,
+            "minLength": 4,
+            "title": "Otp",
+            "type": "string"
+          },
+          "photoMediaId": {
+            "description": "media_id of the proof-of-delivery photo",
+            "format": "uuid",
+            "title": "Photomediaid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "photoMediaId",
+          "otp"
+        ],
+        "title": "DeliverIn",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "LocationPingIn": {
+        "properties": {
+          "accuracyM": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracym"
+          },
+          "heading": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heading"
+          },
+          "lat": {
+            "title": "Lat",
+            "type": "number"
+          },
+          "lng": {
+            "title": "Lng",
+            "type": "number"
+          },
+          "poolId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Poolid"
+          },
+          "recordedAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recordedat"
+          },
+          "speedMs": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speedms"
+          }
+        },
+        "required": [
+          "lat",
+          "lng"
+        ],
+        "title": "LocationPingIn",
+        "type": "object"
+      },
+      "PickupIn": {
+        "properties": {
+          "collectedAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collectedat"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "weightKg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weightkg"
+          }
+        },
+        "title": "PickupIn",
+        "type": "object"
+      },
+      "PoolOut": {
+        "properties": {
+          "assignedAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignedat"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kmSaved": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kmsaved"
+          },
+          "partnerId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partnerid"
+          },
+          "poolDate": {
+            "format": "date",
+            "title": "Pooldate",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PoolStatus"
+          },
+          "stops": {
+            "items": {
+              "$ref": "#/components/schemas/StopOut"
+            },
+            "title": "Stops",
+            "type": "array"
+          },
+          "totalKm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Totalkm"
+          }
+        },
+        "required": [
+          "id",
+          "poolDate",
+          "partnerId",
+          "status",
+          "totalKm",
+          "kmSaved",
+          "createdAt",
+          "assignedAt"
+        ],
+        "title": "PoolOut",
+        "type": "object"
+      },
+      "PoolRunResponse": {
+        "properties": {
+          "pools": {
+            "items": {
+              "$ref": "#/components/schemas/PoolOut"
+            },
+            "title": "Pools",
+            "type": "array"
+          },
+          "poolsCreated": {
+            "title": "Poolscreated",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "poolsCreated",
+          "pools"
+        ],
+        "title": "PoolRunResponse",
+        "type": "object"
+      },
+      "PoolStatus": {
+        "enum": [
+          "PENDING",
+          "ASSIGNED",
+          "IN_PROGRESS",
+          "COMPLETED"
+        ],
+        "title": "PoolStatus",
+        "type": "string"
+      },
+      "StopActionIn": {
+        "properties": {
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "title": "StopActionIn",
+        "type": "object"
+      },
+      "StopOut": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "customerName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customername"
+          },
+          "customerPhone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customerphone"
+          },
+          "doneAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doneat"
+          },
+          "eta": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "lat": {
+            "title": "Lat",
+            "type": "number"
+          },
+          "lng": {
+            "title": "Lng",
+            "type": "number"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "orderId": {
+            "format": "uuid",
+            "title": "Orderid",
+            "type": "string"
+          },
+          "otp": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Otp"
+          },
+          "otpVerified": {
+            "default": false,
+            "title": "Otpverified",
+            "type": "boolean"
+          },
+          "photoMediaId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photomediaid"
+          },
+          "poolId": {
+            "format": "uuid",
+            "title": "Poolid",
+            "type": "string"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StopStatus"
+          },
+          "stopType": {
+            "$ref": "#/components/schemas/StopType"
+          },
+          "weightKg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weightkg"
+          }
+        },
+        "required": [
+          "id",
+          "poolId",
+          "orderId",
+          "stopType",
+          "seq",
+          "lat",
+          "lng",
+          "status"
+        ],
+        "title": "StopOut",
+        "type": "object"
+      },
+      "StopStatus": {
+        "enum": [
+          "PENDING",
+          "ARRIVED",
+          "DONE",
+          "SKIPPED"
+        ],
+        "title": "StopStatus",
+        "type": "string"
+      },
+      "StopType": {
+        "enum": [
+          "PICKUP",
+          "DROP"
+        ],
+        "title": "StopType",
+        "type": "string"
+      },
+      "TrackOut": {
+        "properties": {
+          "eta": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta"
+          },
+          "orderId": {
+            "format": "uuid",
+            "title": "Orderid",
+            "type": "string"
+          },
+          "partnerId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partnerid"
+          },
+          "partnerLat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest GPS lat from location pings",
+            "title": "Partnerlat"
+          },
+          "partnerLng": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest GPS lng from location pings",
+            "title": "Partnerlng"
+          },
+          "partnerName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partnername"
+          },
+          "partnerPhone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partnerphone"
+          },
+          "partnerUpdatedAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partnerupdatedat"
+          },
+          "poolId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Poolid"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "stop": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StopOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "orderId"
+        ],
+        "title": "TrackOut",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "logistics service",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "ops"
+        ]
+      }
+    },
+    "/location": {
+      "post": {
+        "operationId": "record_location_location_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationPingIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Record a GPS location ping (every 30 s while on route)",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/my-route": {
+      "get": {
+        "operationId": "my_route_my_route_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pool_date",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "title": "Pool Date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoolOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Today's assigned pool for the authenticated delivery partner",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/orders/{order_id}/track": {
+      "get": {
+        "operationId": "track_order_orders__order_id__track_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Order Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Live tracking for a customer order",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/pools": {
+      "get": {
+        "description": "Every pool for `pool_date` with its stops in `seq` order, oldest pool first.",
+        "operationId": "list_pools_pools_get",
+        "parameters": [
+          {
+            "description": "Date to list pools for",
+            "in": "query",
+            "name": "pool_date",
+            "required": false,
+            "schema": {
+              "description": "Date to list pools for",
+              "format": "date",
+              "title": "Pool Date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PoolOut"
+                  },
+                  "title": "Response List Pools Pools Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Saved pools for a given date",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/pools/run": {
+      "post": {
+        "description": "Fetch READY_FOR_DISPATCH orders, cluster them, persist pools, publish pool.assigned.",
+        "operationId": "run_pools_pools_run_post",
+        "parameters": [
+          {
+            "description": "Date to pool orders for",
+            "in": "query",
+            "name": "pool_date",
+            "required": false,
+            "schema": {
+              "description": "Date to pool orders for",
+              "format": "date",
+              "title": "Pool Date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoolRunResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Run the pooling job for a given date",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/stops/{stop_id}/arrive": {
+      "post": {
+        "operationId": "arrive_at_stop_stops__stop_id__arrive_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "stop_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Stop Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Mark partner arrival at a stop",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/stops/{stop_id}/deliver": {
+      "post": {
+        "operationId": "confirm_delivery_stops__stop_id__deliver_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "stop_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Stop Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliverIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Complete a DROP stop with photo proof + OTP",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/stops/{stop_id}/pickup": {
+      "post": {
+        "operationId": "confirm_pickup_stops__stop_id__pickup_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "stop_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Stop Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/PickupIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Mark a PICKUP stop as done",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/stops/{stop_id}/skip": {
+      "post": {
+        "operationId": "skip_stop_stops__stop_id__skip_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "stop_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Stop Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/StopActionIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Mark a stop as skipped",
+        "tags": [
+          "logistics"
+        ]
+      }
+    }
+  }
+}

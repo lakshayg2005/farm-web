@@ -55,15 +55,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ...state,
       login: async (phone, password) =>
         accept(await api<TokenResponse>('/identity/login', { method: 'POST', body: { phone, password }, anonymous: true })),
-      register: async (input) => {
+      // Register answers with the new user only (no tokens): the OTP step that follows signs in.
+      register: (input) => {
         const { email, ...rest } = input
-        return accept(
-          await api<TokenResponse>('/identity/register', {
-            method: 'POST',
-            body: { ...rest, ...(email ? { email } : {}) },
-            anonymous: true,
-          }),
-        )
+        return api<User>('/identity/register', {
+          method: 'POST',
+          body: { ...rest, ...(email ? { email } : {}) },
+          anonymous: true,
+        })
       },
       requestOtp: (phone) => api<OtpRequestResponse>('/identity/otp/request', { method: 'POST', body: { phone }, anonymous: true }),
       verifyOtp: async (phone, code) =>

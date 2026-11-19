@@ -1,3 +1,4 @@
+import type { LogisticsComponents } from '@/api/generated'
 import { api } from '@/api/http'
 import type { User } from '@/features/auth/types'
 
@@ -17,7 +18,8 @@ export interface InspectionSummary {
   grade: string | null
 }
 
-/** One delivery pool: nearby drop points grouped into a single vehicle route (HLD section 14). */
+/** One delivery pool: nearby drop points grouped into a single vehicle route (HLD section 14).
+ * The page's own shape; `toPool` builds it from the logistics contract (PoolOut). */
 export interface PoolStop {
   orderId: string
   kind: 'PICKUP' | 'DROP'
@@ -37,14 +39,44 @@ export interface Pool {
   stops: PoolStop[]
 }
 
+type PoolOut = LogisticsComponents['schemas']['PoolOut']
+type PoolRunResponse = LogisticsComponents['schemas']['PoolRunResponse']
+
+const round1 = (km: number) => Math.round(km * 10) / 10
+
+/** Logistics sends flat lat/lng stops and no route line, so draw the route through the stops in order. */
+export function toPool(out: PoolOut): Pool {
+  const stops: PoolStop[] = (out.stops ?? [])
+    .map((s) => ({
+      orderId: s.orderId,
+      kind: s.stopType,
+      sequence: s.seq,
+      eta: s.eta ?? null,
+      location: { type: 'Point' as const, coordinates: [s.lng, s.lat] as [number, number] },
+    }))
+    .sort((a, b) => a.sequence - b.sequence)
+  return {
+    id: out.id,
+    date: out.poolDate,
+    partnerId: out.partnerId ?? null,
+    status: out.status,
+    totalKm: round1(out.totalKm ?? 0),
+    savedKm: round1(out.kmSaved ?? 0),
+    route: stops.length > 1 ? { type: 'LineString', coordinates: stops.map((s) => s.location.coordinates) } : null,
+    stops,
+  }
+}
+
 export const adminApi = {
   farmers: (verified: boolean) =>
     api<UserPage>(`/identity/users?role=farmer&farmerVerified=${verified}&limit=200`),
   verifyFarmer: (userId: string) => api<UserRow>(`/identity/users/${userId}/verify-farmer`, { method: 'POST' }),
   inspections: () => api<InspectionSummary[]>('/quality/inspections'),
-  pools: (date: string) => api<Pool[]>(`/logistics/pools?date=${date}`),
-  /** HLD section 15: POST /logistics/pools/run?date (admin), answering with that date's pools. */
-  runPooling: (date: string) => api<Pool[]>(`/logistics/pools/run?date=${date}`, { method: 'POST' }),
+  /** GET /logistics/pools?pool_date (admin): the pools saved for that date. */
+  pools: (date: string) => api<PoolOut[]>(`/logistics/pools?pool_date=${date}`).then((rows) => rows.map(toPool)),
+  /** POST /logistics/pools/run?pool_date (admin) answers { poolsCreated, pools } for that date. */
+  runPooling: (date: string) =>
+    api<PoolRunResponse>(`/logistics/pools/run?pool_date=${date}`, { method: 'POST' }).then((r) => r.pools.map(toPool)),
 }
 
 /** Share of finished inspections that passed, as a whole percent; null until one is finished. */
@@ -76,7 +108,7 @@ export function poolSummary(pools: Pool[]) {
 export const orderedStops = (pool: Pool) => [...pool.stops].sort((a, b) => a.sequence - b.sequence)
 
 export const POOL_STATUS: Record<string, string> = {
-  PLANNED: 'Planned',
+  PENDING: 'Planned',
   ASSIGNED: 'Partner assigned',
   IN_PROGRESS: 'On the road',
   COMPLETED: 'Delivered',
