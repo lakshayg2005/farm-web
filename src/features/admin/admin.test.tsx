@@ -48,12 +48,6 @@ describe('farmer verification', () => {
 })
 
 describe('pooling', () => {
-  it('offers to run pooling while logistics has no saved-pools list (GET /pools answers 404)', async () => {
-    mockApi({ 'POST /identity/refresh': adminLogin })
-    renderAt('/admin/pooling')
-    await screen.findByText(/No pools for this date yet/)
-  })
-
   it('says so when the logistics service is down', async () => {
     mockApi({
       'POST /identity/refresh': adminLogin,

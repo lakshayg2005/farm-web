@@ -838,6 +838,61 @@
         ]
       }
     },
+    "/pools": {
+      "get": {
+        "description": "Every pool for `pool_date` with its stops in `seq` order, oldest pool first.",
+        "operationId": "list_pools_pools_get",
+        "parameters": [
+          {
+            "description": "Date to list pools for",
+            "in": "query",
+            "name": "pool_date",
+            "required": false,
+            "schema": {
+              "description": "Date to list pools for",
+              "format": "date",
+              "title": "Pool Date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PoolOut"
+                  },
+                  "title": "Response List Pools Pools Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Saved pools for a given date",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
     "/pools/run": {
       "post": {
         "description": "Fetch READY_FOR_DISPATCH orders, cluster them, persist pools, publish pool.assigned.",

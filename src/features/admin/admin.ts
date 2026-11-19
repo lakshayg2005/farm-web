@@ -1,5 +1,5 @@
 import type { LogisticsComponents } from '@/api/generated'
-import { api, ApiError } from '@/api/http'
+import { api } from '@/api/http'
 import type { User } from '@/features/auth/types'
 
 export interface UserRow extends User {
@@ -72,15 +72,8 @@ export const adminApi = {
     api<UserPage>(`/identity/users?role=farmer&farmerVerified=${verified}&limit=200`),
   verifyFarmer: (userId: string) => api<UserRow>(`/identity/users/${userId}/verify-farmer`, { method: 'POST' }),
   inspections: () => api<InspectionSummary[]>('/quality/inspections'),
-  /** TODO: logistics has no GET /pools?date= yet; until it does, a 404 means "nothing saved to show". */
-  pools: (date: string) =>
-    api<PoolOut[]>(`/logistics/pools?pool_date=${date}`).then(
-      (rows) => rows.map(toPool),
-      (e: unknown) => {
-        if (e instanceof ApiError && e.status === 404) return []
-        throw e
-      },
-    ),
+  /** GET /logistics/pools?pool_date (admin): the pools saved for that date. */
+  pools: (date: string) => api<PoolOut[]>(`/logistics/pools?pool_date=${date}`).then((rows) => rows.map(toPool)),
   /** POST /logistics/pools/run?pool_date (admin) answers { poolsCreated, pools } for that date. */
   runPooling: (date: string) =>
     api<PoolRunResponse>(`/logistics/pools/run?pool_date=${date}`, { method: 'POST' }).then((r) => r.pools.map(toPool)),

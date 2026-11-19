@@ -72,6 +72,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/pools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Saved pools for a given date
+         * @description Every pool for `pool_date` with its stops in `seq` order, oldest pool first.
+         */
+        get: operations["list_pools_pools_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/pools/run": {
         parameters: {
             query?: never;
@@ -477,6 +497,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TrackOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_pools_pools_get: {
+        parameters: {
+            query?: {
+                /** @description Date to list pools for */
+                pool_date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PoolOut"][];
                 };
             };
             /** @description Validation Error */
