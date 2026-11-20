@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { useEffect, type CSSProperties } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router'
+import { useAuth } from '@/features/auth/authContext'
 import type { Section } from '@/routes/types'
 import { BrandMark } from './BrandMark'
 import { CropRows } from './CropRows'
@@ -16,6 +17,7 @@ export function RoleLayout({ section }: { section: Section }) {
   const { pathname } = useLocation()
   const current = section.pages.find((p) => pathname.endsWith(`/${p.path}`))
   const hasTabs = section.pages.length > 1
+  const { user, logout } = useAuth()
 
   useEffect(() => {
     document.title = current ? `${current.label} | ${section.label} | Farm Platform` : 'Farm Platform'
@@ -27,13 +29,14 @@ export function RoleLayout({ section }: { section: Section }) {
       className="min-h-dvh lg:grid lg:grid-cols-[17rem_1fr]"
     >
       {/* Desktop rail */}
-      <aside className="relative hidden border-r border-line bg-paper-deep lg:block">
+      <aside className="relative hidden bg-forest-deep text-white lg:block">
         <div className="sticky top-0 flex h-dvh flex-col pr-3">
           <CropRows direction="vertical" className="absolute inset-y-0 right-0 w-3" />
           <div className="px-6 pt-6">
-            <BrandMark />
+            <BrandMark tone="light" />
           </div>
-          <p className="px-6 pt-10 font-display text-[2rem] leading-none">{section.label}</p>
+          <p className="px-6 pt-10 text-xs font-semibold tracking-[0.18em] text-white/45 uppercase">Workspace</p>
+          <p className="px-6 pt-1 font-display text-[2rem] leading-none">{section.label}</p>
           <nav aria-label={`${section.label} pages`} className="mt-6 flex-1 px-3">
             <ul className="space-y-1">
               {section.pages.map((page) => (
@@ -42,7 +45,7 @@ export function RoleLayout({ section }: { section: Section }) {
                     to={page.path}
                     className={({ isActive }) =>
                       `relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors duration-200 ${
-                        isActive ? 'font-semibold text-ink' : 'text-ink-soft hover:bg-white/60 hover:text-ink'
+                        isActive ? 'font-semibold text-forest-deep' : 'text-white/70 hover:bg-white/8 hover:text-white'
                       }`
                     }
                   >
@@ -52,7 +55,7 @@ export function RoleLayout({ section }: { section: Section }) {
                           <motion.span
                             layoutId="rail-active"
                             transition={quick}
-                            className="absolute inset-0 rounded-lg bg-[color-mix(in_oklab,var(--role)_28%,white)]"
+                            className="absolute inset-0 rounded-lg bg-lime"
                           />
                         )}
                         <Icon name={page.icon} className="relative size-5" />
@@ -64,8 +67,21 @@ export function RoleLayout({ section }: { section: Section }) {
               ))}
             </ul>
           </nav>
-          <div className="border-t border-line px-6 py-5">
-            <NavLink to="/" className="inline-flex items-center gap-1.5 text-ink-soft hover:text-ink">
+          <div className="mx-3 mb-4 rounded-2xl bg-white/6 p-3">
+            {user && (
+              <div className="flex items-center gap-3 px-1 pb-3">
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-lime font-bold text-forest-deep">
+                  {user.name.charAt(0)}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate font-semibold">{user.name}</span>
+                  <button type="button" onClick={() => void logout()} className="text-sm text-white/60 hover:text-white">
+                    Sign out
+                  </button>
+                </span>
+              </div>
+            )}
+            <NavLink to="/" className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-white/70 hover:bg-white/8 hover:text-white">
               <Icon name="back" className="size-4" />
               All sections
             </NavLink>
@@ -74,7 +90,7 @@ export function RoleLayout({ section }: { section: Section }) {
       </aside>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-20 bg-paper/95 backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-20 border-b border-line bg-paper/85 backdrop-blur-lg lg:hidden">
         <div className="flex h-14 items-center justify-between px-4">
           <BrandMark className="text-base" />
           <span className="rounded-full bg-[color-mix(in_oklab,var(--role)_20%,white)] px-3 py-0.5 text-sm font-semibold">
@@ -119,7 +135,7 @@ export function RoleLayout({ section }: { section: Section }) {
                           <motion.span
                             layoutId="tab-active"
                             transition={quick}
-                            className="absolute inset-0 rounded-full bg-[color-mix(in_oklab,var(--role)_24%,white)]"
+                            className="absolute inset-0 rounded-full bg-lime/70"
                           />
                         )}
                         <Icon name={page.icon} className="relative size-5" />

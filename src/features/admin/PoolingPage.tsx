@@ -40,14 +40,14 @@ export function PoolingPage() {
               setSelected(null)
               run.reset()
             }}
-            className="mt-1 rounded-lg border border-line bg-white px-3 py-2 font-normal"
+            className="mt-1 rounded-xl border border-line bg-white px-3 py-2 font-normal"
           />
         </label>
         <button
           type="button"
           onClick={() => run.mutate()}
           disabled={run.isPending || !date}
-          className="rounded-lg bg-indigo px-4 py-2 font-semibold text-white disabled:opacity-60"
+          className="rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60"
         >
           {run.isPending ? 'Running…' : list.length ? 'Run pooling again' : 'Run pooling'}
         </button>
@@ -95,7 +95,7 @@ export function PoolingPage() {
                           type="button"
                           onClick={() => setSelected(pool.id === selected ? null : pool.id)}
                           aria-pressed={selected === pool.id}
-                          className="w-full rounded-xl border border-line bg-white px-4 py-3 text-left transition-colors duration-150 hover:border-indigo aria-pressed:border-indigo aria-pressed:bg-[color-mix(in_oklab,var(--role)_10%,white)]"
+                          className="w-full card px-4 py-3 text-left transition-colors duration-150 hover:border-indigo aria-pressed:border-indigo aria-pressed:bg-[color-mix(in_oklab,var(--role)_10%,white)]"
                         >
                           <span className="flex items-baseline justify-between gap-2">
                             <span className="font-semibold">Pool {i + 1}</span>
@@ -123,7 +123,7 @@ export function PoolingPage() {
 
 function Stat({ label, value, note, strong }: { label: string; value: string; note?: string; strong?: boolean }) {
   return (
-    <div className="rounded-xl border border-line bg-white px-4 py-3">
+    <div className="card px-4 py-3">
       <dt className="text-sm text-ink-soft">{label}</dt>
       <dd className={`font-display text-2xl ${strong ? 'text-leaf' : ''}`}>{value}</dd>
       {note && <dd className="text-sm text-ink-soft">{note}</dd>}

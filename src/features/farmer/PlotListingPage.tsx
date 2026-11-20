@@ -135,7 +135,7 @@ export function PlotListingPage() {
 
   return (
     <section className="mt-8 max-w-5xl space-y-6">
-      <div className="rounded-xl border border-line bg-white p-4 sm:p-6">
+      <div className="card p-4 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="font-display text-xl">Draw your plot boundary</h2>
@@ -148,7 +148,7 @@ export function PlotListingPage() {
         <p className="mt-2 text-xs text-ink-soft">Map data &copy; OpenStreetMap contributors. The backend checks polygon validity, overlap and area.</p>
       </div>
 
-      <form onSubmit={submit} className="rounded-xl border border-line bg-white p-4 sm:p-6">
+      <form onSubmit={submit} className="card p-4 sm:p-6">
         <h2 className="font-display text-xl">Plot details and growing season</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="grid gap-1 text-sm font-semibold">

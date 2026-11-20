@@ -23,11 +23,11 @@ export function OrdersPage() {
   return (
     <div className="mt-8 max-w-3xl space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl border border-line bg-white p-5">
+        <div className="card p-5">
           <p className="text-sm text-ink-soft">Earned (delivered orders)</p>
           <p className="mt-1 font-display text-4xl">{rupees(money.earned)}</p>
         </div>
-        <div className="rounded-xl border border-line bg-white p-5">
+        <div className="card p-5">
           <p className="text-sm text-ink-soft">On the way to you (paid, not delivered)</p>
           <p className="mt-1 font-display text-4xl">{rupees(money.pending)}</p>
         </div>
@@ -80,7 +80,7 @@ function OrderRow({ order }: { order: OrderSummary }) {
   const cancellable = ['PLACED', 'CONFIRMED', 'PACKED', 'QC_PASSED', 'READY_FOR_DISPATCH'].includes(order.status)
 
   return (
-    <div className="rounded-xl border border-line bg-white p-4">
+    <div className="card p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="font-semibold">
@@ -100,7 +100,7 @@ function OrderRow({ order }: { order: OrderSummary }) {
                 setError(undefined)
                 pack.mutate()
               }}
-              className="rounded-lg bg-indigo px-4 py-2 font-semibold text-white disabled:opacity-60"
+              className="rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60"
             >
               {pack.isPending ? 'Marking…' : 'Mark packed'}
             </button>

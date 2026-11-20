@@ -15,8 +15,8 @@ import {
 } from './reservations'
 
 const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not reach the server. Try again.')
-const primary = 'rounded-lg bg-indigo px-4 py-2 font-semibold text-white hover:bg-indigo/90 disabled:opacity-60'
-const quiet = 'rounded-lg border border-line bg-white px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
+const primary = 'rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest hover:bg-indigo/90 disabled:opacity-60'
+const quiet = 'rounded-xl border border-line bg-white px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
 
 /** Re-renders every `ms` so countdowns stay current. */
 function useNow(ms: number) {
@@ -103,7 +103,7 @@ export function RequestsPage() {
       {past.length > 0 && (
         <details className="group">
           <summary className="cursor-pointer font-semibold text-ink-soft hover:text-ink">Past requests ({past.length})</summary>
-          <ul className="mt-3 divide-y divide-line rounded-xl border border-line bg-white">
+          <ul className="mt-3 divide-y divide-line card">
             {past.map((r) => {
               const s = info(r)
               return (
@@ -155,7 +155,7 @@ function RequestCard({
   const busy = accept.isPending || reject.isPending
 
   return (
-    <article className="rounded-xl border border-line bg-white p-4 sm:p-5">
+    <article className="card p-4 sm:p-5">
       <h3 className="font-display text-xl leading-tight">
         {cropName}, {r.expectedQtyKg} kg
       </h3>
@@ -210,7 +210,7 @@ function RequestCard({
 function AgreementCard({ reservation: r, info, cropName }: { reservation: Reservation; info: SeasonInfo | undefined; cropName: string }) {
   const status = AGREEMENT_TEXT[r.status] ?? { label: r.status, next: '' }
   return (
-    <article className="rounded-xl border border-line bg-white p-4 sm:p-5">
+    <article className="card p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h3 className="font-display text-xl leading-tight">
           {cropName}, {r.expectedQtyKg} kg

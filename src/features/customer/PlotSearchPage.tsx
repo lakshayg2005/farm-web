@@ -34,7 +34,7 @@ export function PlotSearchPage() {
         <div className="flex flex-wrap gap-3">
           <label className="block">
             <span className="block text-sm font-semibold">Season</span>
-            <select value={season} onChange={(e) => setSeason(e.target.value)} className="mt-1 rounded-lg border border-line bg-white px-3 py-2">
+            <select value={season} onChange={(e) => setSeason(e.target.value)} className="mt-1 rounded-xl border border-line bg-white px-3 py-2">
               <option value="">Any season</option>
               {SEASONS.map((s) => (
                 <option key={s}>{s}</option>
@@ -43,7 +43,7 @@ export function PlotSearchPage() {
           </label>
           <label className="block">
             <span className="block text-sm font-semibold">Crop</span>
-            <select value={crop} onChange={(e) => setCrop(e.target.value)} className="mt-1 rounded-lg border border-line bg-white px-3 py-2">
+            <select value={crop} onChange={(e) => setCrop(e.target.value)} className="mt-1 rounded-xl border border-line bg-white px-3 py-2">
               <option value="">Any crop</option>
               {(crops.data ?? []).map((c) => (
                 <option key={c.id} value={c.id}>
@@ -81,7 +81,7 @@ export function PlotSearchPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedId(p.id)}
-                    className="w-full rounded-xl border border-line bg-white px-4 py-3 text-left hover:border-indigo"
+                    className="w-full card px-4 py-3 text-left hover:border-indigo"
                   >
                     <span className="block font-display text-lg">{p.properties.title}</span>
                     <span className="block text-sm text-ink-soft">
@@ -123,7 +123,7 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
 
   if (reserve.isSuccess) {
     return (
-      <div className="rounded-xl border border-line bg-white p-5" role="status">
+      <div className="card p-5" role="status">
         <h2 className="font-display text-2xl">Request sent</h2>
         <p className="mt-2 text-ink-soft">
           The farmer has 48 hours to accept. Once they do, pay the deposit from your reservations to confirm the plot.
@@ -136,7 +136,7 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-4 rounded-xl border border-line bg-white p-5">
+    <form onSubmit={onSubmit} noValidate className="space-y-4 card p-5">
       <div className="flex items-start justify-between gap-3">
         <h2 className="font-display text-2xl">{p.title}</h2>
         <button type="button" onClick={onClose} className="text-ink-soft underline">
@@ -178,7 +178,7 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
           {error}
         </p>
       )}
-      <button type="submit" disabled={reserve.isPending} className="w-full rounded-lg bg-indigo px-4 py-2.5 font-semibold text-white disabled:opacity-60">
+      <button type="submit" disabled={reserve.isPending} className="w-full rounded-full bg-indigo px-5 py-2.5 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
         {reserve.isPending ? 'Sending…' : 'Request this plot'}
       </button>
     </form>

@@ -1,4 +1,5 @@
 import { createElement } from 'react'
+import { CatalogBrowser } from '@/features/catalog/CatalogBrowser'
 import type { Section } from '@/routes/types'
 import { PlotSearchPage } from './PlotSearchPage'
 import { ReservationsPage } from './ReservationsPage'
@@ -6,9 +7,17 @@ import { ReservationsPage } from './ReservationsPage'
 export const customerSection: Section = {
   role: 'customer',
   label: 'Customer',
-  audience: 'Find farmland near you, reserve a plot and follow your crop.',
+  audience: 'Buy fresh produce, or reserve a plot of farmland and follow your crop.',
   accent: 'var(--color-indigo)',
   pages: [
+    {
+      path: 'produce',
+      label: 'Fresh produce',
+      icon: 'basket',
+      summary: 'What farmers near you are selling, how fresh it is and when it will reach you.',
+      empty: { title: 'No produce yet', body: 'Listings from farmers near you will show here.' },
+      element: createElement('div', { className: 'mt-8' }, createElement(CatalogBrowser)),
+    },
     {
       path: 'plots',
       label: 'Find land',

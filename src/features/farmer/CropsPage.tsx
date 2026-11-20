@@ -19,9 +19,9 @@ import {
 
 const message = (e: unknown) =>
   e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not reach the server. Try again.'
-const primary = 'rounded-lg bg-indigo px-4 py-2 font-semibold text-white hover:bg-indigo/90 disabled:opacity-60'
-const quiet = 'rounded-lg border border-line bg-white px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
-const input = 'mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 font-normal'
+const primary = 'rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest hover:bg-indigo/90 disabled:opacity-60'
+const quiet = 'rounded-xl border border-line bg-white px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
+const input = 'mt-1 w-full rounded-xl border border-line bg-white px-3 py-2 font-normal'
 
 /** Crops being grown for a customer: deposit paid (ACTIVE), harvest ready, or on its way. */
 const GROWING = ['ACTIVE', 'HARVEST_READY', 'FULFILLING']
@@ -101,7 +101,7 @@ function CropCard({ reservation: r, info, cropName }: { reservation: Reservation
   const canPost = r.status === 'ACTIVE' || r.status === 'HARVEST_READY'
 
   return (
-    <article className="rounded-xl border border-line bg-white p-4 sm:p-6" aria-label={`${cropName} for a customer`}>
+    <article className="card p-4 sm:p-6" aria-label={`${cropName} for a customer`}>
       <h2 className="font-display text-2xl leading-tight">
         {cropName}, {r.expectedQtyKg} kg
       </h2>

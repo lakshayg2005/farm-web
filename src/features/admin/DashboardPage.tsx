@@ -4,7 +4,7 @@ import { adminApi, passRate, todayISO, totalSavedKm } from './admin'
 
 function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-xl border border-line bg-white p-5">
+    <div className="card p-5">
       <p className="text-sm text-ink-soft">{label}</p>
       <p className="mt-1 font-display text-4xl">{value}</p>
       {hint && <p className="mt-1 text-sm text-ink-soft">{hint}</p>}

@@ -12,7 +12,7 @@ import {
 } from './inspector'
 
 const message = (e: unknown) => (e instanceof ApiError || e instanceof Error ? e.message : 'Could not reach the server. Try again.')
-const field = 'mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 font-normal'
+const field = 'mt-1 w-full rounded-xl border border-line bg-white px-3 py-2 font-normal'
 const subjectText: Record<string, string> = { ORDER: 'Packed order', HARVEST: 'Harvest', RESERVATION: 'Harvest' }
 
 export function InspectionsPage() {
@@ -48,7 +48,7 @@ export function InspectionsPage() {
   return (
     <div className="mt-8 max-w-3xl space-y-8">
       <div>
-        <button type="button" onClick={share} className="rounded-lg border border-line bg-white px-3 py-2 font-semibold">
+        <button type="button" onClick={share} className="rounded-xl border border-line bg-white px-3 py-2 font-semibold">
           Share my location
         </button>
         {located && (
@@ -99,7 +99,7 @@ export function InspectionsPage() {
           </h2>
           <ul className="mt-3 space-y-2">
             {done.map((i) => (
-              <li key={i.id} className="rounded-xl border border-line bg-white px-4 py-3">
+              <li key={i.id} className="card px-4 py-3">
                 {subjectText[i.subjectType] ?? i.subjectType} · grade {i.grade ?? '–'} · {i.result ?? i.status}
               </li>
             ))}
@@ -114,7 +114,7 @@ function ClaimRow({ inspection: i, onDone }: { inspection: Inspection; onDone: (
   const [error, setError] = useState<string>()
   const claim = useMutation({ mutationFn: () => inspectorApi.claim(i.id), onSuccess: onDone, onError: (e) => setError(message(e)) })
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-3">
+    <div className="flex flex-wrap items-center justify-between gap-3 card px-4 py-3">
       <div>
         <p className="font-semibold">
           {subjectText[i.subjectType] ?? i.subjectType}
@@ -127,7 +127,7 @@ function ClaimRow({ inspection: i, onDone }: { inspection: Inspection; onDone: (
           </p>
         )}
       </div>
-      <button type="button" disabled={claim.isPending} onClick={() => claim.mutate()} className="rounded-lg bg-indigo px-4 py-2 font-semibold text-white disabled:opacity-60">
+      <button type="button" disabled={claim.isPending} onClick={() => claim.mutate()} className="rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
         Claim
       </button>
     </div>
@@ -169,7 +169,7 @@ function ReportCard({ inspection: i, onDone }: { inspection: Inspection; onDone:
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate aria-label={`Report for ${subjectText[i.subjectType] ?? i.subjectType}`} className="space-y-4 rounded-xl border border-line bg-white p-5">
+    <form onSubmit={onSubmit} noValidate aria-label={`Report for ${subjectText[i.subjectType] ?? i.subjectType}`} className="space-y-4 card p-5">
       <p className="font-semibold">
         {subjectText[i.subjectType] ?? i.subjectType}
         {i.attempt > 1 ? ` · attempt ${i.attempt}` : ''}
@@ -245,7 +245,7 @@ function ReportCard({ inspection: i, onDone }: { inspection: Inspection; onDone:
           {error}
         </p>
       )}
-      <button type="submit" disabled={submit.isPending} className="rounded-lg bg-indigo px-4 py-2 font-semibold text-white disabled:opacity-60">
+      <button type="submit" disabled={submit.isPending} className="rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
         {submit.isPending ? 'Submitting…' : 'Submit report'}
       </button>
     </form>

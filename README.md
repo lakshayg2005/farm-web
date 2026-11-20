@@ -82,3 +82,28 @@ Colours and fonts are Tailwind theme tokens in `src/index.css`: `paper`, `paper-
 (`mustard` farmer, `indigo` customer, `leaf` inspector, `soil` admin). Headings use `font-display` (Young Serif); body text uses Mukta,
 which also covers Devanagari. Inside a section the CSS variable `--role` holds the section colour.
 Animations use Motion (`motion/react`) and respect the reduced-motion setting through `MotionConfig`.
+
+## Deploying
+
+**Netlify (website).** `netlify.toml` holds the build settings: `pnpm build`, publish `dist`, and
+a catch-all redirect so routes like `/catalog` work on reload. In Netlify, set the environment
+variable `VITE_API_BASE_URL` to the deployed API gateway (for example
+`https://<backend>.onrender.com/api/v1`). The backend gateway must allow the Netlify origin in its
+CORS list (`farm-backend/infra/traefik/dynamic.yml`, `accessControlAllowOriginList`).
+
+Without a reachable backend the public catalog (`/catalog`) still works: it shows clearly labelled
+sample produce. Sign-in and the role sections need the backend.
+
+## Produce catalog
+
+`/catalog` (public) and *Customer → Fresh produce* list what farmers near a chosen place are
+selling (`GET /catalog/listings/search`). Each listing shows:
+
+- **Freshness**: days since harvest against the shelf life of its category (leafy greens 4 days,
+  vegetables 7, fruit 8, grains and pulses months), as a label and a bar.
+- **Arrival**: orders are packed, inspected and pooled overnight, so nearby farms (≤ 25 km) arrive
+  the next morning; farther ones take 1–2, 2–3 or 3–5 days. Crops not yet harvested add the days
+  until harvest. The detail panel shows the whole timeline.
+- Price, stock, grade, organic, distance and the farm.
+
+The logic is in `src/features/catalog/catalog.ts` (tested in `catalog.test.tsx`).

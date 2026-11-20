@@ -1,24 +1,43 @@
 import { useEffect, type ReactNode } from 'react'
 import { BrandMark } from '@/components/BrandMark'
-import { CropRows } from '@/components/CropRows'
 
 export function AuthShell({ title, intro, children }: { title: string; intro: string; children: ReactNode }) {
   useEffect(() => {
     document.title = `${title} | Farm Platform`
   }, [title])
   return (
-    <div className="mx-auto grid min-h-dvh max-w-5xl content-start gap-10 px-4 pt-6 pb-12 sm:px-8 lg:grid-cols-[1fr_24rem] lg:pt-10">
-      <div className="lg:col-span-2">
+    <div className="grid min-h-dvh lg:grid-cols-[1fr_1.05fr]">
+      <div className="flex flex-col px-4 pt-6 pb-12 sm:px-10 lg:px-16 lg:pt-10">
         <BrandMark />
+        <div className="my-auto w-full max-w-md pt-12 lg:pt-0">
+          <h1 className="font-display text-[2.4rem] leading-[1.08]">{title}</h1>
+          <p className="mt-3 text-lg text-ink-soft">{intro}</p>
+          <div className="mt-8">{children}</div>
+        </div>
       </div>
-      <div className="max-w-md">
-        <h1 className="font-display text-[2.2rem] leading-[1.1]">{title}</h1>
-        <p className="mt-3 text-ink-soft">{intro}</p>
-        <div className="mt-8">{children}</div>
-      </div>
-      <div className="relative hidden min-h-64 overflow-hidden rounded-xl lg:block" style={{ '--role': 'var(--color-leaf)' } as React.CSSProperties}>
-        <CropRows className="absolute inset-0" />
-      </div>
+      <aside className="mesh relative hidden overflow-hidden p-10 text-white lg:flex lg:flex-col lg:justify-end">
+        <p className="absolute top-10 left-10 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-lime">
+          🌱 Fresh from verified farms
+        </p>
+        <div className="relative grid max-w-md gap-3">
+          {[
+            ['🧑‍🌾', 'Farmers', 'List produce, open plots for the season and get paid on delivery.'],
+            ['🛒', 'Customers', 'Buy fresh produce or reserve farmland and follow your crop.'],
+            ['🔍', 'Inspectors', 'Grade batches on the spot with geo-tagged photos.'],
+          ].map(([emoji, name, body]) => (
+            <div key={name} className="flex items-start gap-3 rounded-2xl bg-white/95 p-4 text-ink shadow-lg">
+              <span className="text-2xl" aria-hidden>
+                {emoji}
+              </span>
+              <span>
+                <strong className="block">{name}</strong>
+                <span className="text-[0.95rem] text-ink-soft">{body}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+        <p className="relative mt-8 font-display text-3xl leading-tight">One account for every role on the farm.</p>
+      </aside>
     </div>
   )
 }
@@ -39,7 +58,7 @@ export function Field({
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2.5"
+        className="mt-1 w-full rounded-xl border border-line bg-white px-3 py-2.5"
         {...input}
       />
       {hint && !error && (
@@ -57,4 +76,4 @@ export function Field({
 }
 
 export const primaryButton =
-  'w-full rounded-lg bg-indigo px-4 py-2.5 font-semibold text-white transition-opacity disabled:opacity-60'
+  'w-full rounded-full bg-indigo px-5 py-2.5 font-semibold text-white shadow-sm transition-colors hover:bg-forest transition-opacity disabled:opacity-60'

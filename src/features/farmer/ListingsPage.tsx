@@ -27,9 +27,9 @@ const message = (e: unknown) =>
   e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not reach the server. Try again.'
 
 const input =
-  'mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 font-normal disabled:bg-paper disabled:text-ink-soft'
-const primary = 'rounded-lg bg-indigo px-4 py-2 font-semibold text-white hover:bg-indigo/90 disabled:opacity-60'
-const quiet = 'rounded-lg border border-line bg-white px-3 py-1.5 font-semibold hover:border-ink-soft disabled:opacity-60'
+  'mt-1 w-full rounded-xl border border-line bg-white px-3 py-2 font-normal disabled:bg-paper disabled:text-ink-soft'
+const primary = 'rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest hover:bg-indigo/90 disabled:opacity-60'
+const quiet = 'rounded-xl border border-line bg-white px-3 py-1.5 font-semibold hover:border-ink-soft disabled:opacity-60'
 const panel = { initial: { opacity: 0, y: -8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: 0.2 } }
 
 /** Order: on sale first, then sold out, then paused; newest change first within each. */
@@ -166,7 +166,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
   }
 
   return (
-    <article className="rounded-xl border border-line bg-white p-4 sm:p-5">
+    <article className="card p-4 sm:p-5">
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="sm:w-60 sm:shrink-0">
           {l.mediaIds.length > 0 ? (
@@ -379,7 +379,7 @@ function ListingEditor({
 
   const title = listing ? `Edit ${listing.cropName}` : 'Add a listing'
   return (
-    <form onSubmit={submit} noValidate className="rounded-xl border border-line bg-white p-4 sm:p-6" aria-label={title}>
+    <form onSubmit={submit} noValidate className="card p-4 sm:p-6" aria-label={title}>
       <h2 className="font-display text-2xl">{title}</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {farms.length > 1 && (
@@ -529,7 +529,7 @@ function FarmSetup() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="mt-8 max-w-2xl rounded-xl border border-line bg-white p-4 sm:p-6" aria-label="Add your farm">
+    <form onSubmit={submit} noValidate className="mt-8 max-w-2xl card p-4 sm:p-6" aria-label="Add your farm">
       <h2 className="font-display text-2xl">Add your farm first</h2>
       <p className="mt-1 text-ink-soft">
         Produce is picked up from your farm gate, and photos are checked against its location. You only do this once.

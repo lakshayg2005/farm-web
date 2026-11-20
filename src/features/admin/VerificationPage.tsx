@@ -37,7 +37,7 @@ function FarmerRow({ farmer }: { farmer: UserRow }) {
     onError: (e) => setError(message(e)),
   })
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-3">
+    <div className="flex flex-wrap items-center justify-between gap-3 card px-4 py-3">
       <div>
         <p className="font-semibold">{farmer.name}</p>
         <p className="text-sm text-ink-soft">
@@ -58,7 +58,7 @@ function FarmerRow({ farmer }: { farmer: UserRow }) {
           setError(undefined)
           verify.mutate()
         }}
-        className="rounded-lg bg-indigo px-4 py-2 font-semibold text-white disabled:opacity-60"
+        className="rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60"
       >
         {verify.isPending ? 'Verifying…' : `Verify ${farmer.name}`}
       </button>
