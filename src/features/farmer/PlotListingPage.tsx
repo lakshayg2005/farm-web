@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { api, ApiError } from '@/api/http'
+import { MyPlots } from './MyPlots'
 import { mediaUploadPayload, plotCreatePayload, seasonCreatePayload, type Polygon } from './plotPayloads'
 
 type PlotCreated = { id: string; areaAcres: number }
@@ -15,6 +17,7 @@ function errorMessage(error: unknown) {
 }
 
 export function PlotListingPage() {
+  const queryClient = useQueryClient()
   const mapElement = useRef<HTMLDivElement>(null)
   const drawnLayers = useRef<LeafletFeatureGroup | null>(null)
   const [boundary, setBoundary] = useState<Polygon | null>(null)
@@ -121,6 +124,8 @@ export function PlotListingPage() {
         }
       }
       setSavedPlot(plot)
+      void queryClient.invalidateQueries({ queryKey: ['farmer-plots'] })
+      void queryClient.invalidateQueries({ queryKey: ['farmer-plot-seasons', plot.id] })
       setMessage(`Plot saved successfully. Calculated area: ${Number(plot.areaAcres).toFixed(2)} acres.${photoMessage}`)
       setTitle('')
       setBoundary(null)
@@ -198,6 +203,8 @@ export function PlotListingPage() {
           {saving ? 'Saving plot and season…' : 'Save plot and season'}
         </button>
       </form>
+
+      <MyPlots />
     </section>
   )
 }

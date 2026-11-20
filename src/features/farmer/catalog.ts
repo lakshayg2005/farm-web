@@ -86,6 +86,7 @@ export const catalogApi = {
   myFarms: () => api<Page<Farm>>('/catalog/farms/mine?limit=50').then((r) => r.items),
   createFarm: (body: FarmInput) =>
     api<Farm>('/catalog/farms', { method: 'POST', body, headers: { 'Idempotency-Key': crypto.randomUUID() } }),
+  updateFarm: (id: string, body: Partial<FarmInput>) => api<Farm>(`/catalog/farms/${id}`, { method: 'PATCH', body }),
   myListings: () => api<Page<Listing>>('/catalog/listings/mine?limit=100').then((r) => r.items),
   createListing: (body: ListingInput, idempotencyKey: string) =>
     api<Listing>('/catalog/listings', { method: 'POST', body, headers: { 'Idempotency-Key': idempotencyKey } }),

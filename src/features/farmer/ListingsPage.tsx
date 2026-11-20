@@ -16,6 +16,7 @@ import {
   UNITS,
   type CatalogCrop,
   type Farm,
+  type FarmInput,
   type FarmForm,
   type Listing,
   type ListingChanges,
@@ -42,6 +43,7 @@ export function ListingsPage() {
   const [editing, setEditing] = useState<Listing | 'new' | null>(null)
   const [notice, setNotice] = useState<string>()
   const [editorError, setEditorError] = useState<string>()
+  const [editingFarm, setEditingFarm] = useState(false)
 
   if (farms.isPending) return <p className="mt-8 text-ink-soft">Loading your farms…</p>
   if (farms.isError)
@@ -50,7 +52,8 @@ export function ListingsPage() {
         Could not load your farms. Refresh to try again.
       </p>
     )
-  if (farms.data.length === 0) return <FarmSetup />
+  const farm = farms.data[0]
+  if (!farm) return <FarmSetup />
 
   const live = (listings.data ?? [])
     .filter((l) => l.status !== 'ARCHIVED')
@@ -59,6 +62,18 @@ export function ListingsPage() {
 
   return (
     <div className="mt-8 max-w-4xl space-y-6">
+      {editingFarm ? (
+        <FarmSetup farm={farm} onDone={() => setEditingFarm(false)} />
+      ) : (
+        <p className="flex flex-wrap items-baseline gap-x-3 text-sm text-ink-soft">
+          <span>
+            <span className="font-semibold text-ink">{farm.name}</span> · {[farm.village, farm.district].filter(Boolean).join(', ')}
+          </span>
+          <button type="button" className="font-semibold text-indigo underline" onClick={() => setEditingFarm(true)}>
+            Edit farm
+          </button>
+        </p>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-ink-soft" role="status">
           {listings.isSuccess && (live.length === 0 ? 'Nothing listed yet.' : `${onSale} of ${live.length} listings on sale.`)}
@@ -501,13 +516,31 @@ function ListingEditor({
   )
 }
 
-function FarmSetup() {
+function FarmSetup({ farm, onDone }: { farm?: Farm; onDone?: () => void }) {
   const queryClient = useQueryClient()
-  const [f, setF] = useState<FarmForm>({ name: '', village: '', district: '', state: '', lat: '', lng: '' })
+  const [f, setF] = useState<FarmForm>(
+    farm
+      ? {
+          name: farm.name,
+          village: farm.village ?? '',
+          district: farm.district,
+          state: farm.state ?? '',
+          lat: String(farm.location.coordinates[1]),
+          lng: String(farm.location.coordinates[0]),
+        }
+      : { name: '', village: '', district: '', state: '', lat: '', lng: '' },
+  )
   const [error, setError] = useState<string>()
   const create = useMutation({
-    mutationFn: catalogApi.createFarm,
-    onSuccess: (farm) => queryClient.setQueryData(['farms', 'mine'], [farm]),
+    mutationFn: (body: FarmInput) =>
+      farm
+        ? catalogApi.updateFarm(farm.id, { ...body, village: body.village ?? null, state: body.state ?? null } as Partial<FarmInput>)
+        : catalogApi.createFarm(body),
+    onSuccess: (saved) => {
+      if (farm) void queryClient.invalidateQueries({ queryKey: ['farms', 'mine'] })
+      else queryClient.setQueryData(['farms', 'mine'], [saved])
+      onDone?.()
+    },
     onError: (e) => setError(message(e)),
   })
   const set = (k: keyof FarmForm) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value })
@@ -529,10 +562,12 @@ function FarmSetup() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="mt-8 max-w-2xl rounded-xl border border-line bg-white p-4 sm:p-6" aria-label="Add your farm">
-      <h2 className="font-display text-2xl">Add your farm first</h2>
+    <form onSubmit={submit} noValidate className="mt-8 max-w-2xl rounded-xl border border-line bg-white p-4 sm:p-6" aria-label={farm ? 'Edit your farm' : 'Add your farm'}>
+      <h2 className="font-display text-2xl">{farm ? 'Edit your farm' : 'Add your farm first'}</h2>
       <p className="mt-1 text-ink-soft">
-        Produce is picked up from your farm gate, and photos are checked against its location. You only do this once.
+        {farm
+          ? 'Produce is picked up from your farm gate, so keep the location accurate.'
+          : 'Produce is picked up from your farm gate, and photos are checked against its location. You only do this once.'}
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <label className="font-semibold sm:col-span-2">
@@ -574,6 +609,11 @@ function FarmSetup() {
       <button type="submit" disabled={create.isPending} className={`${primary} mt-5`}>
         {create.isPending ? 'Saving…' : 'Save farm'}
       </button>
+      {farm && (
+        <button type="button" className={`${quiet} ml-2`} onClick={onDone}>
+          Cancel
+        </button>
+      )}
     </form>
   )
 }

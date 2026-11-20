@@ -23,7 +23,7 @@
         { "name": "Lakshay", "github": "lakshayg2005", "role": "Team lead", "built": "Backend skeleton, identity, CI, gateway, data seeder, website login, land search and reservations, admin and inspector pages" },
         { "name": "Rohit", "github": "rohitraghuwanshi07", "role": "Member", "built": "Land and quality services, farmer plot drawing page" },
         { "name": "Akshat", "github": "Akshats-git", "role": "Member", "built": "Website setup, catalog service and photo (media) service" },
-        { "name": "Aman", "github": "Aman-maths", "role": "Member", "built": "Team contributions to the website" }
+        { "name": "Aman", "github": "Aman-maths", "role": "Member", "built": "Logistics pools-by-date endpoint, event bus retries and dead-letter guide" }
       ]
     }
   ]

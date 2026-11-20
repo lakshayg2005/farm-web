@@ -17,6 +17,8 @@ const fieldShape: Record<Role, { area: string; angle: string }> = {
 
 export function HomePage() {
   const { user, logout } = useAuth()
+  // Signed-in people only see the sections they hold a role for; visitors see all of them.
+  const visibleSections = user ? sections.filter((s) => user.roles.includes(s.role)) : sections
   useEffect(() => {
     document.title = 'Farm Platform'
   }, [])
@@ -60,7 +62,7 @@ export function HomePage() {
 
         <nav aria-label="Sections">
           <ul className="grid gap-3 lg:auto-rows-[11rem] lg:grid-cols-6">
-            {sections.map((section, i) => {
+            {visibleSections.map((section, i) => {
               const shape = fieldShape[section.role]
               return (
                 <li key={section.role} className={shape.area}>
@@ -81,7 +83,7 @@ export function HomePage() {
           </ul>
         </nav>
       </div>
-      <p className="mt-12 text-center text-ink-soft">
+      <p className="mt-12 text-right text-ink-soft">
         <Link to="/team" className="font-semibold text-indigo underline">
           Meet the team
         </Link>

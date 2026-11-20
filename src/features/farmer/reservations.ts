@@ -6,7 +6,20 @@ export interface MyPlot {
   title: string
   areaAcres: number
   status: string
+  description?: string | null
+  soilType?: string | null
+  waterSource?: string | null
 }
+
+export interface PlotChanges {
+  title?: string
+  description?: string | null
+  soilType?: string | null
+  waterSource?: string | null
+}
+
+/** The season endpoint replaces the whole season, so every field is sent. */
+export type SeasonInput = Pick<Season, 'season' | 'startDate' | 'endDate' | 'price' | 'allowedCrops'>
 
 export interface Season {
   id: string
@@ -32,6 +45,9 @@ export interface SeasonInfo {
 export const farmerLandApi = {
   reservations: () => api<Reservation[]>('/land/reservations/mine'),
   plots: () => api<MyPlot[]>('/land/plots/mine'),
+  updatePlot: (id: string, body: PlotChanges) => api<MyPlot>(`/land/plots/${id}`, { method: 'PATCH', body }),
+  updateSeason: (plotId: string, seasonId: string, body: SeasonInput) =>
+    api<Season>(`/land/plots/${plotId}/seasons/${seasonId}`, { method: 'PATCH', body }),
   seasons: (plotId: string) => api<Season[]>(`/land/plots/${plotId}/seasons`),
   accept: (id: string) => api<Reservation>(`/land/reservations/${id}/accept`, { method: 'POST' }),
   reject: (id: string) => api<Reservation>(`/land/reservations/${id}/reject`, { method: 'POST' }),
