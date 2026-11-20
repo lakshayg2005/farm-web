@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { ApiError } from '@/api/http'
+import { AgreementTerms } from '@/features/customer/AgreementTerms'
 import { day, landApi, rupees, type Reservation } from '@/features/customer/land'
 import {
   AGREEMENT_TEXT,
@@ -234,6 +235,7 @@ function AgreementCard({ reservation: r, info, cropName }: { reservation: Reserv
         )}
       </dl>
       <p className="mt-3 text-ink-soft">{status.next}</p>
+      <AgreementTerms reservationId={r.id} />
       {(r.status === 'ACTIVE' || r.status === 'HARVEST_READY') && (
         <Link to="/farmer/crops" className="mt-2 inline-block font-semibold text-indigo underline">
           Open crop updates

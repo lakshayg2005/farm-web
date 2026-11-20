@@ -9,6 +9,7 @@ const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not 
 export function OrdersPage() {
   const [tab, setTab] = useState<TabId>('new')
   const orders = useQuery({ queryKey: ['farmer-orders'], queryFn: ordersApi.list })
+  const payouts = useQuery({ queryKey: ['farmer-payouts'], queryFn: ordersApi.payouts, retry: false })
 
   if (orders.isPending) return <p className="mt-8 text-ink-soft">Loading orders…</p>
   if (orders.isError)
@@ -24,8 +25,10 @@ export function OrdersPage() {
     <div className="mt-8 max-w-3xl space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="card p-5">
-          <p className="text-sm text-ink-soft">Earned (delivered orders)</p>
-          <p className="mt-1 font-display text-4xl">{rupees(money.earned)}</p>
+          <p className="text-sm text-ink-soft">
+            {payouts.data ? `Paid out to you (${payouts.data.items.length} completed orders)` : 'Earned (delivered orders)'}
+          </p>
+          <p className="mt-1 font-display text-4xl">{rupees(payouts.data?.total ?? money.earned)}</p>
         </div>
         <div className="card p-5">
           <p className="text-sm text-ink-soft">On the way to you (paid, not delivered)</p>

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
+import { AgreementTerms } from './AgreementTerms'
 import { Link } from 'react-router'
 import { ApiError } from '@/api/http'
 import { day, landApi, rupees, type CropUpdate, type Reservation } from './land'
@@ -95,6 +96,7 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
           Cancel this reservation
         </button>
       )}
+      {['ACCEPTED', 'ACTIVE', 'HARVEST_READY', 'FULFILLING', 'COMPLETED'].includes(r.status) && <AgreementTerms reservationId={r.id} />}
       {FOLLOWED.includes(r.status) && <Timeline reservationId={r.id} />}
       {r.status === 'HARVEST_READY' && <HarvestChoice reservationId={r.id} onDone={refresh} />}
       {r.status === 'FULFILLING' && <p className="mt-4">Your harvest order is in progress. Track it under your orders.</p>}
