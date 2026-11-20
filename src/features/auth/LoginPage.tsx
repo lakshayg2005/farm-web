@@ -40,7 +40,7 @@ export function LoginPage() {
         <Field label="Phone number" name="phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} error={errors.phone} />
         <Field label="Password" name="password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} />
         {errors.form && (
-          <p role="alert" className="font-semibold text-red-700">
+          <p role="alert" className="font-semibold text-red-400">
             {errors.form}
           </p>
         )}

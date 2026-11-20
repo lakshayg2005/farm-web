@@ -34,7 +34,7 @@ export function PlotSearchPage() {
         <div className="flex flex-wrap gap-3">
           <label className="block">
             <span className="block text-sm font-semibold">Season</span>
-            <select value={season} onChange={(e) => setSeason(e.target.value)} className="mt-1 rounded-xl border border-line bg-white px-3 py-2">
+            <select value={season} onChange={(e) => setSeason(e.target.value)} className="mt-1 rounded-xl border border-line bg-transparent px-3 py-2">
               <option value="">Any season</option>
               {SEASONS.map((s) => (
                 <option key={s}>{s}</option>
@@ -43,7 +43,7 @@ export function PlotSearchPage() {
           </label>
           <label className="block">
             <span className="block text-sm font-semibold">Crop</span>
-            <select value={crop} onChange={(e) => setCrop(e.target.value)} className="mt-1 rounded-xl border border-line bg-white px-3 py-2">
+            <select value={crop} onChange={(e) => setCrop(e.target.value)} className="mt-1 rounded-xl border border-line bg-transparent px-3 py-2">
               <option value="">Any crop</option>
               {(crops.data ?? []).map((c) => (
                 <option key={c.id} value={c.id}>
@@ -56,7 +56,7 @@ export function PlotSearchPage() {
         {hasMap ? (
           <PlotMap plots={plots} selectedId={selectedId} onSelect={setSelectedId} onBoundsChange={setBounds} />
         ) : (
-          <p role="note" className="rounded-lg bg-white px-3 py-2.5 text-sm">
+          <p role="note" className="rounded-xl border border-gray-800 bg-neutral-950 px-4 py-3 text-sm text-gray-300">
             The map could not load, so these are plots within 200 km of central India. Refresh to try the map again.
           </p>
         )}
@@ -71,7 +71,7 @@ export function PlotSearchPage() {
               {search.isPending && ready ? 'Searching…' : `${plots.length} ${plots.length === 1 ? 'plot' : 'plots'} open in this area`}
             </p>
             {search.isError && (
-              <p role="alert" className="font-semibold text-red-700">
+              <p role="alert" className="font-semibold text-red-400">
                 Could not load plots. Move the map or refresh to try again.
               </p>
             )}
@@ -174,11 +174,11 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
         </p>
       )}
       {error && (
-        <p role="alert" className="font-semibold text-red-700">
+        <p role="alert" className="font-semibold text-red-400">
           {error}
         </p>
       )}
-      <button type="submit" disabled={reserve.isPending} className="w-full rounded-xl bg-indigo px-5 py-2.5 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
+      <button type="submit" disabled={reserve.isPending} className="w-full rounded-xl bg-white px-5 py-2.5 font-semibold text-black transition-colors hover:bg-gray-200 disabled:opacity-60">
         {reserve.isPending ? 'Sending…' : 'Request this plot'}
       </button>
     </form>

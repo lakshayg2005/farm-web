@@ -1,12 +1,11 @@
-import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router'
 import { useAuth } from '@/features/auth/authContext'
 import { homePathFor } from '@/features/auth/roles'
 import { BrandMark } from './BrandMark'
-import { Icon } from './Icon'
 
 const links = [
+  { to: '/', label: 'Home' },
   { to: '/catalog', label: 'Fresh produce' },
   { to: '/customer/plots', label: 'Reserve farmland' },
   { to: '/#how', label: 'How it works' },
@@ -18,27 +17,19 @@ const links = [
 export function SiteHeader() {
   const { user, logout } = useAuth()
   const [open, setOpen] = useState(false)
-  const light = true
-  const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `px-3 py-1.5 text-[0.95rem] transition-colors ${
-      light
-        ? isActive
-          ? 'text-white'
-          : 'text-neutral-400 hover:text-white'
-        : isActive
-          ? 'bg-ink/5 text-ink'
-          : 'text-ink-soft hover:bg-ink/5 hover:text-ink'
-    }`
+  const close = () => setOpen(false)
+  const linkClass = ({ isActive }: { isActive: boolean }) => (isActive ? 'text-white' : 'text-gray-400 hover:text-white')
 
   return (
-    <header className="relative z-30 border-b border-neutral-800 bg-black text-white">
-      <div className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-4 px-4 sm:px-8">
-        <BrandMark tone="light" />
-        <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+    <nav className="border-b border-gray-800 bg-black py-4 text-white">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6">
+        <BrandMark />
+
+        <div className="hidden items-center gap-8 md:flex">
           {links.map((l) =>
             l.to.includes('#') ? (
               // a hash link is never "active": NavLink would light it up on the home page
-              <Link key={l.to} to={l.to} className={linkClass({ isActive: false })}>
+              <Link key={l.to} to={l.to} className="text-gray-400 hover:text-white">
                 {l.label}
               </Link>
             ) : (
@@ -47,87 +38,59 @@ export function SiteHeader() {
               </NavLink>
             ),
           )}
-        </nav>
-        <div className="hidden items-center gap-2 md:flex">
+        </div>
+
+        <div className="flex items-center gap-3 md:gap-4">
           {user ? (
             <>
-              <Link to={homePathFor(user)} className={light ? 'btn-ghost !border-white/20 !bg-white/10 !text-white' : 'btn-ghost'}>
-                <span className="grid size-6 place-items-center rounded-full bg-lime text-xs font-bold text-forest-deep">
-                  {user.name.charAt(0)}
-                </span>
+              <Link to={homePathFor(user)} className="hidden max-w-[10rem] truncate text-sm text-gray-400 hover:text-white sm:inline">
                 {user.name}
               </Link>
               <button
                 type="button"
-                onClick={() => void logout()}
-                className={`px-2 text-sm font-medium ${light ? 'text-white/75 hover:text-white' : 'text-ink-soft hover:text-ink'}`}
+                onClick={() => {
+                  close()
+                  void logout()
+                }}
+                className="rounded-lg border border-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-900"
               >
-                Sign out
+                Logout
               </button>
             </>
           ) : (
-            <>
-              <Link
-                to="/login"
-                className={`px-3 py-2 font-medium ${light ? 'text-neutral-300 hover:text-white' : 'hover:bg-ink/5'}`}
-              >
-                Sign in
-              </Link>
-              <Link to="/register" className="rounded-lg bg-white px-5 py-2 font-medium text-black hover:bg-neutral-200">
-                Get started
-              </Link>
-            </>
+            <Link to="/login" onClick={close} className="rounded-lg bg-white px-5 py-2 font-medium text-black hover:bg-gray-200">
+              Login
+            </Link>
           )}
+
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            className="rounded-lg border border-gray-800 p-2 text-gray-300 hover:text-white md:hidden"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+              {open ? <path d="M5 5l10 10M15 5L5 15" /> : <path d="M3 6h14M3 10h14M3 14h14" />}
+            </svg>
+          </button>
         </div>
-        <button
-          type="button"
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className={`grid size-10 place-items-center rounded-full md:hidden ${light ? 'text-white hover:bg-white/10' : 'hover:bg-ink/5'}`}
-        >
-          <Icon name={open ? 'close' : 'sliders'} className="size-5" />
-        </button>
       </div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.nav
-            aria-label="Main mobile"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18 }}
-            className="card absolute inset-x-4 top-16 p-3 text-ink md:hidden"
-          >
-            <ul className="grid gap-1">
-              {links.map((l) => (
-                <li key={l.to}>
-                  <Link to={l.to} onClick={() => setOpen(false)} className="block rounded-xl px-4 py-2.5 font-medium hover:bg-paper">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-              <li className="mt-2 border-t border-line pt-3">
-                {user ? (
-                  <Link to={homePathFor(user)} className="btn-primary w-full">
-                    Open my dashboard
-                  </Link>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link to="/login" className="btn-ghost">
-                      Sign in
-                    </Link>
-                    <Link to="/register" className="btn-primary">
-                      Get started
-                    </Link>
-                  </div>
-                )}
-              </li>
-            </ul>
-          </motion.nav>
-        )}
-      </AnimatePresence>
-    </header>
+      {open && (
+        <div aria-label="Main mobile" role="navigation" className="mx-auto mt-4 flex max-w-7xl flex-col gap-1 border-t border-gray-800 px-6 pt-3 md:hidden">
+          {links.map((l) => (
+            <Link key={l.to} to={l.to} onClick={close} className="py-2 text-gray-400 hover:text-white">
+              {l.label}
+            </Link>
+          ))}
+          {!user && (
+            <Link to="/register" onClick={close} className="py-2 text-gray-400 hover:text-white">
+              Register
+            </Link>
+          )}
+        </div>
+      )}
+    </nav>
   )
 }

@@ -40,14 +40,14 @@ export function PoolingPage() {
               setSelected(null)
               run.reset()
             }}
-            className="mt-1 rounded-xl border border-line bg-white px-3 py-2 font-normal"
+            className="mt-1 rounded-xl border border-line bg-transparent px-3 py-2 font-normal"
           />
         </label>
         <button
           type="button"
           onClick={() => run.mutate()}
           disabled={run.isPending || !date}
-          className="rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60"
+          className="rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 disabled:opacity-60"
         >
           {run.isPending ? 'Running…' : list.length ? 'Run pooling again' : 'Run pooling'}
         </button>
@@ -57,7 +57,7 @@ export function PoolingPage() {
       </div>
 
       {error && (
-        <p role="alert" className="font-semibold text-red-700">
+        <p role="alert" className="font-semibold text-red-400">
           {isUnavailable(error)
             ? 'Pooling is not available yet: the logistics service is not running. Try again once it is deployed.'
             : error instanceof ApiError

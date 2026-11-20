@@ -30,7 +30,7 @@ export function ProduceCard({
         aria-label={`${item.cropName} from ${item.farmName}`}
         className="card group flex h-full w-full flex-col overflow-hidden text-left transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]"
       >
-        <div className="relative grid h-40 place-items-center overflow-hidden bg-neutral-100">
+        <div className="relative grid h-40 place-items-center overflow-hidden bg-neutral-900">
           <span
             aria-hidden
             className="text-[4.5rem] drop-shadow-[0_8px_12px_rgb(0_0_0/0.15)] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
@@ -39,7 +39,7 @@ export function ProduceCard({
           </span>
           <div className="absolute inset-x-3 top-3 flex flex-wrap gap-1.5">
             {item.isOrganic && (
-              <span className="glass inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold text-[#1d6b3a]">
+              <span className="glass inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold text-green-400">
                 <Icon name="leaf" className="size-3.5" /> Organic
               </span>
             )}

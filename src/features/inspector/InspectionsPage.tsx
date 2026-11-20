@@ -12,7 +12,7 @@ import {
 } from './inspector'
 
 const message = (e: unknown) => (e instanceof ApiError || e instanceof Error ? e.message : 'Could not reach the server. Try again.')
-const field = 'mt-1 w-full rounded-xl border border-line bg-white px-3 py-2 font-normal'
+const field = 'mt-1 w-full rounded-xl border border-line bg-transparent px-3 py-2 font-normal'
 const subjectText: Record<string, string> = { ORDER: 'Packed order', HARVEST: 'Harvest', RESERVATION: 'Harvest' }
 
 export function InspectionsPage() {
@@ -37,7 +37,7 @@ export function InspectionsPage() {
   if (list.isPending) return <p className="mt-8 text-ink-soft">Loading inspections…</p>
   if (list.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-red-400">
         Could not load inspections. Refresh to try again.
       </p>
     )
@@ -48,7 +48,7 @@ export function InspectionsPage() {
   return (
     <div className="mt-8 max-w-3xl space-y-8">
       <div>
-        <button type="button" onClick={share} className="rounded-xl border border-line bg-white px-3 py-2 font-semibold">
+        <button type="button" onClick={share} className="rounded-xl border border-line bg-transparent px-3 py-2 font-semibold">
           Share my location
         </button>
         {located && (
@@ -122,12 +122,12 @@ function ClaimRow({ inspection: i, onDone }: { inspection: Inspection; onDone: (
         </p>
         <p className="text-sm text-ink-soft">Waiting since {new Date(i.createdAt).toLocaleString('en-IN')}</p>
         {error && (
-          <p role="alert" className="text-sm font-semibold text-red-700">
+          <p role="alert" className="text-sm font-semibold text-red-400">
             {error}
           </p>
         )}
       </div>
-      <button type="button" disabled={claim.isPending} onClick={() => claim.mutate()} className="rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
+      <button type="button" disabled={claim.isPending} onClick={() => claim.mutate()} className="rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 disabled:opacity-60">
         Claim
       </button>
     </div>
@@ -241,11 +241,11 @@ function ReportCard({ inspection: i, onDone }: { inspection: Inspection; onDone:
         <span className="text-xs font-normal text-ink-soft">Up to 10 photos, JPEG, PNG or WebP, 5 MB each.</span>
       </label>
       {error && (
-        <p role="alert" className="font-semibold text-red-700">
+        <p role="alert" className="font-semibold text-red-400">
           {error}
         </p>
       )}
-      <button type="submit" disabled={submit.isPending} className="rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
+      <button type="submit" disabled={submit.isPending} className="rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 disabled:opacity-60">
         {submit.isPending ? 'Submitting…' : 'Submit report'}
       </button>
     </form>

@@ -65,7 +65,7 @@ export function ProduceDrawer({
         transition={{ type: 'tween', duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         className="absolute inset-y-0 right-0 flex w-full max-w-lg flex-col overflow-y-auto bg-paper shadow-2xl"
       >
-        <div className="relative grid h-56 shrink-0 place-items-center bg-neutral-100">
+        <div className="relative grid h-56 shrink-0 place-items-center bg-neutral-900">
           <span aria-hidden className="animate-float text-[6.5rem] drop-shadow-[0_12px_16px_rgb(0_0_0/0.18)]">
             {look.emoji}
           </span>
@@ -84,12 +84,12 @@ export function ProduceDrawer({
           <div>
             <div className="flex flex-wrap gap-2">
               {item.isOrganic && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-leaf/12 px-2.5 py-0.5 text-sm font-semibold text-[#1d6b3a]">
+                <span className="inline-flex items-center gap-1 rounded-full bg-leaf/12 px-2.5 py-0.5 text-sm font-semibold text-green-400">
                   <Icon name="leaf" className="size-4" /> Certified organic
                 </span>
               )}
               {item.grade && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-mustard/15 px-2.5 py-0.5 text-sm font-semibold text-[#8a5c00]">
+                <span className="inline-flex items-center gap-1 rounded-full bg-mustard/15 px-2.5 py-0.5 text-sm font-semibold text-amber-400">
                   <Icon name="star" className="size-4" /> Grade {item.grade} (inspected)
                 </span>
               )}
@@ -151,7 +151,7 @@ export function ProduceDrawer({
           </section>
 
           <section aria-labelledby="farm-h" className="card flex items-center gap-4 p-4">
-            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-neutral-100 text-2xl" aria-hidden>
+            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-neutral-900 text-2xl" aria-hidden>
               👩‍🌾
             </span>
             <div className="min-w-0">
@@ -174,7 +174,7 @@ export function ProduceDrawer({
             <p className="mt-1 text-sm text-white/75">
               Add it to your basket in the Farm customer app: pay once, track the delivery live and confirm it with an OTP.
             </p>
-            <Link to="/register" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-black hover:bg-neutral-200">
+            <Link to="/register" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-black hover:bg-neutral-800">
               Create a customer account <Icon name="arrow" className="size-4" />
             </Link>
           </div>

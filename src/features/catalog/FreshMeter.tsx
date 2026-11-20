@@ -1,11 +1,11 @@
 import type { Freshness, FreshTone } from './catalog'
 
 const TONE: Record<FreshTone, { bar: string; chip: string }> = {
-  peak: { bar: 'bg-leaf', chip: 'bg-leaf/12 text-[#1d6b3a]' },
-  fresh: { bar: 'bg-[#7cbf4b]', chip: 'bg-[#7cbf4b]/15 text-[#3f6d1f]' },
-  good: { bar: 'bg-mustard', chip: 'bg-mustard/15 text-[#8a5c00]' },
-  soon: { bar: 'bg-tomato', chip: 'bg-tomato/12 text-[#a5361a]' },
-  upcoming: { bar: 'bg-sky', chip: 'bg-sky/12 text-[#245a99]' },
+  peak: { bar: 'bg-leaf', chip: 'bg-leaf/12 text-green-400' },
+  fresh: { bar: 'bg-[#7cbf4b]', chip: 'bg-[#7cbf4b]/15 text-lime-400' },
+  good: { bar: 'bg-mustard', chip: 'bg-mustard/15 text-amber-400' },
+  soon: { bar: 'bg-tomato', chip: 'bg-tomato/12 text-red-400' },
+  upcoming: { bar: 'bg-sky', chip: 'bg-sky/12 text-blue-400' },
 }
 
 /** Freshness as a labelled bar: full while the crop is at its best, emptying as it ages. */

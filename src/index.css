@@ -1,32 +1,32 @@
 @import 'tailwindcss';
 
 @theme {
-  /* AINow look: black and white, grey text and thin grey borders. */
-  --color-paper: #ffffff;
-  --color-paper-deep: #f4f4f5;
-  --color-surface: #ffffff;
-  --color-ink: #0a0a0a;
-  --color-ink-soft: #6b7280;
-  --color-line: #e5e7eb;
+  /* Exactly AINow's palette: black pages, white text, gray-400 secondary text, gray-800 borders.
+     Colour names keep their old meaning so every page follows: "paper" is the page, "ink" the text,
+     "indigo" the primary action (a white button on black, as on AINow). */
+  --color-paper: #000000;
+  --color-paper-deep: #0a0a0a; /* neutral-950 */
+  --color-surface: #000000;
+  --color-ink: #ffffff;
+  --color-ink-soft: #9ca3af; /* gray-400 */
+  --color-line: #1f2937; /* gray-800 */
 
-  /* "indigo" is the primary action colour everywhere (kept as a name so existing classes work):
-     black on light pages. forest / forest-deep are the dark surfaces (navbar, hero, footer). */
-  --color-indigo: #0a0a0a;
+  --color-indigo: #ffffff;
   --color-forest: #171717;
   --color-forest-deep: #000000;
   --color-lime: #ffffff;
   --color-mustard: #a3a3a3;
-  /* Colours kept only where they carry meaning (freshness, organic, errors). */
-  --color-leaf: #16a34a;
-  --color-tomato: #dc2626;
-  --color-soil: #525252;
-  --color-sky: #2563eb;
+  --color-leaf: #4ade80; /* green-400 */
+  --color-tomato: #f87171; /* red-400 */
+  --color-soil: #a3a3a3;
+  --color-sky: #60a5fa;
 
-  --font-display: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Arial, Helvetica, sans-serif;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Arial, Helvetica, sans-serif;
+  /* AINow sets body to Arial, Helvetica */
+  --font-display: Arial, Helvetica, sans-serif;
+  --font-sans: Arial, Helvetica, sans-serif;
 
   --shadow-card: none;
-  --shadow-lift: 0 12px 32px -16px rgb(0 0 0 / 0.25);
+  --shadow-lift: none;
 
   --animate-float: float 6s ease-in-out infinite;
   --animate-marquee: marquee 40s linear infinite;
@@ -60,8 +60,8 @@
   }
 
   ::selection {
-    background: #0a0a0a;
-    color: #ffffff;
+    background: #ffffff;
+    color: #000000;
   }
 
   /* Headings: bold and tight, like AINow */
@@ -71,7 +71,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid #6366f1;
+    outline: 2px solid #818cf8;
     outline-offset: 2px;
     border-radius: 6px;
   }
@@ -87,8 +87,8 @@
   input:focus,
   select:focus,
   textarea:focus {
-    border-color: var(--color-indigo);
-    box-shadow: 0 0 0 3px rgb(0 0 0 / 0.08);
+    border-color: #ffffff;
+    box-shadow: none;
     outline: none;
   }
 
@@ -122,7 +122,7 @@
 
 /* White card with a soft shadow: the base of most panels. */
 @utility card {
-  background: var(--color-surface);
+  background: transparent;
   border: 1px solid var(--color-line);
   border-radius: 1rem;
   box-shadow: var(--shadow-card);
@@ -130,9 +130,10 @@
 
 /* Frosted glass for floating headers and badges over imagery. */
 @utility glass {
-  background: color-mix(in oklab, white 72%, transparent);
-  backdrop-filter: blur(14px) saturate(1.4);
-  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  background: rgb(0 0 0 / 0.65);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 @utility btn-primary {
@@ -141,16 +142,16 @@
   justify-content: center;
   gap: 0.5rem;
   border-radius: 0.75rem;
-  background: var(--color-indigo);
+  background: #ffffff;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
-  color: white;
+  color: #000000;
   transition:
     transform 150ms,
     background 150ms,
     box-shadow 150ms;
   &:hover {
-    background: #262626;
+    background: #e5e7eb;
   }
 }
 
@@ -160,15 +161,16 @@
   justify-content: center;
   gap: 0.5rem;
   border-radius: 0.75rem;
-  border: 1px solid #d1d5db;
-  background: var(--color-surface);
+  border: 1px solid #374151;
+  background: transparent;
+  color: #ffffff;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   transition:
     border-color 150ms,
     transform 150ms;
   &:hover {
-    background: #f9fafb;
+    background: #111827;
   }
 }
 

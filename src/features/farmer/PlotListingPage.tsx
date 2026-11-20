@@ -144,7 +144,7 @@ export function PlotListingPage() {
           <span className="rounded-full bg-paper-deep px-3 py-1 text-sm">{boundary ? 'Boundary drawn' : 'No boundary yet'}</span>
         </div>
         <div ref={mapElement} className="mt-4 h-[360px] w-full overflow-hidden rounded-lg border border-line" />
-        {mapError && <p role="alert" className="mt-2 text-sm text-red-700">{mapError}</p>}
+        {mapError && <p role="alert" className="mt-2 text-sm text-red-400">{mapError}</p>}
         <p className="mt-2 text-xs text-ink-soft">Map data &copy; OpenStreetMap contributors. The backend checks polygon validity, overlap and area.</p>
       </div>
 

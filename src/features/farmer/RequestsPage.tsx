@@ -16,8 +16,8 @@ import {
 } from './reservations'
 
 const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not reach the server. Try again.')
-const primary = 'rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest hover:bg-indigo/90 disabled:opacity-60'
-const quiet = 'rounded-xl border border-line bg-white px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
+const primary = 'rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 hover:bg-white/90 disabled:opacity-60'
+const quiet = 'rounded-xl border border-line bg-transparent px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
 
 /** Re-renders every `ms` so countdowns stay current. */
 function useNow(ms: number) {
@@ -39,7 +39,7 @@ export function RequestsPage() {
   if (reservations.isPending) return <p className="mt-8 text-ink-soft">Loading reservation requests…</p>
   if (reservations.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-red-400">
         Could not load reservation requests. Refresh to try again.
       </p>
     )
@@ -47,7 +47,7 @@ export function RequestsPage() {
   const all = reservations.data
   if (all.length === 0)
     return (
-      <div className="mt-8 max-w-xl rounded-xl border border-dashed border-line bg-white/60 p-6">
+      <div className="mt-8 max-w-xl rounded-xl border border-dashed border-line bg-transparent p-6">
         <h2 className="text-lg font-semibold">No reservation requests yet</h2>
         <p className="mt-1 text-ink-soft">
           Customers find your plots on the map when a season is open. Each request waits 48 hours for your answer.
@@ -165,13 +165,13 @@ function RequestCard({
       {r.total !== null && <p className="mt-1">Estimated value {rupees(r.total)}</p>}
 
       <div className="mt-4">
-        <p className={`text-sm font-semibold ${urgent ? 'text-red-700' : ''}`}>
+        <p className={`text-sm font-semibold ${urgent ? 'text-red-400' : ''}`}>
           {timeLeft(r.expiresAt, now)} to answer
           <span className="font-normal text-ink-soft">, until {new Date(r.expiresAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}</span>
         </p>
         <div aria-hidden="true" className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-paper-deep">
           <div
-            className={`h-full origin-left rounded-full transition-transform duration-300 ${urgent ? 'bg-red-600' : 'bg-[var(--role)]'}`}
+            className={`h-full origin-left rounded-full transition-transform duration-300 ${urgent ? 'bg-red-700' : 'bg-[var(--role)]'}`}
             style={{ transform: `scaleX(${left})` }}
           />
         </div>
@@ -181,7 +181,7 @@ function RequestCard({
         {confirmDecline ? (
           <>
             <span>Decline this request? The customer is told and the season opens again.</span>
-            <button type="button" disabled={busy} onClick={() => reject.mutate()} className={`${quiet} text-red-700`}>
+            <button type="button" disabled={busy} onClick={() => reject.mutate()} className={`${quiet} text-red-400`}>
               {reject.isPending ? 'Declining…' : 'Decline'}
             </button>
             <button type="button" onClick={() => setConfirmDecline(false)} className="underline">
@@ -200,7 +200,7 @@ function RequestCard({
         )}
       </div>
       {error && (
-        <p role="alert" className="mt-3 font-semibold text-red-700">
+        <p role="alert" className="mt-3 font-semibold text-red-400">
           {error}
         </p>
       )}

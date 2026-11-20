@@ -60,7 +60,7 @@ export function VerifyPage() {
   return (
     <AuthShell title="Verify your phone" intro={`We sent a 6-digit code to ${phone}.`}>
       {devCode && (
-        <p className="mb-5 rounded-lg bg-white px-3 py-2.5 text-sm" role="note">
+        <p className="mb-5 rounded-xl border border-gray-800 bg-neutral-950 px-4 py-3 text-sm text-gray-300" role="note">
           Test mode: no SMS is sent. Your code is <strong className="font-mono text-base">{devCode}</strong>.
         </p>
       )}

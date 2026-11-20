@@ -14,7 +14,7 @@ export function OrdersPage() {
   if (orders.isPending) return <p className="mt-8 text-ink-soft">Loading orders…</p>
   if (orders.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-red-400">
         Could not load your orders. Refresh to try again.
       </p>
     )
@@ -46,7 +46,7 @@ export function OrdersPage() {
               role="tab"
               aria-selected={tab === t.id}
               onClick={() => setTab(t.id)}
-              className="rounded-full border border-line bg-white px-4 py-1.5 font-semibold aria-selected:border-indigo aria-selected:bg-indigo aria-selected:text-white"
+              className="rounded-full border border-line bg-transparent px-4 py-1.5 font-semibold aria-selected:border-indigo aria-selected:bg-white aria-selected:text-black"
             >
               {t.label} ({count})
             </button>
@@ -103,7 +103,7 @@ function OrderRow({ order }: { order: OrderSummary }) {
                 setError(undefined)
                 pack.mutate()
               }}
-              className="rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60"
+              className="rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 disabled:opacity-60"
             >
               {pack.isPending ? 'Marking…' : 'Mark packed'}
             </button>
@@ -129,7 +129,7 @@ function OrderRow({ order }: { order: OrderSummary }) {
         </div>
       </div>
       {error && (
-        <p role="alert" className="mt-2 text-sm font-semibold text-red-700">
+        <p role="alert" className="mt-2 text-sm font-semibold text-red-400">
           {error}
         </p>
       )}
@@ -137,7 +137,7 @@ function OrderRow({ order }: { order: OrderSummary }) {
         (detail.isPending ? (
           <p className="mt-3 text-ink-soft">Loading…</p>
         ) : detail.isError ? (
-          <p role="alert" className="mt-3 font-semibold text-red-700">
+          <p role="alert" className="mt-3 font-semibold text-red-400">
             Could not load the order.
           </p>
         ) : (

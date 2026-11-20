@@ -167,7 +167,7 @@ export function CatalogBrowser() {
               aria-pressed={organic}
               onClick={() => setOrganic((v) => !v)}
               className={`inline-flex h-11 items-center gap-1.5 rounded-full border px-4 font-medium transition-colors ${
-                organic ? 'border-black bg-black text-white' : 'border-line bg-surface hover:border-ink-soft'
+                organic ? 'border-white bg-white text-black' : 'border-line bg-surface hover:border-ink-soft'
               }`}
             >
               <Icon name="leaf" className="size-4.5" /> Organic
@@ -189,13 +189,13 @@ export function CatalogBrowser() {
                   onClick={() => setCategory(c.id)}
                   className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 whitespace-nowrap transition-all ${
                     active
-                      ? 'border-black bg-black text-white'
+                      ? 'border-white bg-white text-black'
                       : 'border-line bg-surface hover:-translate-y-0.5 hover:border-ink-soft'
                   }`}
                 >
                   <span aria-hidden>{c.emoji}</span>
                   <span className="font-medium">{c.label}</span>
-                  <span className={`text-sm ${active ? 'text-white/70' : 'text-ink-soft'}`}>{counts[c.id] ?? 0}</span>
+                  <span className={`text-sm ${active ? 'text-gray-600' : 'text-ink-soft'}`}>{counts[c.id] ?? 0}</span>
                 </button>
               </li>
             )
@@ -205,7 +205,7 @@ export function CatalogBrowser() {
 
       {offline && (
         <p role="status" className="mt-5 flex items-start gap-3 rounded-2xl border border-mustard/40 bg-mustard/10 px-4 py-3 text-[0.95rem]">
-          <Icon name="sparkle" className="mt-0.5 size-5 shrink-0 text-[#8a5c00]" />
+          <Icon name="sparkle" className="mt-0.5 size-5 shrink-0 text-amber-400" />
           <span>
             <strong>Showing sample produce.</strong> The live catalog could not be reached, so these listings are examples of
             what farmers near {place.name} offer. Start the backend to see real stock.
@@ -222,7 +222,7 @@ export function CatalogBrowser() {
           ['Peak fresh', String(peak), 'leaf'],
         ].map(([label, value, icon]) => (
           <div key={label} className="card flex items-center gap-3 px-4 py-3">
-            <span className="grid size-10 place-items-center rounded-xl bg-neutral-100 text-black">
+            <span className="grid size-10 place-items-center rounded-xl bg-neutral-900 text-black">
               <Icon name={icon as 'basket'} className="size-5" />
             </span>
             <div>

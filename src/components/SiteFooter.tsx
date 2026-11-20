@@ -1,46 +1,48 @@
 import { Link } from 'react-router'
-import { BrandMark } from './BrandMark'
+import { useAuth } from '@/features/auth/authContext'
+import { homePathFor } from '@/features/auth/roles'
 
-/** Footer for the public pages. */
+/** Footer: the same layout as AINow's (brand on the left, link columns on the right). */
 export function SiteFooter() {
+  const { user } = useAuth()
   return (
-    <footer className="mt-24 bg-forest-deep text-white/75">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-8 md:grid-cols-[2fr_1fr_1fr_1fr]">
-        <div className="max-w-sm">
-          <BrandMark tone="light" />
-          <p className="mt-4 text-[0.95rem]">
-            Fresh produce straight from verified farmers, quality-checked and delivered in shared, low-carbon routes.
-            Or reserve a plot and follow your own crop to harvest.
-          </p>
+    <footer className="border-t border-gray-800 bg-black text-white">
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <div className="flex flex-col justify-between gap-8 md:flex-row">
+          <div>
+            <h2 className="text-2xl font-bold">Farm Platform</h2>
+            <p className="mt-3 max-w-sm text-sm leading-6 text-gray-500">
+              Fresh produce straight from verified farmers, or a plot of farmland to follow from sowing to harvest.
+            </p>
+          </div>
+
+          <div className="flex gap-12">
+            <FooterCol
+              title="Explore"
+              links={[
+                ['/', 'Home'],
+                ['/catalog', 'Fresh produce'],
+                ['/customer/plots', 'Reserve farmland'],
+                ['/team', 'Our team'],
+              ]}
+            />
+            <FooterCol
+              title="Account"
+              links={
+                user
+                  ? [[homePathFor(user), 'Dashboard']]
+                  : [
+                      ['/register', 'Register'],
+                      ['/login', 'Login'],
+                    ]
+              }
+            />
+          </div>
         </div>
-        <FooterCol
-          title="Shop"
-          links={[
-            ['/catalog', 'Fresh produce'],
-            ['/customer/plots', 'Reserve farmland'],
-            ['/customer/reservations', 'My reservations'],
-          ]}
-        />
-        <FooterCol
-          title="Work with us"
-          links={[
-            ['/register', 'Sell as a farmer'],
-            ['/inspector', 'Quality inspectors'],
-            ['/admin', 'Operations'],
-          ]}
-        />
-        <FooterCol
-          title="Project"
-          links={[
-            ['/team', 'Our team'],
-            ['/#how', 'How it works'],
-          ]}
-        />
-      </div>
-      <div className="border-t border-white/10">
-        <p className="mx-auto max-w-7xl px-4 py-5 text-sm text-white/50 sm:px-8">
-          A CSD course project · Team 1 (apps) and Team 2 (website) · Guided by Dr Gagan Sir
-        </p>
+
+        <div className="mt-12 border-t border-gray-800 pt-6 text-sm text-gray-600">
+          © {new Date().getFullYear()} Farm Platform. A CSD course project, guided by Dr Gagan Sir.
+        </div>
       </div>
     </footer>
   )
@@ -49,16 +51,14 @@ export function SiteFooter() {
 function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
   return (
     <div>
-      <p className="text-sm font-semibold tracking-wide text-white uppercase">{title}</p>
-      <ul className="mt-4 space-y-2">
+      <h3 className="text-sm font-semibold">{title}</h3>
+      <div className="mt-4 space-y-3 text-sm text-gray-500">
         {links.map(([to, label]) => (
-          <li key={to}>
-            <Link to={to} className="hover:text-white">
-              {label}
-            </Link>
-          </li>
+          <Link key={to} to={to} className="block hover:text-white">
+            {label}
+          </Link>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

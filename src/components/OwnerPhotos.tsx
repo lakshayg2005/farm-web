@@ -3,9 +3,9 @@ import { isProcessing, mediaApi, photoBadge, type Media, type OwnerType } from '
 
 const BADGE_TONE = {
   verified: 'bg-leaf text-white',
-  unverified: 'bg-amber-200 text-ink',
-  checking: 'bg-white/90 text-ink',
-  failed: 'bg-red-100 text-red-800',
+  unverified: 'bg-amber-900/50 text-amber-300 text-ink',
+  checking: 'bg-black/80 text-white',
+  failed: 'bg-red-950/40 text-red-300 text-red-400',
 } as const
 
 /** The photos attached to a listing, reservation, ...; each shows whether its location was verified. */

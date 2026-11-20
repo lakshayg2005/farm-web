@@ -1,10 +1,7 @@
-import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
 import data from './team.json'
-
-const GRADIENTS = ['from-neutral-900 to-neutral-700', 'from-neutral-700 to-neutral-500']
 
 function Photo({ name, src }: { name: string; src: string }) {
   const [missing, setMissing] = useState(false)
@@ -12,7 +9,7 @@ function Photo({ name, src }: { name: string; src: string }) {
     return (
       <span
         aria-hidden
-        className="grid size-40 place-items-center rounded-2xl border border-neutral-700 bg-neutral-900 font-display text-6xl text-white"
+        className="grid size-40 shrink-0 place-items-center rounded-2xl border border-gray-800 bg-neutral-950 text-6xl font-bold text-white"
       >
         {name.replace(/^Dr\s+/, '').charAt(0)}
       </span>
@@ -22,80 +19,54 @@ function Photo({ name, src }: { name: string; src: string }) {
       src={src}
       alt={name}
       onError={() => setMissing(true)}
-      className="size-40 rounded-[2rem] object-cover shadow-xl ring-4 ring-white/20"
+      className="size-40 shrink-0 rounded-2xl border border-gray-800 object-cover"
     />
   )
 }
 
 export function TeamPage() {
   useEffect(() => {
-    document.title = 'Our team · Farm Platform'
+    document.title = 'Our team | Farm Platform'
   }, [])
   const { guide, teams } = data
   return (
-    <div className="min-h-dvh">
-      <div className="mesh relative overflow-hidden text-white">
-        <SiteHeader />
-        <section
-          aria-labelledby="thanks"
-          className="mx-auto flex max-w-7xl flex-col gap-8 px-4 pt-12 pb-20 sm:flex-row sm:items-center sm:px-8 lg:pt-16"
-        >
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
+    <>
+      <SiteHeader />
+      <main className="min-h-screen bg-black px-6 py-24 text-white">
+        <div className="mx-auto max-w-7xl">
+          <section aria-labelledby="thanks" className="flex flex-col gap-10 sm:flex-row sm:items-center">
             <Photo name={guide.name} src={guide.photo} />
-          </motion.div>
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold tracking-widest text-neutral-500 uppercase">{guide.role}</p>
-            <h1 id="thanks" className="mt-2 font-display text-[2.4rem] leading-tight sm:text-5xl">
-              With thanks to {guide.name}
-            </h1>
-            <p className="mt-4 text-lg leading-8 text-neutral-400">{guide.thanks}</p>
-          </div>
-        </section>
-      </div>
-
-      <div className="mx-auto max-w-7xl px-4 sm:px-8">
-        {teams.map((team, t) => (
-          <section key={team.name} aria-label={team.name} className="mt-16">
-            <div className="flex flex-wrap items-end justify-between gap-2">
-              <h2 className="font-display text-3xl">{team.name}</h2>
-              <p className="text-ink-soft">{team.about}</p>
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold tracking-widest text-gray-500 uppercase">{guide.role}</p>
+              <h1 id="thanks" className="mt-4 text-5xl font-bold md:text-6xl">
+                With thanks to {guide.name}
+              </h1>
+              <p className="mt-6 text-lg leading-8 text-gray-400">{guide.thanks}</p>
             </div>
-            <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {team.members.map((m, i) => (
-                <motion.li
-                  key={m.github}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.06 }}
-                  className="card flex flex-col p-5"
-                >
-                  <div className="flex items-center gap-3">
-                    <span
-                      aria-hidden
-                      className={`grid size-12 place-items-center rounded-2xl bg-gradient-to-br font-display text-xl text-white ${GRADIENTS[(i + t) % GRADIENTS.length]}`}
-                    >
-                      {m.name.charAt(0)}
-                    </span>
-                    <div>
-                      <p className="text-lg leading-tight font-semibold">{m.name}</p>
-                      <p className="text-sm text-ink-soft">{m.role}</p>
-                    </div>
-                  </div>
-                  <p className="mt-4 flex-1 text-[0.95rem]">{m.built}</p>
-                  <a
-                    href={`https://github.com/${m.github}`}
-                    className="mt-4 inline-block text-sm font-semibold text-indigo hover:underline"
-                  >
-                    @{m.github}
-                  </a>
-                </motion.li>
-              ))}
-            </ul>
           </section>
-        ))}
-      </div>
+
+          {teams.map((team) => (
+            <section key={team.name} aria-label={team.name} className="mt-24">
+              <h2 className="text-2xl font-bold">{team.name}</h2>
+              <p className="mt-2 text-gray-400">{team.about}</p>
+              <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {team.members.map((m, i) => (
+                  <li key={m.github} className="rounded-2xl border border-gray-800 p-6">
+                    <span className="text-sm font-medium text-gray-500">{String(i + 1).padStart(2, '0')}</span>
+                    <p className="mt-3 text-lg font-semibold">{m.name}</p>
+                    <p className="text-sm text-gray-500">{m.role}</p>
+                    <p className="mt-3 leading-7 text-gray-400">{m.built}</p>
+                    <a href={`https://github.com/${m.github}`} className="mt-4 inline-block text-sm font-medium text-gray-300 hover:text-white">
+                      @{m.github}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </main>
       <SiteFooter />
-    </div>
+    </>
   )
 }

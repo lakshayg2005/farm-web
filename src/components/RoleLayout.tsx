@@ -4,7 +4,6 @@ import { NavLink, Outlet, useLocation } from 'react-router'
 import { useAuth } from '@/features/auth/authContext'
 import type { Section } from '@/routes/types'
 import { BrandMark } from './BrandMark'
-import { CropRows } from './CropRows'
 import { Icon } from './Icon'
 
 const quick = { type: 'tween', duration: 0.22, ease: [0.25, 0.8, 0.3, 1] } as const
@@ -26,17 +25,16 @@ export function RoleLayout({ section }: { section: Section }) {
   return (
     <div
       style={{ '--role': section.accent } as CSSProperties}
-      className="min-h-dvh lg:grid lg:grid-cols-[17rem_1fr]"
+      className="min-h-dvh bg-black text-white lg:grid lg:grid-cols-[17rem_1fr]"
     >
       {/* Desktop rail */}
-      <aside className="relative hidden bg-forest-deep text-white lg:block">
-        <div className="sticky top-0 flex h-dvh flex-col pr-3">
-          <CropRows direction="vertical" className="absolute inset-y-0 right-0 w-3" />
+      <aside className="relative hidden border-r border-gray-800 bg-black text-white lg:block">
+        <div className="sticky top-0 flex h-dvh flex-col">
           <div className="px-6 pt-6">
-            <BrandMark tone="light" />
+            <BrandMark />
           </div>
-          <p className="px-6 pt-10 text-xs font-semibold tracking-[0.18em] text-white/45 uppercase">Workspace</p>
-          <p className="px-6 pt-1 font-display text-[2rem] leading-none">{section.label}</p>
+          <p className="px-6 pt-10 text-sm tracking-widest text-gray-500 uppercase">Workspace</p>
+          <p className="px-6 pt-2 text-3xl font-bold">{section.label}</p>
           <nav aria-label={`${section.label} pages`} className="mt-6 flex-1 px-3">
             <ul className="space-y-1">
               {section.pages.map((page) => (
@@ -45,7 +43,7 @@ export function RoleLayout({ section }: { section: Section }) {
                     to={page.path}
                     className={({ isActive }) =>
                       `relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors duration-200 ${
-                        isActive ? 'font-semibold text-forest-deep' : 'text-white/70 hover:bg-white/8 hover:text-white'
+                        isActive ? 'font-semibold text-white' : 'text-gray-400 hover:text-white'
                       }`
                     }
                   >
@@ -55,7 +53,7 @@ export function RoleLayout({ section }: { section: Section }) {
                           <motion.span
                             layoutId="rail-active"
                             transition={quick}
-                            className="absolute inset-0 rounded-lg bg-lime"
+                            className="absolute inset-0 rounded-lg bg-neutral-900"
                           />
                         )}
                         <Icon name={page.icon} className="relative size-5" />
@@ -67,21 +65,21 @@ export function RoleLayout({ section }: { section: Section }) {
               ))}
             </ul>
           </nav>
-          <div className="mx-3 mb-4 rounded-2xl bg-white/6 p-3">
+          <div className="mx-3 mb-4 rounded-2xl border border-gray-800 p-3">
             {user && (
               <div className="flex items-center gap-3 px-1 pb-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-lime font-bold text-forest-deep">
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white font-bold text-black">
                   {user.name.charAt(0)}
                 </span>
                 <span className="min-w-0">
                   <span className="block truncate font-semibold">{user.name}</span>
-                  <button type="button" onClick={() => void logout()} className="text-sm text-white/60 hover:text-white">
+                  <button type="button" onClick={() => void logout()} className="text-sm text-gray-500 hover:text-white">
                     Sign out
                   </button>
                 </span>
               </div>
             )}
-            <NavLink to="/" className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-white/70 hover:bg-white/8 hover:text-white">
+            <NavLink to="/" className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-gray-400 hover:text-white">
               <Icon name="back" className="size-4" />
               All sections
             </NavLink>
@@ -90,17 +88,16 @@ export function RoleLayout({ section }: { section: Section }) {
       </aside>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-20 border-b border-line bg-paper/85 backdrop-blur-lg lg:hidden">
+      <header className="sticky top-0 z-20 border-b border-gray-800 bg-black lg:hidden">
         <div className="flex h-14 items-center justify-between px-4">
           <BrandMark className="text-base" />
-          <span className="rounded-full bg-[color-mix(in_oklab,var(--role)_20%,white)] px-3 py-0.5 text-sm font-semibold">
+          <span className="rounded-full border border-gray-700 px-3 py-0.5 text-sm text-gray-300">
             {section.label}
           </span>
         </div>
-        <CropRows className="h-1.5" />
-      </header>
+              </header>
 
-      <main className={`px-4 py-8 sm:px-8 lg:px-14 lg:py-14 ${hasTabs ? 'pb-28 lg:pb-14' : ''}`}>
+      <main className={`bg-black px-6 py-12 sm:px-8 lg:px-14 lg:py-16 ${hasTabs ? 'pb-28 lg:pb-14' : ''}`}>
         <motion.div
           key={pathname}
           initial={{ opacity: 0, y: 8 }}
@@ -115,7 +112,7 @@ export function RoleLayout({ section }: { section: Section }) {
       {hasTabs && (
         <nav
           aria-label={`${section.label} pages`}
-          className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-20 border-t border-gray-800 bg-black pb-[env(safe-area-inset-bottom)] lg:hidden"
         >
           <ul className="grid" style={{ gridTemplateColumns: `repeat(${section.pages.length}, minmax(0, 1fr))` }}>
             {section.pages.map((page) => (
@@ -135,7 +132,7 @@ export function RoleLayout({ section }: { section: Section }) {
                           <motion.span
                             layoutId="tab-active"
                             transition={quick}
-                            className="absolute inset-0 rounded-full bg-neutral-200"
+                            className="absolute inset-0 rounded-full bg-neutral-800"
                           />
                         )}
                         <Icon name={page.icon} className="relative size-5" />

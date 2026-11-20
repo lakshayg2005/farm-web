@@ -11,7 +11,7 @@ export function VerificationPage() {
   if (waiting.isPending) return <p className="mt-8 text-ink-soft">Loading farmers…</p>
   if (waiting.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-red-400">
         Could not load the farmers. Refresh to try again.
       </p>
     )
@@ -46,7 +46,7 @@ function FarmerRow({ farmer }: { farmer: UserRow }) {
           {farmer.phoneVerified ? '' : ' · phone not verified'}
         </p>
         {error && (
-          <p role="alert" className="mt-1 text-sm font-semibold text-red-700">
+          <p role="alert" className="mt-1 text-sm font-semibold text-red-400">
             {error}
           </p>
         )}
@@ -58,7 +58,7 @@ function FarmerRow({ farmer }: { farmer: UserRow }) {
           setError(undefined)
           verify.mutate()
         }}
-        className="rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60"
+        className="rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 disabled:opacity-60"
       >
         {verify.isPending ? 'Verifying…' : `Verify ${farmer.name}`}
       </button>

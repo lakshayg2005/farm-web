@@ -27,9 +27,9 @@ const message = (e: unknown) =>
   e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not reach the server. Try again.'
 
 const input =
-  'mt-1 w-full rounded-xl border border-line bg-white px-3 py-2 font-normal disabled:bg-paper disabled:text-ink-soft'
-const primary = 'rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest hover:bg-indigo/90 disabled:opacity-60'
-const quiet = 'rounded-xl border border-line bg-white px-3 py-1.5 font-semibold hover:border-ink-soft disabled:opacity-60'
+  'mt-1 w-full rounded-xl border border-line bg-transparent px-3 py-2 font-normal disabled:bg-paper disabled:text-ink-soft'
+const primary = 'rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 hover:bg-white/90 disabled:opacity-60'
+const quiet = 'rounded-xl border border-line bg-transparent px-3 py-1.5 font-semibold hover:border-ink-soft disabled:opacity-60'
 const panel = { initial: { opacity: 0, y: -8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: 0.2 } }
 
 /** Order: on sale first, then sold out, then paused; newest change first within each. */
@@ -46,7 +46,7 @@ export function ListingsPage() {
   if (farms.isPending) return <p className="mt-8 text-ink-soft">Loading your farms…</p>
   if (farms.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-red-400">
         Could not load your farms. Refresh to try again.
       </p>
     )
@@ -108,12 +108,12 @@ export function ListingsPage() {
       {listings.isPending ? (
         <p className="text-ink-soft">Loading your listings…</p>
       ) : listings.isError ? (
-        <p role="alert" className="font-semibold text-red-700">
+        <p role="alert" className="font-semibold text-red-400">
           Could not load your listings. Refresh to try again.
         </p>
       ) : live.length === 0 ? (
         editing === null && (
-          <div className="rounded-xl border border-dashed border-line bg-white/60 p-6">
+          <div className="rounded-xl border border-dashed border-line bg-transparent p-6">
             <h2 className="text-lg font-semibold">Put your first produce up for sale</h2>
             <p className="mt-1 text-ink-soft">
               Add the crop, how much you have, your price and a photo taken at the farm. Customers nearby see it straight away.
@@ -229,7 +229,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
               {confirmRemove ? (
                 <span className="flex items-center gap-2">
                   <span className="text-sm">Remove this listing?</span>
-                  <button type="button" disabled={remove.isPending} onClick={() => remove.mutate()} className={`${quiet} text-red-700`}>
+                  <button type="button" disabled={remove.isPending} onClick={() => remove.mutate()} className={`${quiet} text-red-400`}>
                     {remove.isPending ? 'Removing…' : 'Remove'}
                   </button>
                   <button type="button" onClick={() => setConfirmRemove(false)} className="text-sm underline">
@@ -247,7 +247,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
             <p className="mt-2 text-sm text-ink-soft">Sold out. Add stock to put it back on sale.</p>
           )}
           {error && (
-            <p role="alert" className="mt-2 font-semibold text-red-700">
+            <p role="alert" className="mt-2 font-semibold text-red-400">
               {error}
             </p>
           )}
@@ -485,7 +485,7 @@ function ListingEditor({
       </div>
 
       {error && (
-        <p role="alert" className="mt-4 font-semibold text-red-700">
+        <p role="alert" className="mt-4 font-semibold text-red-400">
           {error}
         </p>
       )}
@@ -567,7 +567,7 @@ function FarmSetup() {
         </fieldset>
       </div>
       {error && (
-        <p role="alert" className="mt-4 font-semibold text-red-700">
+        <p role="alert" className="mt-4 font-semibold text-red-400">
           {error}
         </p>
       )}
