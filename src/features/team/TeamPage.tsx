@@ -4,12 +4,7 @@ import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
 import data from './team.json'
 
-const GRADIENTS = [
-  'from-[#1f6b45] to-[#3f9d5c]',
-  'from-[#e9a419] to-[#e4572e]',
-  'from-[#3f7cc4] to-[#1f6b45]',
-  'from-[#8a5a33] to-[#e9a419]',
-]
+const GRADIENTS = ['from-neutral-900 to-neutral-700', 'from-neutral-700 to-neutral-500']
 
 function Photo({ name, src }: { name: string; src: string }) {
   const [missing, setMissing] = useState(false)
@@ -17,7 +12,7 @@ function Photo({ name, src }: { name: string; src: string }) {
     return (
       <span
         aria-hidden
-        className="grid size-40 place-items-center rounded-[2rem] bg-gradient-to-br from-lime to-mustard font-display text-6xl text-forest-deep shadow-xl"
+        className="grid size-40 place-items-center rounded-2xl border border-neutral-700 bg-neutral-900 font-display text-6xl text-white"
       >
         {name.replace(/^Dr\s+/, '').charAt(0)}
       </span>
@@ -40,7 +35,7 @@ export function TeamPage() {
   return (
     <div className="min-h-dvh">
       <div className="mesh relative overflow-hidden text-white">
-        <SiteHeader tone="light" />
+        <SiteHeader />
         <section
           aria-labelledby="thanks"
           className="mx-auto flex max-w-7xl flex-col gap-8 px-4 pt-12 pb-20 sm:flex-row sm:items-center sm:px-8 lg:pt-16"
@@ -49,11 +44,11 @@ export function TeamPage() {
             <Photo name={guide.name} src={guide.photo} />
           </motion.div>
           <div className="max-w-2xl">
-            <p className="font-semibold text-lime">{guide.role}</p>
+            <p className="text-sm font-semibold tracking-widest text-neutral-500 uppercase">{guide.role}</p>
             <h1 id="thanks" className="mt-2 font-display text-[2.4rem] leading-tight sm:text-5xl">
               With thanks to {guide.name}
             </h1>
-            <p className="mt-4 text-lg text-white/80">{guide.thanks}</p>
+            <p className="mt-4 text-lg leading-8 text-neutral-400">{guide.thanks}</p>
           </div>
         </section>
       </div>

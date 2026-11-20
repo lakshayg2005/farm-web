@@ -30,7 +30,7 @@ export function ProduceCard({
         aria-label={`${item.cropName} from ${item.farmName}`}
         className="card group flex h-full w-full flex-col overflow-hidden text-left transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]"
       >
-        <div className="relative grid h-40 place-items-center overflow-hidden" style={{ background: look.hue }}>
+        <div className="relative grid h-40 place-items-center overflow-hidden bg-neutral-100">
           <span
             aria-hidden
             className="text-[4.5rem] drop-shadow-[0_8px_12px_rgb(0_0_0/0.15)] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"

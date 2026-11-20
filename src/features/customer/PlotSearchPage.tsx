@@ -178,7 +178,7 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
           {error}
         </p>
       )}
-      <button type="submit" disabled={reserve.isPending} className="w-full rounded-full bg-indigo px-5 py-2.5 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
+      <button type="submit" disabled={reserve.isPending} className="w-full rounded-xl bg-indigo px-5 py-2.5 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
         {reserve.isPending ? 'Sending…' : 'Request this plot'}
       </button>
     </form>

@@ -103,7 +103,7 @@ function OrderRow({ order }: { order: OrderSummary }) {
                 setError(undefined)
                 pack.mutate()
               }}
-              className="rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60"
+              className="rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60"
             >
               {pack.isPending ? 'Marking…' : 'Mark packed'}
             </button>

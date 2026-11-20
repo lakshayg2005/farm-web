@@ -1,7 +1,6 @@
 import { motion } from 'motion/react'
-import { useEffect, type CSSProperties } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router'
-import { CropRows } from '@/components/CropRows'
 import { Icon, type IconName } from '@/components/Icon'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
@@ -36,30 +35,29 @@ export function HomePage() {
     <div className="min-h-dvh overflow-x-clip">
       {/* Hero */}
       <section className="mesh relative text-white">
-        <FieldLines />
-        <SiteHeader tone="light" />
+        <SiteHeader />
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 pt-10 pb-24 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:pt-16 lg:pb-32">
           <div>
             <motion.p
               {...rise()}
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-medium text-lime"
+              className="inline-flex items-center gap-2 rounded-full border border-neutral-700 px-4 py-2 text-sm text-neutral-300"
             >
-              <span className="size-2 animate-pulse rounded-full bg-lime" /> Farm to table, without the middlemen
+              ✦ Farm to table, without the middlemen
             </motion.p>
-            <motion.h1 {...rise(0.05)} className="mt-5 font-display text-[2.8rem] leading-[1.02] sm:text-[4.2rem]">
-              From the farmer’s field <span className="text-gradient">to your table</span>
+            <motion.h1 {...rise(0.05)} className="mt-8 font-display text-5xl leading-tight sm:text-7xl">
+              From the farmer’s field <span className="block text-neutral-400">to your table.</span>
             </motion.h1>
-            <motion.p {...rise(0.1)} className="mt-6 max-w-xl text-lg text-white/75 sm:text-xl">
+            <motion.p {...rise(0.1)} className="mt-8 max-w-xl text-lg leading-8 text-neutral-400 sm:text-xl">
               Buy produce harvested days ago from verified farmers near you, graded by inspectors and delivered on shared
               routes. Or reserve a plot of farmland and follow your own crop until harvest.
             </motion.p>
             <motion.div {...rise(0.15)} className="mt-9 flex flex-wrap gap-3">
-              <Link to="/catalog" className="btn-primary !bg-lime !px-6 !py-3 !text-forest-deep hover:!bg-white">
+              <Link to="/catalog" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-black transition hover:bg-neutral-200">
                 Browse fresh produce <Icon name="arrow" className="size-4.5" />
               </Link>
               <Link
                 to="/customer/plots"
-                className="inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3 font-semibold text-white transition-colors hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-700 px-7 py-3.5 font-semibold text-white transition hover:bg-neutral-900"
               >
                 Reserve farmland
               </Link>
@@ -73,7 +71,7 @@ export function HomePage() {
                 <div key={label}>
                   <dt className="sr-only">{label}</dt>
                   <dd className="font-display text-3xl text-white">{n}</dd>
-                  <dd className="text-sm text-white/60">{label}</dd>
+                  <dd className="text-sm text-neutral-500">{label}</dd>
                 </div>
               ))}
             </motion.dl>
@@ -97,23 +95,18 @@ export function HomePage() {
       {/* How it works */}
       <section id="how" className="mx-auto max-w-7xl scroll-mt-8 px-4 pt-24 sm:px-8">
         <motion.div {...rise()} className="max-w-2xl">
-          <p className="font-semibold text-indigo">How it works</p>
+          <p className="text-sm font-semibold tracking-widest text-neutral-500 uppercase">How it works</p>
           <h2 className="mt-2 font-display text-4xl leading-tight sm:text-5xl">Fresh, fair and traceable at every step</h2>
-          <p className="mt-4 text-lg text-ink-soft">
+          <p className="mt-4 text-lg leading-8 text-neutral-600">
             Every listing shows when it was harvested and when it will arrive, so you always know what you are buying.
           </p>
         </motion.div>
         <ol className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
-            <motion.li key={s.title} {...rise(i * 0.08)} className="card relative overflow-hidden p-6">
-              <span className="absolute top-2 right-5 font-display text-7xl leading-none text-paper-deep select-none" aria-hidden>
-                {i + 1}
-              </span>
-              <span className="relative grid size-12 place-items-center rounded-2xl bg-indigo text-white">
-                <Icon name={s.icon} className="size-6" />
-              </span>
-              <h3 className="relative mt-5 text-xl font-semibold">{s.title}</h3>
-              <p className="relative mt-2 text-ink-soft">{s.body}</p>
+            <motion.li key={s.title} {...rise(i * 0.08)} className="rounded-2xl border border-neutral-200 p-8">
+              <span className="text-sm font-medium text-neutral-400">{String(i + 1).padStart(2, '0')}</span>
+              <h3 className="mt-8 text-2xl font-bold tracking-tight">{s.title}</h3>
+              <p className="mt-4 leading-7 text-neutral-600">{s.body}</p>
             </motion.li>
           ))}
         </ol>
@@ -121,33 +114,33 @@ export function HomePage() {
 
       {/* Two ways to buy */}
       <section className="mx-auto mt-24 grid max-w-7xl gap-5 px-4 sm:px-8 lg:grid-cols-2">
-        <motion.div {...rise()} className="relative overflow-hidden rounded-[1.75rem] bg-[#fde2dc] p-8 sm:p-10">
-          <span className="absolute -right-6 -bottom-8 text-[11rem] leading-none opacity-90" aria-hidden>
+        <motion.div {...rise()} className="relative overflow-hidden rounded-2xl bg-black p-8 text-white sm:p-10">
+          <span className="absolute -right-6 -bottom-8 text-[11rem] leading-none opacity-80 grayscale" aria-hidden>
             🍅
           </span>
-          <p className="font-semibold text-tomato">V1 · Fresh produce</p>
-          <h3 className="mt-2 max-w-sm font-display text-3xl leading-tight">Vegetables, fruits and grains from farms near you</h3>
+          <p className="text-sm font-semibold tracking-widest text-neutral-500 uppercase">V1 · Fresh produce</p>
+          <h3 className="mt-4 max-w-sm font-display text-3xl leading-tight">Vegetables, fruits and grains from farms near you</h3>
           <ul className="mt-5 max-w-xs space-y-2">
             {['Harvest date on every listing', 'Grade A/B/C from an inspector', 'Next-day pooled delivery'].map((t) => (
               <li key={t} className="flex items-center gap-2">
-                <Icon name="check" className="size-5 text-tomato" /> {t}
+                <Icon name="check" className="size-5 text-neutral-400" /> <span className="text-neutral-300">{t}</span>
               </li>
             ))}
           </ul>
-          <Link to="/catalog" className="btn-primary relative mt-8 !bg-ink hover:!bg-forest-deep">
+          <Link to="/catalog" className="relative mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-black hover:bg-neutral-200">
             Open the catalog <Icon name="arrow" className="size-4" />
           </Link>
         </motion.div>
-        <motion.div {...rise(0.08)} className="relative overflow-hidden rounded-[1.75rem] bg-[#e2f0d6] p-8 sm:p-10">
-          <span className="absolute -right-4 -bottom-6 text-[10rem] leading-none" aria-hidden>
+        <motion.div {...rise(0.08)} className="relative overflow-hidden rounded-2xl border border-neutral-200 p-8 sm:p-10">
+          <span className="absolute -right-4 -bottom-6 text-[10rem] leading-none opacity-80 grayscale" aria-hidden>
             🌾
           </span>
-          <p className="font-semibold text-indigo">V2 · Farmland reservation</p>
-          <h3 className="mt-2 max-w-sm font-display text-3xl leading-tight">Reserve a plot and watch your crop grow</h3>
+          <p className="text-sm font-semibold tracking-widest text-neutral-500 uppercase">V2 · Farmland reservation</p>
+          <h3 className="mt-4 max-w-sm font-display text-3xl leading-tight">Reserve a plot and watch your crop grow</h3>
           <ul className="mt-5 max-w-xs space-y-2">
             {['Pick a plot on the map', 'Photo updates from the farmer', 'Home delivery or buy-back at harvest'].map((t) => (
               <li key={t} className="flex items-center gap-2">
-                <Icon name="check" className="size-5 text-indigo" /> {t}
+                <Icon name="check" className="size-5 text-neutral-400" /> <span className="text-neutral-600">{t}</span>
               </li>
             ))}
           </ul>
@@ -161,10 +154,10 @@ export function HomePage() {
       <section className="mx-auto mt-24 max-w-7xl px-4 sm:px-8">
         <motion.div {...rise()} className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-xl">
-            <p className="font-semibold text-indigo">One platform, four roles</p>
+            <p className="text-sm font-semibold tracking-widest text-neutral-500 uppercase">One platform, four roles</p>
             <h2 className="mt-2 font-display text-4xl leading-tight">Choose your section to get started</h2>
           </div>
-          <Link to="/team" className="font-semibold text-indigo hover:underline">
+          <Link to="/team" className="font-semibold hover:underline">
             Meet the team →
           </Link>
         </motion.div>
@@ -174,19 +167,16 @@ export function HomePage() {
               <motion.li key={section.role} {...rise(i * 0.07)}>
                 <Link
                   to={`/${section.role}`}
-                  style={{ '--role': section.accent } as CSSProperties}
-                  className="card group flex h-full flex-col overflow-hidden transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]"
+                  className="group flex h-full flex-col rounded-2xl border border-neutral-200 p-6 transition-colors hover:border-black"
                 >
-                  <CropRows delay={0.1 + i * 0.12} className="h-20" />
-                  <span className="flex flex-1 flex-col p-5">
-                    <span className="-mt-11 grid size-12 place-items-center rounded-2xl border-4 border-surface bg-[color-mix(in_oklab,var(--role)_85%,black)] text-white">
-                      <Icon name={roleIcon[section.role]} className="size-5" />
-                    </span>
-                    <span className="mt-3 block font-display text-xl leading-tight">{section.label}</span>
-                    <span className="mt-1 block flex-1 text-[0.95rem] leading-snug text-ink-soft">{section.audience}</span>
-                    <span className="mt-4 inline-flex items-center gap-1.5 font-semibold text-indigo">
-                      Open <Icon name="arrow" className="size-4 transition-transform group-hover:translate-x-1" />
-                    </span>
+                  <span className="flex items-center justify-between text-sm font-medium text-neutral-400">
+                    {String(i + 1).padStart(2, '0')}
+                    <Icon name={roleIcon[section.role]} className="size-5 text-neutral-400 group-hover:text-black" />
+                  </span>
+                  <span className="mt-8 block text-2xl font-bold tracking-tight">{section.label}</span>
+                  <span className="mt-2 block flex-1 leading-7 text-neutral-600">{section.audience}</span>
+                  <span className="mt-6 inline-flex items-center gap-1.5 font-semibold">
+                    Open <Icon name="arrow" className="size-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </Link>
               </motion.li>
@@ -197,16 +187,15 @@ export function HomePage() {
 
       {/* Thanks */}
       <section className="mx-auto mt-24 max-w-7xl px-4 sm:px-8">
-        <motion.div {...rise()} className="mesh relative overflow-hidden rounded-[1.75rem] px-8 py-12 text-white sm:px-12">
-          <FieldLines />
-          <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+        <motion.div {...rise()} className="relative overflow-hidden rounded-2xl bg-black px-8 py-12 text-white sm:px-12">
+            <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div className="max-w-2xl">
-              <p className="font-semibold text-lime">With gratitude</p>
+              <p className="text-sm font-semibold tracking-widest text-neutral-500 uppercase">With gratitude</p>
               <p className="mt-2 font-display text-3xl leading-tight sm:text-4xl">
                 Built by two teams of students, guided by Dr Gagan Sir
               </p>
             </div>
-            <Link to="/team" className="btn-primary shrink-0 !bg-white !text-forest-deep hover:!bg-lime">
+            <Link to="/team" className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-black hover:bg-neutral-200">
               Meet the team <Icon name="users" className="size-4.5" />
             </Link>
           </div>
@@ -215,23 +204,6 @@ export function HomePage() {
 
       <SiteFooter />
     </div>
-  )
-}
-
-/** Fine contour lines, like ploughed fields seen from a drone, behind dark panels. */
-function FieldLines() {
-  return (
-    <svg aria-hidden className="pointer-events-none absolute inset-0 size-full opacity-[0.09]" preserveAspectRatio="none" viewBox="0 0 800 600">
-      {Array.from({ length: 22 }, (_, i) => (
-        <path
-          key={i}
-          d={`M-50 ${80 + i * 26} C 200 ${20 + i * 26}, 420 ${160 + i * 24}, 850 ${60 + i * 27}`}
-          stroke="white"
-          strokeWidth="1.2"
-          fill="none"
-        />
-      ))}
-    </svg>
   )
 }
 
@@ -245,9 +217,9 @@ function HeroShowcase() {
       className="relative mx-auto w-full max-w-md"
       aria-hidden
     >
-      <div className="absolute -inset-6 rounded-[2.5rem] bg-lime/20 blur-3xl" />
-      <div className="relative overflow-hidden rounded-[1.75rem] bg-surface text-ink shadow-[0_30px_80px_-20px_rgb(0_0_0/0.55)]">
-        <div className="grid h-56 place-items-center bg-[#fde2dc]">
+      
+      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-surface text-ink">
+        <div className="grid h-56 place-items-center bg-neutral-100">
           <span className="animate-float text-[7.5rem] drop-shadow-[0_14px_18px_rgb(0_0_0/0.2)]">🍅</span>
         </div>
         <div className="space-y-4 p-6">

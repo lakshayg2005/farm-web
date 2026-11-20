@@ -65,7 +65,7 @@ export function ProduceDrawer({
         transition={{ type: 'tween', duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         className="absolute inset-y-0 right-0 flex w-full max-w-lg flex-col overflow-y-auto bg-paper shadow-2xl"
       >
-        <div className="relative grid h-56 shrink-0 place-items-center" style={{ background: look.hue }}>
+        <div className="relative grid h-56 shrink-0 place-items-center bg-neutral-100">
           <span aria-hidden className="animate-float text-[6.5rem] drop-shadow-[0_12px_16px_rgb(0_0_0/0.18)]">
             {look.emoji}
           </span>
@@ -138,7 +138,7 @@ export function ProduceDrawer({
               {steps.map((s, i) => (
                 <li key={s.title} className="relative flex gap-3 pb-4 last:pb-0">
                   {i < steps.length - 1 && <span aria-hidden className="absolute top-8 bottom-0 left-4 w-px bg-line" />}
-                  <span className="relative grid size-8 shrink-0 place-items-center rounded-full bg-indigo/10 text-indigo">
+                  <span className="relative grid size-8 shrink-0 place-items-center rounded-xl bg-indigo/10 text-indigo">
                     <Icon name={s.icon} className="size-4" />
                   </span>
                   <div className="pt-1">
@@ -151,7 +151,7 @@ export function ProduceDrawer({
           </section>
 
           <section aria-labelledby="farm-h" className="card flex items-center gap-4 p-4">
-            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-lime/50 text-2xl" aria-hidden>
+            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-neutral-100 text-2xl" aria-hidden>
               👩‍🌾
             </span>
             <div className="min-w-0">
@@ -169,12 +169,12 @@ export function ProduceDrawer({
             </div>
           </section>
 
-          <div className="rounded-2xl bg-forest p-5 text-white">
+          <div className="rounded-2xl bg-black p-5 text-white">
             <p className="font-semibold">Ready to order?</p>
             <p className="mt-1 text-sm text-white/75">
               Add it to your basket in the Farm customer app: pay once, track the delivery live and confirm it with an OTP.
             </p>
-            <Link to="/register" className="btn-primary mt-4 !bg-lime !text-forest-deep hover:!bg-white">
+            <Link to="/register" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-black hover:bg-neutral-200">
               Create a customer account <Icon name="arrow" className="size-4" />
             </Link>
           </div>

@@ -135,7 +135,7 @@ export function RoleLayout({ section }: { section: Section }) {
                           <motion.span
                             layoutId="tab-active"
                             transition={quick}
-                            className="absolute inset-0 rounded-full bg-lime/70"
+                            className="absolute inset-0 rounded-full bg-neutral-200"
                           />
                         )}
                         <Icon name={page.icon} className="relative size-5" />

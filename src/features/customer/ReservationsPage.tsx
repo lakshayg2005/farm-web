@@ -85,7 +85,7 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
 
       {r.status === 'ACCEPTED' && r.deposit !== null && (
         <div className="mt-4">
-          <button type="button" disabled={pay.isPending} onClick={() => pay.mutate()} className="rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
+          <button type="button" disabled={pay.isPending} onClick={() => pay.mutate()} className="rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
             {pay.isPending ? 'Paying…' : `Pay deposit ${rupees(r.deposit)}`}
           </button>
           <p className="mt-1 text-sm text-ink-soft">Payments are simulated in this project. Pay before {day(r.expiresAt)}.</p>
@@ -223,7 +223,7 @@ function HarvestChoice({ reservationId, onDone }: { reservationId: string; onDon
           {error}
         </p>
       )}
-      <button type="submit" disabled={choose.isPending} className="rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
+      <button type="submit" disabled={choose.isPending} className="rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60">
         {choose.isPending ? 'Saving…' : 'Confirm my choice'}
       </button>
     </form>

@@ -47,7 +47,7 @@ export function PoolingPage() {
           type="button"
           onClick={() => run.mutate()}
           disabled={run.isPending || !date}
-          className="rounded-full bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60"
+          className="rounded-xl bg-indigo px-5 py-2 font-semibold text-white shadow-sm transition-colors hover:bg-forest disabled:opacity-60"
         >
           {run.isPending ? 'Running…' : list.length ? 'Run pooling again' : 'Run pooling'}
         </button>

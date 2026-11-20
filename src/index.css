@@ -1,37 +1,32 @@
 @import 'tailwindcss';
 
-@import '@fontsource/young-serif/400.css';
-@import '@fontsource/mukta/400.css';
-@import '@fontsource/mukta/500.css';
-@import '@fontsource/mukta/600.css';
-@import '@fontsource/mukta/700.css';
-
 @theme {
-  /* Surfaces: a warm cream page with white cards on top */
-  --color-paper: #f7f5ee;
-  --color-paper-deep: #eeebe0;
+  /* AINow look: black and white, grey text and thin grey borders. */
+  --color-paper: #ffffff;
+  --color-paper-deep: #f4f4f5;
   --color-surface: #ffffff;
-  --color-ink: #14211a;
-  --color-ink-soft: #55645b;
-  --color-line: #e2ddd0;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #6b7280;
+  --color-line: #e5e7eb;
 
-  /* Brand. "indigo" is the primary action colour everywhere; the name is kept so existing
-     classes (bg-indigo, text-indigo) pick up the new forest green without touching every page. */
-  --color-indigo: #1f6b45;
-  --color-forest: #0f3d27;
-  --color-forest-deep: #0a2a1b;
-  --color-mustard: #e9a419;
-  --color-leaf: #3f9d5c;
-  --color-lime: #c5e86c;
-  --color-tomato: #e4572e;
-  --color-soil: #8a5a33;
-  --color-sky: #3f7cc4;
+  /* "indigo" is the primary action colour everywhere (kept as a name so existing classes work):
+     black on light pages. forest / forest-deep are the dark surfaces (navbar, hero, footer). */
+  --color-indigo: #0a0a0a;
+  --color-forest: #171717;
+  --color-forest-deep: #000000;
+  --color-lime: #ffffff;
+  --color-mustard: #a3a3a3;
+  /* Colours kept only where they carry meaning (freshness, organic, errors). */
+  --color-leaf: #16a34a;
+  --color-tomato: #dc2626;
+  --color-soil: #525252;
+  --color-sky: #2563eb;
 
-  --font-display: 'Young Serif', Georgia, serif;
-  --font-sans: 'Mukta', ui-sans-serif, system-ui, sans-serif;
+  --font-display: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Arial, Helvetica, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Arial, Helvetica, sans-serif;
 
-  --shadow-card: 0 1px 2px rgb(20 33 26 / 0.04), 0 4px 16px -4px rgb(20 33 26 / 0.08);
-  --shadow-lift: 0 2px 4px rgb(20 33 26 / 0.05), 0 18px 40px -12px rgb(20 33 26 / 0.22);
+  --shadow-card: none;
+  --shadow-lift: 0 12px 32px -16px rgb(0 0 0 / 0.25);
 
   --animate-float: float 6s ease-in-out infinite;
   --animate-marquee: marquee 40s linear infinite;
@@ -54,7 +49,7 @@
 
 @layer base {
   html {
-    font-size: 106.25%; /* 17px: Mukta sets small */
+    font-size: 100%;
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
   }
@@ -65,12 +60,18 @@
   }
 
   ::selection {
-    background: var(--color-lime);
-    color: var(--color-forest-deep);
+    background: #0a0a0a;
+    color: #ffffff;
+  }
+
+  /* Headings: bold and tight, like AINow */
+  .font-display {
+    font-weight: 700;
+    letter-spacing: -0.025em;
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-mustard);
+    outline: 2px solid #6366f1;
     outline-offset: 2px;
     border-radius: 6px;
   }
@@ -87,7 +88,7 @@
   select:focus,
   textarea:focus {
     border-color: var(--color-indigo);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-indigo) 18%, transparent);
+    box-shadow: 0 0 0 3px rgb(0 0 0 / 0.08);
     outline: none;
   }
 
@@ -122,8 +123,8 @@
 /* White card with a soft shadow: the base of most panels. */
 @utility card {
   background: var(--color-surface);
-  border: 1px solid color-mix(in oklab, var(--color-line) 70%, transparent);
-  border-radius: 1.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
   box-shadow: var(--shadow-card);
 }
 
@@ -139,19 +140,17 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
+  border-radius: 0.75rem;
   background: var(--color-indigo);
-  padding: 0.7rem 1.4rem;
+  padding: 0.75rem 1.5rem;
   font-weight: 600;
   color: white;
-  box-shadow: 0 6px 18px -6px color-mix(in oklab, var(--color-indigo) 70%, transparent);
   transition:
     transform 150ms,
     background 150ms,
     box-shadow 150ms;
   &:hover {
-    background: var(--color-forest);
-    transform: translateY(-1px);
+    background: #262626;
   }
 }
 
@@ -160,31 +159,25 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--color-line);
+  border-radius: 0.75rem;
+  border: 1px solid #d1d5db;
   background: var(--color-surface);
-  padding: 0.7rem 1.4rem;
+  padding: 0.75rem 1.5rem;
   font-weight: 600;
   transition:
     border-color 150ms,
     transform 150ms;
   &:hover {
-    border-color: var(--color-ink-soft);
-    transform: translateY(-1px);
+    background: #f9fafb;
   }
 }
 
-/* Soft noise-free mesh used behind the hero and section headers. */
+/* Dark panels (hero, banners): plain black, as on AINow. */
 @utility mesh {
-  background:
-    radial-gradient(60% 80% at 85% 10%, color-mix(in oklab, var(--color-lime) 45%, transparent), transparent 70%),
-    radial-gradient(50% 70% at 10% 90%, color-mix(in oklab, var(--color-mustard) 30%, transparent), transparent 70%),
-    linear-gradient(160deg, var(--color-forest) 0%, var(--color-forest-deep) 100%);
+  background: #000000;
 }
 
+/* Second line of a headline: grey, as on AINow ("Artificial Intelligence." in grey). */
 @utility text-gradient {
-  background: linear-gradient(100deg, var(--color-lime), var(--color-mustard));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #9ca3af;
 }

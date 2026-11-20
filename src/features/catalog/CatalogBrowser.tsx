@@ -167,7 +167,7 @@ export function CatalogBrowser() {
               aria-pressed={organic}
               onClick={() => setOrganic((v) => !v)}
               className={`inline-flex h-11 items-center gap-1.5 rounded-full border px-4 font-medium transition-colors ${
-                organic ? 'border-leaf bg-leaf text-white' : 'border-line bg-surface hover:border-ink-soft'
+                organic ? 'border-black bg-black text-white' : 'border-line bg-surface hover:border-ink-soft'
               }`}
             >
               <Icon name="leaf" className="size-4.5" /> Organic
@@ -189,7 +189,7 @@ export function CatalogBrowser() {
                   onClick={() => setCategory(c.id)}
                   className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 whitespace-nowrap transition-all ${
                     active
-                      ? 'border-forest bg-forest text-white shadow-[var(--shadow-card)]'
+                      ? 'border-black bg-black text-white'
                       : 'border-line bg-surface hover:-translate-y-0.5 hover:border-ink-soft'
                   }`}
                 >
@@ -222,7 +222,7 @@ export function CatalogBrowser() {
           ['Peak fresh', String(peak), 'leaf'],
         ].map(([label, value, icon]) => (
           <div key={label} className="card flex items-center gap-3 px-4 py-3">
-            <span className="grid size-10 place-items-center rounded-xl bg-indigo/10 text-indigo">
+            <span className="grid size-10 place-items-center rounded-xl bg-neutral-100 text-black">
               <Icon name={icon as 'basket'} className="size-5" />
             </span>
             <div>

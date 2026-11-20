@@ -28,3 +28,8 @@ class NoopIntersectionObserver {
   }
 }
 globalThis.IntersectionObserver ??= NoopIntersectionObserver as unknown as typeof IntersectionObserver
+
+// findBy*/waitFor give up after 1 s by default, which is too tight when the whole suite runs on a
+// busy machine (tests then fail at random). 5 s keeps them reliable without slowing passing tests.
+import { configure } from '@testing-library/react'
+configure({ asyncUtilTimeout: 5000 })

@@ -14,25 +14,26 @@ const links = [
 ]
 
 /** Top navigation for the public pages (home, catalog, team). */
-export function SiteHeader({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
+/** Always the black bar, as on AINow. */
+export function SiteHeader() {
   const { user, logout } = useAuth()
   const [open, setOpen] = useState(false)
-  const light = tone === 'light'
+  const light = true
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `rounded-full px-3.5 py-1.5 text-[0.95rem] font-medium transition-colors ${
+    `px-3 py-1.5 text-[0.95rem] transition-colors ${
       light
         ? isActive
-          ? 'bg-white/15 text-white'
-          : 'text-white/80 hover:bg-white/10 hover:text-white'
+          ? 'text-white'
+          : 'text-neutral-400 hover:text-white'
         : isActive
           ? 'bg-ink/5 text-ink'
           : 'text-ink-soft hover:bg-ink/5 hover:text-ink'
     }`
 
   return (
-    <header className="relative z-30">
+    <header className="relative z-30 border-b border-neutral-800 bg-black text-white">
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-4 px-4 sm:px-8">
-        <BrandMark tone={tone} />
+        <BrandMark tone="light" />
         <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
           {links.map((l) =>
             l.to.includes('#') ? (
@@ -68,11 +69,11 @@ export function SiteHeader({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
             <>
               <Link
                 to="/login"
-                className={`rounded-full px-4 py-2 font-semibold ${light ? 'text-white hover:bg-white/10' : 'hover:bg-ink/5'}`}
+                className={`px-3 py-2 font-medium ${light ? 'text-neutral-300 hover:text-white' : 'hover:bg-ink/5'}`}
               >
                 Sign in
               </Link>
-              <Link to="/register" className="btn-primary !py-2">
+              <Link to="/register" className="rounded-lg bg-white px-5 py-2 font-medium text-black hover:bg-neutral-200">
                 Get started
               </Link>
             </>
@@ -97,7 +98,7 @@ export function SiteHeader({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.18 }}
-            className="card absolute inset-x-4 top-16 p-3 md:hidden"
+            className="card absolute inset-x-4 top-16 p-3 text-ink md:hidden"
           >
             <ul className="grid gap-1">
               {links.map((l) => (

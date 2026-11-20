@@ -16,7 +16,7 @@ export function AuthShell({ title, intro, children }: { title: string; intro: st
         </div>
       </div>
       <aside className="mesh relative hidden overflow-hidden p-10 text-white lg:flex lg:flex-col lg:justify-end">
-        <p className="absolute top-10 left-10 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-lime">
+        <p className="absolute top-10 left-10 inline-flex items-center gap-2 rounded-full border border-neutral-700 px-4 py-2 text-sm text-neutral-300">
           🌱 Fresh from verified farms
         </p>
         <div className="relative grid max-w-md gap-3">
@@ -76,4 +76,4 @@ export function Field({
 }
 
 export const primaryButton =
-  'w-full rounded-full bg-indigo px-5 py-2.5 font-semibold text-white shadow-sm transition-colors hover:bg-forest transition-opacity disabled:opacity-60'
+  'w-full rounded-xl bg-indigo px-5 py-2.5 font-semibold text-white shadow-sm transition-colors hover:bg-forest transition-opacity disabled:opacity-60'
