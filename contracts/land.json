@@ -1,6 +1,110 @@
 {
   "components": {
     "schemas": {
+      "AgreementOut": {
+        "properties": {
+          "balance": {
+            "title": "Balance",
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "cropId": {
+            "title": "Cropid",
+            "type": "string"
+          },
+          "customerId": {
+            "format": "uuid",
+            "title": "Customerid",
+            "type": "string"
+          },
+          "deposit": {
+            "title": "Deposit",
+            "type": "number"
+          },
+          "endDate": {
+            "format": "date",
+            "title": "Enddate",
+            "type": "string"
+          },
+          "expectedQtyKg": {
+            "title": "Expectedqtykg",
+            "type": "number"
+          },
+          "farmerId": {
+            "format": "uuid",
+            "title": "Farmerid",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "plotId": {
+            "format": "uuid",
+            "title": "Plotid",
+            "type": "string"
+          },
+          "plotTitle": {
+            "title": "Plottitle",
+            "type": "string"
+          },
+          "pricePerKg": {
+            "title": "Priceperkg",
+            "type": "number"
+          },
+          "reservationId": {
+            "format": "uuid",
+            "title": "Reservationid",
+            "type": "string"
+          },
+          "season": {
+            "title": "Season",
+            "type": "string"
+          },
+          "startDate": {
+            "format": "date",
+            "title": "Startdate",
+            "type": "string"
+          },
+          "terms": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Terms",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "reservationId",
+          "farmerId",
+          "customerId",
+          "plotId",
+          "plotTitle",
+          "season",
+          "startDate",
+          "endDate",
+          "cropId",
+          "expectedQtyKg",
+          "pricePerKg",
+          "total",
+          "deposit",
+          "balance",
+          "terms",
+          "createdAt"
+        ],
+        "title": "AgreementOut",
+        "type": "object"
+      },
       "CropUpdateCreate": {
         "properties": {
           "location": {
@@ -1448,6 +1552,55 @@
           }
         ],
         "summary": "Accept Reservation",
+        "tags": [
+          "reservations"
+        ]
+      }
+    },
+    "/reservations/{reservation_id}/agreement": {
+      "get": {
+        "description": "The agreement made when the farmer accepted: price, deposit, balance and terms.",
+        "operationId": "get_agreement_reservations__reservation_id__agreement_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reservation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reservation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgreementOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Agreement",
         "tags": [
           "reservations"
         ]
