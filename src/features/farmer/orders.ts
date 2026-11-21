@@ -33,7 +33,16 @@ export interface OrderDetail extends OrderSummary {
   deliveryDate: string | null
 }
 
+/** One paid-out order, from GET /order/orders/payouts. */
+export interface Payout {
+  orderId: string
+  amount: number
+  currency?: string
+  paidAt: string
+}
+
 export const ordersApi = {
+  payouts: () => api<{ items: Payout[]; total: number }>('/order/orders/payouts?limit=500'),
   list: () => api<{ items: OrderSummary[]; nextCursor: string | null }>('/order/orders?role=farmer&limit=100'),
   get: (id: string) => api<OrderDetail>(`/order/orders/${id}`),
   pack: (id: string) => api<OrderDetail>(`/order/orders/${id}/pack`, { method: 'POST' }),
@@ -66,7 +75,10 @@ export const STATUS_TEXT: Record<OrderStatus, string> = {
 export const inTab = (order: { status: OrderStatus }, tab: TabId) =>
   TABS.find((t) => t.id === tab)!.statuses.some((s) => s === order.status)
 
-/** The API has no payouts endpoint yet, so earnings are worked out from the orders themselves. */
+/**
+ * Money still on its way, worked out from the farmer's own orders. What has been paid out comes from
+ * the payouts endpoint, which is the source of truth for `earned`.
+ */
 export function earnings(orders: OrderSummary[]) {
   const sum = (statuses: OrderStatus[]) =>
     Math.round(orders.filter((o) => statuses.includes(o.status)).reduce((t, o) => t + o.total, 0) * 100) / 100
