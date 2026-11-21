@@ -54,10 +54,10 @@ export function PlotMap({ plots, selectedId, onSelect, onBoundsChange }: Props) 
       { type: 'FeatureCollection', features: plots },
       {
         style: (f) => {
-          const selected = f?.id === selectedId
+          const selected = f?.properties?.plotSeasonId === selectedId
           return { color: selected ? '#d9a404' : '#2e3a87', weight: selected ? 4 : 2, fillOpacity: selected ? 0.45 : 0.25 }
         },
-        onEachFeature: (f, l) => l.on({ click: () => f.id && onPick.current(f.id) }),
+        onEachFeature: (f, l) => l.on({ click: () => f.properties?.plotSeasonId && onPick.current(f.properties.plotSeasonId) }),
       },
     ).addTo(m)
     layer.current = geo

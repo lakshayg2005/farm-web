@@ -212,6 +212,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reservations/{reservation_id}/agreement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Agreement
+         * @description The agreement made when the farmer accepted: price, deposit, balance and terms.
+         */
+        get: operations["get_agreement_reservations__reservation_id__agreement_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reservations/{reservation_id}/cancel": {
         parameters: {
             query?: never;
@@ -285,6 +305,67 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AgreementOut */
+        AgreementOut: {
+            /** Balance */
+            balance: number;
+            /**
+             * Createdat
+             * Format: date-time
+             */
+            createdAt: string;
+            /** Cropid */
+            cropId: string;
+            /**
+             * Customerid
+             * Format: uuid
+             */
+            customerId: string;
+            /** Deposit */
+            deposit: number;
+            /**
+             * Enddate
+             * Format: date
+             */
+            endDate: string;
+            /** Expectedqtykg */
+            expectedQtyKg: number;
+            /**
+             * Farmerid
+             * Format: uuid
+             */
+            farmerId: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Plotid
+             * Format: uuid
+             */
+            plotId: string;
+            /** Plottitle */
+            plotTitle: string;
+            /** Priceperkg */
+            pricePerKg: number;
+            /**
+             * Reservationid
+             * Format: uuid
+             */
+            reservationId: string;
+            /** Season */
+            season: string;
+            /**
+             * Startdate
+             * Format: date
+             */
+            startDate: string;
+            /** Terms */
+            terms: string[];
+            /** Total */
+            total: number;
+        };
         /** CropUpdateCreate */
         CropUpdateCreate: {
             location?: components["schemas"]["Point"] | null;
@@ -989,6 +1070,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_agreement_reservations__reservation_id__agreement_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementOut"];
                 };
             };
             /** @description Validation Error */

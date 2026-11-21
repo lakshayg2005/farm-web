@@ -131,6 +131,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/orders/payouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Farmer: payouts for completed orders
+         * @description One PAYOUT per completed order of my farms (the item value, not the delivery fee).
+         */
+        get: operations["list_payouts_orders_payouts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/orders/{order_id}": {
         parameters: {
             query?: never;
@@ -718,7 +738,7 @@ export interface components {
          *     client.
          * @enum {string}
          */
-        PaymentKind: "FULL" | "DEPOSIT" | "BALANCE" | "REFUND";
+        PaymentKind: "FULL" | "DEPOSIT" | "BALANCE" | "REFUND" | "PAYOUT";
         /**
          * PaymentRecord
          * @description A payment or refund that belongs to an order.
@@ -764,6 +784,36 @@ export interface components {
              * @enum {string}
              */
             status: "SUCCEEDED" | "FAILED";
+        };
+        /** Payout */
+        Payout: {
+            /** Amount */
+            amount: number;
+            /**
+             * Currency
+             * @default INR
+             */
+            currency: string;
+            /**
+             * Orderid
+             * Format: uuid
+             */
+            orderId: string;
+            /**
+             * Paidat
+             * Format: date-time
+             */
+            paidAt: string;
+        };
+        /**
+         * PayoutList
+         * @description A farmer's payouts, newest first, and their sum.
+         */
+        PayoutList: {
+            /** Items */
+            items: components["schemas"]["Payout"][];
+            /** Total */
+            total: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -1166,6 +1216,55 @@ export interface operations {
             };
             /** @description PAYMENT_ALREADY_SETTLED, PAYMENT_NOT_SETTLEABLE or DEPOSIT_ALREADY_PAID */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_payouts_orders_payouts_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutList"];
+                };
+            };
+            /** @description Missing or invalid access token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The token does not have the required role */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -74,6 +74,24 @@ describe('find land', () => {
     expect(post.body).toEqual({ plotSeasonId: 'ps-1', cropId: 'onion', expectedQtyKg: 50 })
   })
 
+  it('reserves the season that was clicked when a plot has several seasons', async () => {
+    signedInAs(['customer'])
+    const rabi = { ...PLOT, properties: { ...PLOT.properties, plotSeasonId: 'ps-2', season: 'Rabi', price: 25 } }
+    const calls = mockApi({
+      'POST /identity/refresh': () => jsonResponse({ accessToken: 'a', refreshToken: 'r', expiresIn: 900, user: { id: 'u1', name: 'A', phone: '+919876543210', email: null, roles: ['customer'], phoneVerified: true, farmerVerified: false } }),
+      'GET /catalog/crops': () => jsonResponse(CROPS),
+      // The same plot id comes back once per season.
+      'GET /land/plots/search': () => jsonResponse({ type: 'FeatureCollection', features: [PLOT, rabi] }),
+      'POST /land/reservations': () => jsonResponse({ ...RESERVATION, plotSeasonId: 'ps-2' }, 201),
+    })
+    renderAt('/customer/plots')
+    await userEvent.click(await screen.findByRole('button', { name: /Rabi/ }))
+    await userEvent.type(screen.getByLabelText('Expected harvest (kg)'), '10')
+    await userEvent.click(screen.getByRole('button', { name: 'Request this plot' }))
+    await screen.findByText('Request sent')
+    expect(calls.find((c) => c.key === 'POST /land/reservations')!.body).toMatchObject({ plotSeasonId: 'ps-2' })
+  })
+
   it('shows the server message when the plot was taken meanwhile', async () => {
     signedInAs(['customer'])
     mockApi({

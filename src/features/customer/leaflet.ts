@@ -1,4 +1,4 @@
-/** Leaflet is loaded from a script tag in index.html (window.L). Only what the search map uses. */
+/** Leaflet is bundled with the app (features/map/leaflet-setup) and exposed as window.L. Only what the search map uses. */
 export interface LeafletLayer {
   addTo(map: LeafletMapLike): LeafletLayer
   remove(): void
@@ -13,14 +13,20 @@ export interface LeafletMapLike {
   remove(): void
 }
 
+/** A plot id repeats for each of its seasons, so features are told apart by plotSeasonId. */
+export interface LeafletFeature {
+  id?: string
+  properties?: { plotSeasonId?: string }
+}
+
 export interface LeafletLib {
   map(el: HTMLElement): LeafletMapLike
   tileLayer(url: string, options: Record<string, unknown>): LeafletLayer
   geoJSON(
     data: unknown,
     options?: {
-      style?: (feature?: { id?: string }) => Record<string, unknown>
-      onEachFeature?: (feature: { id?: string }, layer: { on(events: Record<string, () => void>): void }) => void
+      style?: (feature?: LeafletFeature) => Record<string, unknown>
+      onEachFeature?: (feature: LeafletFeature, layer: { on(events: Record<string, () => void>): void }) => void
     },
   ): LeafletLayer
 }

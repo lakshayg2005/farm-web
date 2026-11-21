@@ -9,6 +9,7 @@ const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not 
 export function OrdersPage() {
   const [tab, setTab] = useState<TabId>('new')
   const orders = useQuery({ queryKey: ['farmer-orders'], queryFn: ordersApi.list })
+  const payouts = useQuery({ queryKey: ['farmer-payouts'], queryFn: ordersApi.payouts })
 
   if (orders.isPending) return <p className="mt-8 text-ink-soft">Loading orders…</p>
   if (orders.isError)
@@ -24,14 +25,37 @@ export function OrdersPage() {
     <div className="mt-8 max-w-3xl space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-line bg-white p-5">
-          <p className="text-sm text-ink-soft">Earned (delivered orders)</p>
-          <p className="mt-1 font-display text-4xl">{rupees(money.earned)}</p>
+          <p className="text-sm text-ink-soft">Paid out to you</p>
+          <p className="mt-1 font-display text-4xl">
+            {payouts.isPending ? '…' : payouts.isError ? 'Unavailable' : rupees(payouts.data.total)}
+          </p>
+          {payouts.isError && (
+            <p role="alert" className="mt-1 text-sm text-red-700">
+              Could not load payouts. Refresh to try again.
+            </p>
+          )}
         </div>
         <div className="rounded-xl border border-line bg-white p-5">
           <p className="text-sm text-ink-soft">On the way to you (paid, not delivered)</p>
           <p className="mt-1 font-display text-4xl">{rupees(money.pending)}</p>
         </div>
       </div>
+
+      {payouts.data && payouts.data.items.length > 0 && (
+        <section aria-label="Recent payouts" className="rounded-xl border border-line bg-white p-5">
+          <h2 className="font-display text-xl">Recent payouts</h2>
+          <ul className="mt-2 divide-y divide-line">
+            {payouts.data.items.slice(0, 5).map((p) => (
+              <li key={p.orderId} className="flex items-center justify-between py-2">
+                <span className="text-ink-soft">
+                  Order {p.orderId.slice(0, 8)}, {day(p.paidAt)}
+                </span>
+                <span className="font-semibold">{rupees(p.amount)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div role="tablist" aria-label="Order status" className="flex flex-wrap gap-2">
         {TABS.map((t) => {
