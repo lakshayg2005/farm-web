@@ -26,7 +26,7 @@ export function PlotSearchPage() {
     placeholderData: (previous) => previous,
   })
   const plots = search.data ?? []
-  const selected = plots.find((p) => p.id === selectedId) ?? null
+  const selected = plots.find((p) => p.properties.plotSeasonId === selectedId) ?? null
 
   return (
     <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
@@ -77,10 +77,10 @@ export function PlotSearchPage() {
             )}
             <ul className="space-y-2">
               {plots.map((p) => (
-                <li key={p.id}>
+                <li key={p.properties.plotSeasonId}>
                   <button
                     type="button"
-                    onClick={() => setSelectedId(p.id)}
+                    onClick={() => setSelectedId(p.properties.plotSeasonId)}
                     className="w-full rounded-xl border border-line bg-white px-4 py-3 text-left hover:border-indigo"
                   >
                     <span className="block font-display text-lg">{p.properties.title}</span>
