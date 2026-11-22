@@ -5,7 +5,10 @@
  * Not translated: text that comes from the server (notification bodies, error messages, crop and farm
  * names). The notification titles that never change are listed at the bottom.
  */
+import { HI_SHOP } from './hi-shop'
+
 export const HI: Record<string, string> = {
+  ...HI_SHOP,
   // shell and navigation
   'All sections': 'सभी सेक्शन',
   'Sign in': 'साइन इन करें',

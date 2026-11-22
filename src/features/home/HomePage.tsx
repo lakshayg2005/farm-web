@@ -53,7 +53,10 @@ export function HomePage() {
               ))
             ) : (
               <>
-                <Link to="/register" className="btn-primary min-h-12 px-6 text-base">
+                <Link to="/catalog" className="btn-primary min-h-12 px-6 text-base">
+                  {t('Browse fresh produce')}
+                </Link>
+                <Link to="/register" className="btn-secondary min-h-12 px-6 text-base">
                   {t('Create an account')}
                 </Link>
                 <Link to="/login" className="btn-secondary min-h-12 px-6 text-base">
@@ -93,6 +96,9 @@ export function HomePage() {
 
       <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-line py-5 text-sm text-ink-soft">
         <span>Farm Platform</span>
+        <Link to="/catalog" className="hover:text-ink hover:underline">
+          {t('Browse produce')}
+        </Link>
         <Link to="/team" className="hover:text-ink hover:underline">
           {t('Team')}
         </Link>

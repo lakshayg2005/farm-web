@@ -52,6 +52,8 @@ test.describe('farmer', () => {
 
   test('plots: the map loads and the draw tool is there', async ({ page }) => {
     await nav(page).getByRole('link', { name: 'Plots' }).click()
+    await expect(page.getByText('Patan river-side plot')).toBeVisible()
+    await page.getByRole('button', { name: 'List a new plot' }).click()
     await expect(page.getByText('Draw your plot boundary')).toBeVisible()
     await expect(page.locator('.leaflet-container')).toBeVisible()
     await expect(page.locator('.leaflet-draw-draw-polygon')).toBeVisible()

@@ -12,6 +12,9 @@ const paths = {
   bell: 'M6 16.5V11a6 6 0 1 1 12 0v5.5l1.5 2h-15L6 16.5Z M10 21h4',
   rupee: 'M7 4.5h10 M7 9h10 M7 4.5h3.5a4 4 0 0 1 0 8H7l8 7.5',
   back: 'M15 5l-7 7 7 7',
+  cart: 'M3 4h2.5l2 11h10l2-8H7 M9.5 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z M16.5 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z',
+  basket: 'M3 10h18l-1.8 9.5H4.8L3 10Z M7 10l3-6 M17 10l-3-6 M9 14v2.5 M12 14v2.5 M15 14v2.5',
+  user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z M4.5 20.5c.8-3.6 3.8-5.5 7.5-5.5s6.7 1.9 7.5 5.5',
 } as const
 
 export type IconName = keyof typeof paths

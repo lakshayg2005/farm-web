@@ -3,6 +3,7 @@ import type { Section } from '@/routes/types'
 import { DashboardPage } from './DashboardPage'
 import { AdminOrdersPage } from './OrdersPage'
 import { PoolingPage } from './PoolingPage'
+import { UsersPage } from './UsersPage'
 import { VerificationPage } from './VerificationPage'
 
 export const adminSection: Section = {
@@ -39,6 +40,14 @@ export const adminSection: Section = {
         body: 'New farmer sign-ups appear here for you to check and verify.',
       },
       element: createElement(VerificationPage),
+    },
+    {
+      path: 'users',
+      label: 'People',
+      icon: 'user',
+      summary: 'Everyone on the platform: their roles, and a way to verify a farmer.',
+      empty: { title: 'No people yet', body: 'Accounts appear here as people sign up.' },
+      element: createElement(UsersPage),
     },
     {
       path: 'pooling',

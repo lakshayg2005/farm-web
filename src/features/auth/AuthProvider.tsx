@@ -67,6 +67,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       requestOtp: (phone) => api<OtpRequestResponse>('/identity/otp/request', { method: 'POST', body: { phone }, anonymous: true }),
       verifyOtp: async (phone, code) =>
         accept(await api<TokenResponse>('/identity/otp/verify', { method: 'POST', body: { phone, code }, anonymous: true })),
+      updateProfile: async (patch) => {
+        const user = await api<User>('/identity/me', { method: 'PATCH', body: patch })
+        setState((s) => ({ ...s, user }))
+        return user
+      },
+      addRole: async (role) => {
+        await api('/identity/me/roles', { method: 'POST', body: { role } })
+        const refreshToken = session.refreshToken
+        if (!refreshToken) throw new Error('Sign in again to use the new role.')
+        return accept(await api<TokenResponse>('/identity/refresh', { method: 'POST', body: { refreshToken }, anonymous: true }))
+      },
       logout: async () => {
         const refreshToken = session.refreshToken
         endSession()

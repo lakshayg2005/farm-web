@@ -9,6 +9,9 @@ import { RegisterPage } from '@/features/auth/RegisterPage'
 import { VerifyPage } from '@/features/auth/VerifyPage'
 import { HomePage } from '@/features/home/HomePage'
 import { NotFoundPage } from '@/features/home/NotFoundPage'
+import { FarmPage } from '@/features/shop/FarmPage'
+import { CatalogPage } from '@/features/shop/CatalogPage'
+import { ProfilePage } from '@/features/auth/ProfilePage'
 import { TeamPage } from '@/features/team/TeamPage'
 import { sections } from './sections'
 
@@ -32,6 +35,9 @@ export const routes: RouteObject[] = [
           { path: '/register', element: <RegisterPage /> },
         ],
       },
+      { path: '/catalog', element: <CatalogPage /> },
+      { path: '/farm/:id', element: <FarmPage /> },
+      { path: '/profile', element: <ProfilePage /> },
       { path: '/team', element: <TeamPage /> },
       { path: '/verify', element: <VerifyPage /> },
       { path: '/no-access', element: <NoAccessPage /> },

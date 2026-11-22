@@ -5,6 +5,7 @@ import { useAuth } from '@/features/auth/authContext'
 import { LanguageSwitch } from '@/i18n/I18nProvider'
 import { useI18n } from '@/i18n/i18n'
 import { useUnreadCount } from '@/features/notifications/notifications'
+import { useCart } from '@/features/shop/shop'
 import type { Section } from '@/routes/types'
 import { BrandMark } from './BrandMark'
 import { Icon } from './Icon'
@@ -24,8 +25,14 @@ export function RoleLayout({ section }: { section: Section }) {
   const inbox = section.pages.find((p) => p.path === 'notifications')
   const tabPages = section.pages.filter((p) => p.path !== 'notifications')
   const hasTabs = tabPages.length > 1
+  const cartCount = useCart().length
   const badge = (page: { path: string }) =>
-    page.path === 'notifications' && unread > 0 ? (
+    page.path === 'cart' && cartCount > 0 ? (
+      <span className="relative ml-auto grid min-w-5 place-items-center rounded-full bg-ink px-1.5 text-xs font-bold text-white">
+        {cartCount}
+        <span className="sr-only"> {t('items')}</span>
+      </span>
+    ) : page.path === 'notifications' && unread > 0 ? (
       <span className="relative ml-auto grid min-w-5 place-items-center rounded-full bg-primary px-1.5 text-xs font-bold text-white">
         {unread > 99 ? '99+' : unread}
         <span className="sr-only"> {t('unread')}</span>
@@ -73,7 +80,11 @@ export function RoleLayout({ section }: { section: Section }) {
             </ul>
           </nav>
           <div className="border-t border-line px-3 pt-4">
-            {user && <p className="truncate font-semibold">{user.name}</p>}
+            {user && (
+              <NavLink to="/profile" className="block truncate font-semibold hover:underline">
+                {user.name}
+              </NavLink>
+            )}
             <div className="mt-1 flex gap-4 text-sm text-ink-soft">
               <NavLink to="/" className="hover:text-ink hover:underline">
                 {t('All sections')}
@@ -100,14 +111,19 @@ export function RoleLayout({ section }: { section: Section }) {
             )}
             <LanguageSwitch />
             <span className="hidden font-semibold sm:inline">{t(section.label)}</span>
-            <button type="button" onClick={() => void logout()} className="text-ink-soft underline">
-              {t('Sign out')}
-            </button>
+            <NavLink to="/profile" aria-label={t('Profile')} className="grid size-10 place-items-center">
+              <Icon name="user" className="size-5" />
+            </NavLink>
           </span>
         </div>
       </header>
 
       <main className={`min-w-0 px-4 py-6 sm:px-8 lg:px-10 lg:py-10 ${hasTabs ? 'pb-28 lg:pb-10' : ''}`}>
+        {section.role === 'farmer' && user && !user.farmerVerified && (
+          <p role="note" className="mx-auto mb-5 max-w-6xl rounded-lg border border-warn/40 bg-[#f7ebd0] p-3 text-[#6f4a0e]">
+            <strong>{t('Waiting for verification')}.</strong> {t('You can set up your farm and listings now. An admin checks new farmers before customers can buy from them.')}
+          </p>
+        )}
         <motion.div
           key={pathname}
           initial={{ opacity: 0, y: 6 }}
@@ -136,7 +152,14 @@ export function RoleLayout({ section }: { section: Section }) {
                     }`
                   }
                 >
-                  <Icon name={page.icon} className="size-5" />
+                  <span className="relative">
+                    <Icon name={page.icon} className="size-5" />
+                    {page.path === 'cart' && cartCount > 0 && (
+                      <span aria-hidden="true" className="absolute -top-1.5 -right-2.5 grid min-w-4 place-items-center rounded-full bg-primary px-1 text-[0.65rem] leading-4 font-bold text-white">
+                        {cartCount}
+                      </span>
+                    )}
+                  </span>
                   <span className="max-w-full truncate">{t(page.label)}</span>
                 </NavLink>
               </li>
