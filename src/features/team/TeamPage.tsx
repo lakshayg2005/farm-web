@@ -23,7 +23,7 @@ export function TeamPage() {
     <div className="mx-auto min-h-dvh max-w-5xl px-4 pt-6 pb-12 sm:px-8 lg:pt-10">
       <div className="flex items-center justify-between gap-4">
         <BrandMark />
-        <Link to="/" className="font-semibold text-indigo underline">
+        <Link to="/" className="font-semibold text-primary underline">
           Back to home
         </Link>
       </div>
@@ -45,11 +45,11 @@ export function TeamPage() {
           <p className="text-ink-soft">{team.about}</p>
           <ul className="mt-5 grid gap-4 sm:grid-cols-2">
             {team.members.map((m) => (
-              <li key={m.github} className="rounded-xl border border-line bg-white p-5">
+              <li key={m.github} className="card p-5">
                 <p className="text-lg font-semibold">{m.name}</p>
                 <p className="text-sm text-ink-soft">{m.role}</p>
                 <p className="mt-2">{m.built}</p>
-                <a href={`https://github.com/${m.github}`} className="mt-2 inline-block text-sm font-semibold text-indigo underline">
+                <a href={`https://github.com/${m.github}`} className="mt-2 inline-block text-sm font-semibold text-primary underline">
                   @{m.github}
                 </a>
               </li>

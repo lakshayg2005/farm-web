@@ -72,6 +72,17 @@ export const STATUS_TEXT: Record<OrderStatus, string> = {
   CANCELLED: 'Cancelled',
 }
 
+/** The eight stages shown on the status rail; COMPLETED shares the last one with DELIVERED. */
+export const STAGES = ['Placed', 'Confirmed', 'Packed', 'Graded', 'Ready for dispatch', 'Pooled', 'In transit', 'Delivered'] as const
+
+/** How many stages are done: 0 for a cancelled order, otherwise the status' position. */
+export function stageOf(status: OrderStatus): number {
+  const order: Partial<Record<OrderStatus, number>> = {
+    PLACED: 1, CONFIRMED: 2, PACKED: 3, QC_PASSED: 4, READY_FOR_DISPATCH: 5, POOLED: 6, IN_TRANSIT: 7, DELIVERED: 8, COMPLETED: 8,
+  }
+  return order[status] ?? 0
+}
+
 export const inTab = (order: { status: OrderStatus }, tab: TabId) =>
   TABS.find((t) => t.id === tab)!.statuses.some((s) => s === order.status)
 

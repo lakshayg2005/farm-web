@@ -23,7 +23,5 @@ export interface Section {
   label: string
   /** Who the section is for, shown on the start page */
   audience: string
-  /** CSS colour used for the section's crop rows and active states */
-  accent: string
   pages: [SectionPage, ...SectionPage[]]
 }

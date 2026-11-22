@@ -1,9 +1,10 @@
 import { Icon, type IconName } from './Icon'
 
+/** Says what the page is for and what to do next. */
 export function EmptyState({ icon, title, body }: { icon: IconName; title: string; body: string }) {
   return (
-    <div className="mt-8 flex max-w-xl gap-4 rounded-xl border border-dashed border-line bg-white/60 p-5 sm:p-6">
-      <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-[color-mix(in_oklab,var(--role)_16%,white)] text-ink">
+    <div className="card mt-8 flex max-w-xl gap-4 border-dashed p-5 sm:p-6">
+      <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-paper-deep text-ink">
         <Icon name={icon} />
       </span>
       <div>

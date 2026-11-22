@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ListSkeleton } from '@/components/ui'
 import { AnimatePresence, motion } from 'motion/react'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
@@ -19,9 +20,9 @@ import {
 
 const message = (e: unknown) =>
   e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not reach the server. Try again.'
-const primary = 'rounded-lg bg-indigo px-4 py-2 font-semibold text-white hover:bg-indigo/90 disabled:opacity-60'
-const quiet = 'rounded-lg border border-line bg-white px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
-const input = 'mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 font-normal'
+const primary = 'btn-primary'
+const quiet = 'btn-secondary hover:border-ink-soft disabled:opacity-60'
+const input = 'mt-1 w-full input font-normal'
 
 /** Crops being grown for a customer: deposit paid (ACTIVE), harvest ready, or on its way. */
 const GROWING = ['ACTIVE', 'HARVEST_READY', 'FULFILLING']
@@ -32,22 +33,22 @@ export function CropsPage() {
   const crops = useQuery({ queryKey: ['crops'], queryFn: landApi.crops, staleTime: 3_600_000 })
   const cropName = (id: string) => crops.data?.find((c) => c.id === id)?.name ?? id
 
-  if (reservations.isPending) return <p className="mt-8 text-ink-soft">Loading your crops…</p>
+  if (reservations.isPending) return <ListSkeleton label="Loading your crops" />
   if (reservations.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-danger">
         Could not load your crops. Refresh to try again.
       </p>
     )
   const growing = reservations.data.filter((r) => GROWING.includes(r.status))
   if (growing.length === 0)
     return (
-      <div className="mt-8 max-w-xl rounded-xl border border-dashed border-line bg-white/60 p-6">
+      <div className="mt-8 max-w-xl card border-dashed p-6">
         <h2 className="text-lg font-semibold">No crops growing for customers yet</h2>
         <p className="mt-1 text-ink-soft">
           A crop shows up here once you accept a reservation and the customer pays the deposit.
         </p>
-        <Link to="/farmer/reservations" className="mt-3 inline-block font-semibold text-indigo underline">
+        <Link to="/farmer/reservations" className="mt-3 inline-block font-semibold text-primary underline">
           See reservation requests
         </Link>
       </div>
@@ -101,7 +102,7 @@ function CropCard({ reservation: r, info, cropName }: { reservation: Reservation
   const canPost = r.status === 'ACTIVE' || r.status === 'HARVEST_READY'
 
   return (
-    <article className="rounded-xl border border-line bg-white p-4 sm:p-6" aria-label={`${cropName} for a customer`}>
+    <article className="card p-4 sm:p-6" aria-label={`${cropName} for a customer`}>
       <h2 className="font-display text-2xl leading-tight">
         {cropName}, {r.expectedQtyKg} kg
       </h2>
@@ -121,7 +122,7 @@ function CropCard({ reservation: r, info, cropName }: { reservation: Reservation
         {updates.isPending ? (
           <p className="text-ink-soft">Loading updates…</p>
         ) : updates.isError ? (
-          <p className="text-red-700">Could not load the updates.</p>
+          <p className="text-danger">Could not load the updates.</p>
         ) : list.length === 0 ? (
           <p className="text-ink-soft">No updates yet. The customer sees each update you post, so start with a photo of the sowing.</p>
         ) : (
@@ -175,7 +176,7 @@ function CropCard({ reservation: r, info, cropName }: { reservation: Reservation
         </div>
       )}
       {error && (
-        <p role="alert" className="mt-3 font-semibold text-red-700">
+        <p role="alert" className="mt-3 font-semibold text-danger">
           {error}
         </p>
       )}
@@ -187,7 +188,7 @@ function TimelineItem({ update: u, reservationId }: { update: CropUpdate; reserv
   const stage = STAGES.find((s) => s.id === u.stage)?.label ?? u.stage
   return (
     <li className="relative">
-      <span aria-hidden="true" className="absolute top-1.5 -left-[1.6rem] size-3 rounded-full border-2 border-white bg-[var(--role)]" />
+      <span aria-hidden="true" className="absolute top-1.5 -left-[1.6rem] size-3 rounded-full border-2 border-white bg-[var(--color-primary)]" />
       <p className="font-semibold">
         {stage} <span className="font-normal text-ink-soft">on {day(u.createdAt)}</span>
       </p>
@@ -274,7 +275,7 @@ function UpdateForm({
           {STAGES.map((s) => (
             <label
               key={s.id}
-              className="cursor-pointer rounded-full border border-line bg-white px-4 py-1.5 has-checked:border-ink has-checked:bg-[color-mix(in_oklab,var(--role)_25%,white)] has-checked:font-semibold"
+              className="cursor-pointer rounded-full border border-line-strong bg-white px-4 py-1.5 min-h-10 has-checked:border-ink has-checked:bg-[#dff1e6] has-checked:font-semibold"
             >
               <input type="radio" name={`stage-${reservationId}`} value={s.id} checked={stage === s.id} onChange={() => setStage(s.id)} className="sr-only" />
               {s.label}
@@ -330,13 +331,13 @@ function UpdateForm({
             </button>
           </>
         ) : (
-          <button type="button" className="font-semibold text-indigo underline" onClick={useMyLocation}>
+          <button type="button" className="font-semibold text-primary underline" onClick={useMyLocation}>
             Attach my location
           </button>
         )}
       </p>
       {error && (
-        <p role="alert" className="font-semibold text-red-700">
+        <p role="alert" className="font-semibold text-danger">
           {error}
         </p>
       )}

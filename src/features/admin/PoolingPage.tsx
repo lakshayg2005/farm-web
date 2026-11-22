@@ -40,14 +40,14 @@ export function PoolingPage() {
               setSelected(null)
               run.reset()
             }}
-            className="mt-1 rounded-lg border border-line bg-white px-3 py-2 font-normal"
+            className="mt-1 input font-normal"
           />
         </label>
         <button
           type="button"
           onClick={() => run.mutate()}
           disabled={run.isPending || !date}
-          className="rounded-lg bg-indigo px-4 py-2 font-semibold text-white disabled:opacity-60"
+          className="btn-primary"
         >
           {run.isPending ? 'Running…' : list.length ? 'Run pooling again' : 'Run pooling'}
         </button>
@@ -57,7 +57,7 @@ export function PoolingPage() {
       </div>
 
       {error && (
-        <p role="alert" className="font-semibold text-red-700">
+        <p role="alert" className="font-semibold text-danger">
           {isUnavailable(error)
             ? 'Pooling is not available yet: the logistics service is not running. Try again once it is deployed.'
             : error instanceof ApiError
@@ -95,7 +95,7 @@ export function PoolingPage() {
                           type="button"
                           onClick={() => setSelected(pool.id === selected ? null : pool.id)}
                           aria-pressed={selected === pool.id}
-                          className="w-full rounded-xl border border-line bg-white px-4 py-3 text-left transition-colors duration-150 hover:border-indigo aria-pressed:border-indigo aria-pressed:bg-[color-mix(in_oklab,var(--role)_10%,white)]"
+                          className="w-full card px-4 py-3 text-left transition-colors duration-150 hover:border-primary aria-pressed:border-primary aria-pressed:bg-[#dff1e6]"
                         >
                           <span className="flex items-baseline justify-between gap-2">
                             <span className="font-semibold">Pool {i + 1}</span>
@@ -103,7 +103,7 @@ export function PoolingPage() {
                           </span>
                           <span className="block text-sm text-ink-soft">
                             {pool.stops.filter((s) => s.kind === 'DROP').length} deliveries, {pool.totalKm} km route,{' '}
-                            <span className="font-semibold text-leaf">{pool.savedKm} km saved</span>
+                            <span className="font-semibold text-primary">{pool.savedKm} km saved</span>
                           </span>
                         </button>
                         {selected === pool.id && <StopList pool={pool} />}
@@ -123,9 +123,9 @@ export function PoolingPage() {
 
 function Stat({ label, value, note, strong }: { label: string; value: string; note?: string; strong?: boolean }) {
   return (
-    <div className="rounded-xl border border-line bg-white px-4 py-3">
+    <div className="card px-4 py-3">
       <dt className="text-sm text-ink-soft">{label}</dt>
-      <dd className={`font-display text-2xl ${strong ? 'text-leaf' : ''}`}>{value}</dd>
+      <dd className={`text-xl font-bold tabular-nums ${strong ? 'text-primary' : ''}`}>{value}</dd>
       {note && <dd className="text-sm text-ink-soft">{note}</dd>}
     </div>
   )
@@ -138,7 +138,7 @@ function StopList({ pool }: { pool: Pool }) {
         <li key={`${stop.orderId}-${stop.kind}-${stop.sequence}`} className="flex items-baseline gap-2">
           <span
             aria-hidden="true"
-            className={`inline-block size-2.5 shrink-0 rounded-full ${stop.kind === 'PICKUP' ? 'bg-mustard' : 'bg-indigo'}`}
+            className={`inline-block size-2.5 shrink-0 rounded-full ${stop.kind === 'PICKUP' ? 'bg-warn' : 'bg-primary'}`}
           />
           <span>
             <span className="font-semibold">

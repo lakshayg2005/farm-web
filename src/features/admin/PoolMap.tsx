@@ -14,7 +14,7 @@ interface PoolFeature {
   geometry: unknown
 }
 
-/** Draws each pool's route and its pickups (mustard) and drops (indigo) on an OpenStreetMap map. */
+/** Draws each pool's route and its pickups (mustard) and drops (primary) on an OpenStreetMap map. */
 export function PoolMap({ pools, selectedId }: { pools: Pool[]; selectedId: string | null }) {
   const el = useRef<HTMLDivElement>(null)
   const map = useRef<LeafletMapLike | null>(null)

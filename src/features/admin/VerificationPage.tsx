@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ListSkeleton } from '@/components/ui'
 import { useState } from 'react'
 import { ApiError } from '@/api/http'
 import { adminApi, type UserRow } from './admin'
@@ -8,10 +9,10 @@ const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not 
 export function VerificationPage() {
   const waiting = useQuery({ queryKey: ['farmers', 'waiting'], queryFn: () => adminApi.farmers(false) })
 
-  if (waiting.isPending) return <p className="mt-8 text-ink-soft">Loading farmers…</p>
+  if (waiting.isPending) return <ListSkeleton label="Loading farmers" />
   if (waiting.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-danger">
         Could not load the farmers. Refresh to try again.
       </p>
     )
@@ -37,7 +38,7 @@ function FarmerRow({ farmer }: { farmer: UserRow }) {
     onError: (e) => setError(message(e)),
   })
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-3">
+    <div className="flex flex-wrap items-center justify-between gap-3 card px-4 py-3">
       <div>
         <p className="font-semibold">{farmer.name}</p>
         <p className="text-sm text-ink-soft">
@@ -46,7 +47,7 @@ function FarmerRow({ farmer }: { farmer: UserRow }) {
           {farmer.phoneVerified ? '' : ' · phone not verified'}
         </p>
         {error && (
-          <p role="alert" className="mt-1 text-sm font-semibold text-red-700">
+          <p role="alert" className="mt-1 text-sm font-semibold text-danger">
             {error}
           </p>
         )}
@@ -58,7 +59,7 @@ function FarmerRow({ farmer }: { farmer: UserRow }) {
           setError(undefined)
           verify.mutate()
         }}
-        className="rounded-lg bg-indigo px-4 py-2 font-semibold text-white disabled:opacity-60"
+        className="btn-primary"
       >
         {verify.isPending ? 'Verifying…' : `Verify ${farmer.name}`}
       </button>
