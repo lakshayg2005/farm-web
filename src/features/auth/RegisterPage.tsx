@@ -7,7 +7,7 @@ import { AuthShell, Field, primaryButton } from './AuthShell'
 import { toE164 } from './phone'
 import type { UserRole } from './types'
 
-/** Inspectors and admins are created by an admin, delivery partners use the app. */
+/** Admins are created by an admin, delivery partners use the app. */
 const choices: { role: UserRole; label: string; body: string }[] = [
   { role: 'farmer', label: 'Farmer', body: 'Sell produce and rent out plots' },
   { role: 'customer', label: 'Customer', body: 'Buy produce and reserve plots' },

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { IconName } from '@/components/Icon'
 
-export type Role = 'farmer' | 'customer' | 'inspector' | 'admin'
+export type Role = 'farmer' | 'customer' | 'admin'
 
 export interface SectionPage {
   /** Path segment under the section, e.g. "listings" → /farmer/listings */

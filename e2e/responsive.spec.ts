@@ -6,7 +6,6 @@ const journeys = [
   { role: 'public', phone: null, pages: ['/', '/login', '/team'] },
   { role: 'farmer', phone: DEMO.farmer, pages: ['listings', 'orders', 'plots', 'reservations', 'crops', 'earnings', 'notifications'] },
   { role: 'customer', phone: DEMO.customer, pages: ['plots', 'reservations', 'notifications'] },
-  { role: 'inspector', phone: DEMO.inspector, pages: ['inspections'] },
   { role: 'admin', phone: DEMO.admin.phone, pages: ['dashboard', 'orders', 'verification', 'pooling'] },
 ]
 const sizes = [

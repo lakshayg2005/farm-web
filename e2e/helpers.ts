@@ -5,7 +5,6 @@ export const DEMO = {
   farmer: '+919100000001', // Ramesh Sahu: listings, orders, payouts, plots
   farmerWithCrops: '+919100000005', // Dinesh Tandon: growing crops with photos
   customer: '+919200000005', // Sanjay Dubey: an active reservation with a crop timeline
-  inspector: '+919300000001',
   admin: { phone: '+919999999999', password: 'DemoAdmin@2026' },
 }
 
@@ -30,7 +29,7 @@ export async function signIn(page: Page, phone: string, password = DEMO.password
   await page.getByLabel('Phone number').fill(phone)
   await page.getByLabel('Password').fill(password)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.waitForURL(/\/(farmer|customer|inspector|admin)\//)
+  await page.waitForURL(/\/(farmer|customer|admin)\//)
 }
 
 /** The main navigation of the current section (sidebar on desktop, bottom bar on mobile). */

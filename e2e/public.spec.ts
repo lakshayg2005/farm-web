@@ -1,13 +1,21 @@
 import { DEMO, expect, signIn, test } from './helpers'
 
 test.describe('public pages and sign-in', () => {
-  test('home shows the four workspaces and the order status example', async ({ page, problems }) => {
+  test('home says what this is and offers a way in', async ({ page, problems }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { level: 1 })).toContainText('farmer')
-    for (const role of ['Farmer', 'Customer', 'Inspector', 'Admin']) {
-      await expect(page.getByRole('navigation', { name: 'Sections' }).getByRole('link', { name: new RegExp(role) })).toBeVisible()
-    }
+    await expect(page.getByRole('link', { name: 'Create an account' })).toBeVisible()
+    await expect(page.getByRole('main').getByRole('link', { name: 'Sign in' })).toBeVisible()
     await expect(page.getByRole('img', { name: /Stage 4 of 8/ })).toBeVisible()
+    await expect(page.getByText(/inspector/i)).toHaveCount(0)
+    expect(problems).toEqual([])
+  })
+
+  test('a signed-in farmer is offered their own workspace', async ({ page, problems }) => {
+    await signIn(page, DEMO.farmer)
+    await page.goto('/')
+    await expect(page.getByRole('link', { name: 'Open Farmer' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Create an account' })).toHaveCount(0)
     expect(problems).toEqual([])
   })
 
