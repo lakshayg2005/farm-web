@@ -1090,7 +1090,8 @@
           "FULL",
           "DEPOSIT",
           "BALANCE",
-          "REFUND"
+          "REFUND",
+          "PAYOUT"
         ],
         "title": "PaymentKind",
         "type": "string"
@@ -1166,6 +1167,58 @@
           "status"
         ],
         "title": "PaymentWebhook",
+        "type": "object"
+      },
+      "Payout": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "currency": {
+            "default": "INR",
+            "title": "Currency",
+            "type": "string"
+          },
+          "orderId": {
+            "format": "uuid",
+            "title": "Orderid",
+            "type": "string"
+          },
+          "paidAt": {
+            "format": "date-time",
+            "title": "Paidat",
+            "type": "string"
+          }
+        },
+        "required": [
+          "orderId",
+          "amount",
+          "paidAt"
+        ],
+        "title": "Payout",
+        "type": "object"
+      },
+      "PayoutList": {
+        "description": "A farmer's payouts, newest first, and their sum.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Payout"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "PayoutList",
         "type": "object"
       },
       "ValidationError": {
@@ -1792,6 +1845,77 @@
           }
         },
         "summary": "Mock gateway: report the result of a payment intent",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/orders/payouts": {
+      "get": {
+        "description": "One PAYOUT per completed order of my farms (the item value, not the delivery fee).",
+        "operationId": "list_payouts_orders_payouts_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayoutList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid access token"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The token does not have the required role"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Farmer: payouts for completed orders",
         "tags": [
           "orders"
         ]

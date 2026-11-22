@@ -56,7 +56,7 @@ export function RegisterPage() {
           <legend className="font-semibold">I want to</legend>
           <div className="mt-2 space-y-2">
             {choices.map((c) => (
-              <label key={c.role} className="flex items-start gap-3 rounded-lg border border-line bg-white px-3 py-2.5">
+              <label key={c.role} className="flex items-start gap-3 rounded-xl border border-line bg-transparent px-3 py-2.5">
                 <input type="checkbox" className="mt-1.5" checked={roles.includes(c.role)} onChange={() => toggle(c.role)} />
                 <span>
                   <span className="block font-semibold">{c.label}</span>
@@ -66,13 +66,13 @@ export function RegisterPage() {
             ))}
           </div>
           {errors.roles && (
-            <p role="alert" className="mt-1 text-sm font-semibold text-red-700">
+            <p role="alert" className="mt-1 text-sm font-semibold text-red-400">
               {errors.roles}
             </p>
           )}
         </fieldset>
         {errors.form && (
-          <p role="alert" className="font-semibold text-red-700">
+          <p role="alert" className="font-semibold text-red-400">
             {errors.form}
           </p>
         )}

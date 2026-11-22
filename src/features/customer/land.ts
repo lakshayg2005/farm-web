@@ -65,6 +65,23 @@ export interface CropUpdate {
   createdAt: string
 }
 
+export interface Agreement {
+  id: string
+  reservationId: string
+  plotTitle: string
+  season: string
+  startDate: string
+  endDate: string
+  cropId: string
+  expectedQtyKg: number
+  pricePerKg: number
+  total: number
+  deposit: number
+  balance: number
+  terms: string[]
+  createdAt: string
+}
+
 export interface PaymentIntent {
   id: string
   amount: number
@@ -107,6 +124,7 @@ export const landApi = {
   myReservations: () => api<Reservation[]>('/land/reservations/mine'),
   cancel: (id: string) => api<Reservation>(`/land/reservations/${id}/cancel`, { method: 'POST' }),
   updates: (id: string) => api<CropUpdate[]>(`/land/reservations/${id}/updates`),
+  agreement: (id: string) => api<Agreement>(`/land/reservations/${id}/agreement`),
   payDeposit: (reservationId: string, amount: number) =>
     api<PaymentIntent>('/order/orders/payments/intent', {
       method: 'POST',

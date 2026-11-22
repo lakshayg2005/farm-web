@@ -1,18 +1,25 @@
 import { Link } from 'react-router'
-import { BrandMark } from '@/components/BrandMark'
+import { SiteHeader } from '@/components/SiteHeader'
 
 export function NotFoundPage() {
   return (
-    <div className="mx-auto min-h-dvh max-w-6xl px-4 pt-6 sm:px-8 lg:pt-10">
-      <BrandMark />
-      <h1 className="mt-16 font-display text-[2.4rem] leading-tight">This page does not exist</h1>
-      <p className="mt-3 max-w-md text-lg text-ink-soft">The link may be old or mistyped. Start again from the section list.</p>
-      <Link
-        to="/"
-        className="mt-8 inline-block rounded-lg bg-indigo px-5 py-2.5 font-semibold text-white hover:bg-indigo/90"
-      >
-        Go to sections
-      </Link>
-    </div>
+    <>
+      <SiteHeader />
+      <main className="flex min-h-[calc(100vh-4.5rem)] items-center justify-center bg-black px-6 pb-24 text-white">
+        <div className="text-center">
+          <p className="text-sm tracking-widest text-gray-500 uppercase">404</p>
+          <h1 className="mt-4 text-4xl font-bold">This page does not exist</h1>
+          <p className="mt-4 text-gray-400">The link may be old or mistyped. Start again from the home page.</p>
+          <div className="mt-8 flex justify-center gap-4">
+            <Link to="/" className="rounded-xl bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200">
+              Home
+            </Link>
+            <Link to="/catalog" className="rounded-xl border border-gray-700 px-6 py-3 font-semibold hover:bg-gray-900">
+              Fresh produce
+            </Link>
+          </div>
+        </div>
+      </main>
+    </>
   )
 }

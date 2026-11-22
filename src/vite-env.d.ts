@@ -22,6 +22,7 @@ interface LeafletFeatureGroup {
 
 interface LeafletMap {
   setView(center: [number, number], zoom: number): LeafletMap
+  flyTo(center: [number, number], zoom?: number): LeafletMap
   addLayer(layer: LeafletFeatureGroup): void
   addControl(control: unknown): void
   on(eventName: string, handler: (event: { layer: LeafletDrawLayer }) => void): void

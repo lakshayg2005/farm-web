@@ -38,6 +38,8 @@ export const ordersApi = {
   get: (id: string) => api<OrderDetail>(`/order/orders/${id}`),
   pack: (id: string) => api<OrderDetail>(`/order/orders/${id}/pack`, { method: 'POST' }),
   cancel: (id: string) => api<OrderDetail>(`/order/orders/${id}/cancel`, { method: 'POST', body: {} }),
+  /** What the farmer has been paid: one PAYOUT per completed order. */
+  payouts: () => api<{ items: { orderId: string; amount: number; paidAt: string }[]; total: number }>('/order/orders/payouts'),
 }
 
 /** The tabs of the orders page, each a set of statuses. */

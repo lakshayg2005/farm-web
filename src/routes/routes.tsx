@@ -5,6 +5,7 @@ import { AuthProvider } from '@/features/auth/AuthProvider'
 import { RedirectIfSignedIn, RequireRole } from '@/features/auth/guards'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { NoAccessPage } from '@/features/auth/NoAccessPage'
+import { CatalogPage } from '@/features/catalog/CatalogPage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
 import { VerifyPage } from '@/features/auth/VerifyPage'
 import { HomePage } from '@/features/home/HomePage'
@@ -33,6 +34,7 @@ export const routes: RouteObject[] = [
         ],
       },
       { path: '/team', element: <TeamPage /> },
+      { path: '/catalog', element: <CatalogPage /> },
       { path: '/verify', element: <VerifyPage /> },
       { path: '/no-access', element: <NoAccessPage /> },
       ...sections.map(

@@ -1,91 +1,162 @@
-import { useEffect, type CSSProperties } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router'
-import { BrandMark } from '@/components/BrandMark'
-import { CropRows } from '@/components/CropRows'
-import { useAuth } from '@/features/auth/authContext'
-import { homePathFor } from '@/features/auth/roles'
+import { SiteFooter } from '@/components/SiteFooter'
+import { SiteHeader } from '@/components/SiteHeader'
 import { sections } from '@/routes/sections'
-import type { Role } from '@/routes/types'
 
-/** Each section is drawn as a field in an aerial patchwork: its own size and furrow angle. */
-const fieldShape: Record<Role, { area: string; angle: string }> = {
-  farmer: { area: 'lg:col-span-4 lg:row-span-2', angle: '-58deg' },
-  customer: { area: 'lg:col-span-2 lg:row-span-2', angle: '24deg' },
-  inspector: { area: 'lg:col-span-3', angle: '90deg' },
-  admin: { area: 'lg:col-span-3', angle: '-24deg' },
-}
+// The page follows AINow's Home exactly: black hero, white "why" section with numbered cards,
+// black preview section with one big bordered card, then the footer.
+
+const STEPS = [
+  { title: 'Fresh', body: 'Every listing shows the day it was harvested and when it will reach your door, so you always know what you are buying.' },
+  { title: 'Graded', body: 'An inspector checks moisture, pests and weight, and grades every batch A, B or C with geo-tagged photos.' },
+  { title: 'Pooled', body: 'Nearby orders share one delivery route every night, cutting kilometres, cost and emissions.' },
+]
 
 export function HomePage() {
-  const { user, logout } = useAuth()
   useEffect(() => {
     document.title = 'Farm Platform'
   }, [])
 
   return (
-    <div className="mx-auto min-h-dvh max-w-6xl px-4 pt-6 pb-12 sm:px-8 lg:pt-10">
-      <div className="flex items-center justify-between gap-4">
-        <BrandMark />
-        {user ? (
-          <p className="flex items-center gap-4">
-            <Link to={homePathFor(user)} className="font-semibold">
-              {user.name}
-            </Link>
-            <button type="button" onClick={() => void logout()} className="text-ink-soft underline">
-              Sign out
-            </button>
-          </p>
-        ) : (
-          <p className="flex items-center gap-4">
-            <Link to="/login" className="font-semibold">
-              Sign in
-            </Link>
-            <Link to="/register" className="rounded-lg bg-indigo px-3 py-1.5 font-semibold text-white">
-              Register
-            </Link>
-          </p>
-        )}
-      </div>
+    <>
+      <SiteHeader />
 
-      <div className="mt-12 grid gap-10 lg:mt-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
-        <header className="max-w-md lg:pt-4">
-          <h1 className="font-display text-[2.6rem] leading-[1.05] sm:text-[3.4rem]">
-            From the farmer’s field to your table
-          </h1>
-          <p className="mt-5 text-lg text-ink-soft">
-            Farmers sell fresh produce and rent out plots of their land. Customers buy produce, or reserve a plot and
-            follow their crop until harvest.
-          </p>
-          <p className="mt-8 font-semibold">Choose your section to get started.</p>
-        </header>
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-black text-white">
+        <div className="mx-auto flex min-h-[85vh] max-w-7xl items-center px-6 py-24">
+          <div className="max-w-4xl">
+            <div className="mb-8 inline-flex rounded-full border border-gray-700 px-4 py-2 text-sm text-gray-300">
+              ✦ Fresh produce and farmland, straight from the farmer
+            </div>
 
-        <nav aria-label="Sections">
-          <ul className="grid gap-3 lg:auto-rows-[11rem] lg:grid-cols-6">
-            {sections.map((section, i) => {
-              const shape = fieldShape[section.role]
-              return (
-                <li key={section.role} className={shape.area}>
+            <h1 className="text-5xl leading-tight font-bold tracking-tight md:text-7xl">
+              From the Farmer’s Field
+              <span className="block text-gray-400">to Your Table.</span>
+            </h1>
+
+            <p className="mt-8 max-w-2xl text-lg leading-8 text-gray-400 md:text-xl">
+              Farm Platform brings you produce harvested days ago from verified farmers near you, graded by inspectors
+              and delivered on shared routes. Or reserve a plot of farmland and follow your crop until harvest.
+            </p>
+
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              <Link
+                to="/catalog"
+                className="rounded-xl bg-white px-7 py-3.5 text-center font-semibold text-black transition hover:bg-gray-200"
+              >
+                Browse Fresh Produce →
+              </Link>
+              <Link
+                to="/customer/plots"
+                className="rounded-xl border border-gray-700 px-7 py-3.5 text-center font-semibold text-white transition hover:bg-gray-900"
+              >
+                Reserve Farmland
+              </Link>
+            </div>
+
+            <p className="mt-6 text-sm text-gray-500">No middlemen. Just fresh produce from farms you can trace.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Why */}
+      <section id="how" className="bg-white py-24 text-black">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold tracking-widest text-gray-500 uppercase">Why Farm Platform</p>
+            <h2 className="mt-4 text-4xl font-bold md:text-5xl">
+              Fresh food,
+              <br />
+              without the middlemen.
+            </h2>
+          </div>
+
+          <div className="mt-16 grid gap-8 md:grid-cols-3">
+            {STEPS.map((step, i) => (
+              <div key={step.title} className="rounded-2xl border border-gray-200 p-8">
+                <span className="text-sm font-medium text-gray-400">{String(i + 1).padStart(2, '0')}</span>
+                <h3 className="mt-8 text-2xl font-bold">{step.title}</h3>
+                <p className="mt-4 leading-7 text-gray-600">{step.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured produce, in the shape of AINow's latest-issue card */}
+      <section className="bg-black py-24 text-white">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <p className="text-sm font-semibold tracking-widest text-gray-500 uppercase">On the catalog today</p>
+              <h2 className="mt-4 text-4xl font-bold md:text-5xl">
+                What farmers near you
+                <br />
+                are offering.
+              </h2>
+            </div>
+            <Link to="/catalog" className="w-fit text-gray-400 transition hover:text-white">
+              View all produce →
+            </Link>
+          </div>
+
+          <Link
+            to="/catalog"
+            className="group mt-14 block overflow-hidden rounded-3xl border border-gray-800 transition hover:border-gray-600"
+          >
+            <div className="grid md:grid-cols-2">
+              <div className="flex flex-col p-8 md:p-12">
+                <span className="w-fit rounded-full border border-gray-700 px-3 py-1 text-xs text-gray-400 uppercase">
+                  Peak fresh · Harvested today
+                </span>
+                <h3 className="mt-8 text-3xl font-bold md:text-4xl">Desi Tomato from Hariyali Farms</h3>
+                <p className="mt-6 leading-7 text-gray-400">
+                  Grade A, organic, 6 km from you at ₹32 per kg. Packed and quality-checked today, on tomorrow
+                  morning’s shared route, at your door by 11 am.
+                </p>
+                <span className="mt-8 w-fit rounded-xl bg-white px-6 py-3 font-semibold text-black transition group-hover:bg-gray-200">
+                  Open the catalog →
+                </span>
+              </div>
+              <div className="relative flex min-h-[280px] items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-950 via-neutral-900 to-black md:min-h-[350px]">
+                <span className="text-8xl transition duration-500 group-hover:scale-110" aria-hidden>
+                  🍅
+                </span>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* Sections */}
+      <section className="bg-white py-24 text-black">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold tracking-widest text-gray-500 uppercase">One platform, four roles</p>
+            <h2 className="mt-4 text-4xl font-bold md:text-5xl">Choose your section.</h2>
+          </div>
+          <nav aria-label="Sections" className="mt-16">
+            <ul className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {sections.map((section, i) => (
+                <li key={section.role}>
                   <Link
                     to={`/${section.role}`}
-                    style={{ '--role': section.accent, '--rows-angle': shape.angle } as CSSProperties}
-                    className="group relative flex h-full min-h-36 flex-col justify-end overflow-hidden rounded-xl bg-paper-deep p-3"
+                    className="group flex h-full flex-col rounded-2xl border border-gray-200 p-8 transition hover:border-black"
                   >
-                    <CropRows delay={0.1 + i * 0.12} className="absolute inset-0" />
-                    <span className="relative block max-w-xs rounded-lg bg-paper/95 px-4 py-3 shadow-[0_1px_0_var(--color-line)] transition-transform duration-200 group-hover:-translate-y-0.5">
-                      <span className="block font-display text-xl leading-tight">{section.label}</span>
-                      <span className="mt-0.5 block text-[0.94rem] leading-snug text-ink-soft">{section.audience}</span>
-                    </span>
+                    <span className="text-sm font-medium text-gray-400">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="mt-8 text-2xl font-bold">{section.label}</span>
+                    <span className="mt-4 flex-1 leading-7 text-gray-600">{section.audience}</span>
+                    <span className="mt-6 font-semibold">Open →</span>
                   </Link>
                 </li>
-              )
-            })}
-          </ul>
-        </nav>
-      </div>
-      <p className="mt-12 text-center text-ink-soft">
-        <Link to="/team" className="font-semibold text-indigo underline">
-          Meet the team
-        </Link>
-      </p>
-    </div>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      </section>
+
+      <SiteFooter />
+    </>
   )
 }

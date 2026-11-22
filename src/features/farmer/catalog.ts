@@ -165,10 +165,10 @@ export function farmPayload(f: FarmForm): FarmInput | string {
 }
 
 export const STATUS_TEXT: Record<ListingStatus, { label: string; tone: string }> = {
-  ACTIVE: { label: 'On sale', tone: 'bg-green-100 text-green-900' },
-  PAUSED: { label: 'Paused', tone: 'bg-neutral-200 text-ink' },
-  SOLD_OUT: { label: 'Sold out', tone: 'bg-amber-100 text-amber-900' },
-  ARCHIVED: { label: 'Removed', tone: 'bg-neutral-200 text-ink-soft' },
+  ACTIVE: { label: 'On sale', tone: 'bg-green-950/40 text-green-400 border border-green-900' },
+  PAUSED: { label: 'Paused', tone: 'bg-neutral-800 text-ink' },
+  SOLD_OUT: { label: 'Sold out', tone: 'bg-amber-950/40 text-amber-300 text-amber-900' },
+  ARCHIVED: { label: 'Removed', tone: 'bg-neutral-800 text-ink-soft' },
 }
 
 export const rupees = (n: number) => `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`

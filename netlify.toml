@@ -1,0 +1,15 @@
+# Netlify: build the Vite app and serve it as a single-page app.
+# Set VITE_API_BASE_URL in Site settings → Environment variables to the deployed gateway,
+# e.g. https://<your-backend>.onrender.com/api/v1 (without it the catalog shows labelled sample data).
+[build]
+  command = "pnpm install --frozen-lockfile && pnpm build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Every path is a client-side route: serve index.html for all of them.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

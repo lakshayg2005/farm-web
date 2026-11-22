@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { FarmLocationPicker } from '@/components/FarmLocationPicker'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef, useState, type FormEvent } from 'react'
 import { ApiError } from '@/api/http'
@@ -27,9 +28,9 @@ const message = (e: unknown) =>
   e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not reach the server. Try again.'
 
 const input =
-  'mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 font-normal disabled:bg-paper disabled:text-ink-soft'
-const primary = 'rounded-lg bg-indigo px-4 py-2 font-semibold text-white hover:bg-indigo/90 disabled:opacity-60'
-const quiet = 'rounded-lg border border-line bg-white px-3 py-1.5 font-semibold hover:border-ink-soft disabled:opacity-60'
+  'mt-1 w-full rounded-xl border border-line bg-transparent px-3 py-2 font-normal disabled:bg-paper disabled:text-ink-soft'
+const primary = 'rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 hover:bg-white/90 disabled:opacity-60'
+const quiet = 'rounded-xl border border-line bg-transparent px-3 py-1.5 font-semibold hover:border-ink-soft disabled:opacity-60'
 const panel = { initial: { opacity: 0, y: -8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: 0.2 } }
 
 /** Order: on sale first, then sold out, then paused; newest change first within each. */
@@ -46,7 +47,7 @@ export function ListingsPage() {
   if (farms.isPending) return <p className="mt-8 text-ink-soft">Loading your farms…</p>
   if (farms.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-red-400">
         Could not load your farms. Refresh to try again.
       </p>
     )
@@ -108,12 +109,12 @@ export function ListingsPage() {
       {listings.isPending ? (
         <p className="text-ink-soft">Loading your listings…</p>
       ) : listings.isError ? (
-        <p role="alert" className="font-semibold text-red-700">
+        <p role="alert" className="font-semibold text-red-400">
           Could not load your listings. Refresh to try again.
         </p>
       ) : live.length === 0 ? (
         editing === null && (
-          <div className="rounded-xl border border-dashed border-line bg-white/60 p-6">
+          <div className="rounded-xl border border-dashed border-line bg-transparent p-6">
             <h2 className="text-lg font-semibold">Put your first produce up for sale</h2>
             <p className="mt-1 text-ink-soft">
               Add the crop, how much you have, your price and a photo taken at the farm. Customers nearby see it straight away.
@@ -166,7 +167,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
   }
 
   return (
-    <article className="rounded-xl border border-line bg-white p-4 sm:p-5">
+    <article className="card p-4 sm:p-5">
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="sm:w-60 sm:shrink-0">
           {l.mediaIds.length > 0 ? (
@@ -229,7 +230,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
               {confirmRemove ? (
                 <span className="flex items-center gap-2">
                   <span className="text-sm">Remove this listing?</span>
-                  <button type="button" disabled={remove.isPending} onClick={() => remove.mutate()} className={`${quiet} text-red-700`}>
+                  <button type="button" disabled={remove.isPending} onClick={() => remove.mutate()} className={`${quiet} text-red-400`}>
                     {remove.isPending ? 'Removing…' : 'Remove'}
                   </button>
                   <button type="button" onClick={() => setConfirmRemove(false)} className="text-sm underline">
@@ -247,7 +248,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
             <p className="mt-2 text-sm text-ink-soft">Sold out. Add stock to put it back on sale.</p>
           )}
           {error && (
-            <p role="alert" className="mt-2 font-semibold text-red-700">
+            <p role="alert" className="mt-2 font-semibold text-red-400">
               {error}
             </p>
           )}
@@ -379,7 +380,7 @@ function ListingEditor({
 
   const title = listing ? `Edit ${listing.cropName}` : 'Add a listing'
   return (
-    <form onSubmit={submit} noValidate className="rounded-xl border border-line bg-white p-4 sm:p-6" aria-label={title}>
+    <form onSubmit={submit} noValidate className="card p-4 sm:p-6" aria-label={title}>
       <h2 className="font-display text-2xl">{title}</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {farms.length > 1 && (
@@ -485,7 +486,7 @@ function ListingEditor({
       </div>
 
       {error && (
-        <p role="alert" className="mt-4 font-semibold text-red-700">
+        <p role="alert" className="mt-4 font-semibold text-red-400">
           {error}
         </p>
       )}
@@ -529,7 +530,7 @@ function FarmSetup() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="mt-8 max-w-2xl rounded-xl border border-line bg-white p-4 sm:p-6" aria-label="Add your farm">
+    <form onSubmit={submit} noValidate className="mt-8 max-w-2xl card p-4 sm:p-6" aria-label="Add your farm">
       <h2 className="font-display text-2xl">Add your farm first</h2>
       <p className="mt-1 text-ink-soft">
         Produce is picked up from your farm gate, and photos are checked against its location. You only do this once.
@@ -561,13 +562,27 @@ function FarmSetup() {
             Longitude
             <input value={f.lng} onChange={set('lng')} inputMode="decimal" placeholder="81.63" className={input} />
           </label>
+          <FarmLocationPicker
+            lat={f.lat.trim() === '' ? null : Number(f.lat)}
+            lng={f.lng.trim() === '' ? null : Number(f.lng)}
+            onChange={(la, ln, place) =>
+              setF((cur) => ({
+                ...cur,
+                lat: String(la),
+                lng: String(ln),
+                village: place?.village && !cur.village ? place.village : cur.village,
+                district: place?.district && !cur.district ? place.district : cur.district,
+                state: place?.state && !cur.state ? place.state : cur.state,
+              }))
+            }
+          />
           <button type="button" onClick={useMyLocation} className="justify-self-start font-semibold text-indigo underline sm:col-span-2">
             Use my location
           </button>
         </fieldset>
       </div>
       {error && (
-        <p role="alert" className="mt-4 font-semibold text-red-700">
+        <p role="alert" className="mt-4 font-semibold text-red-400">
           {error}
         </p>
       )}
