@@ -75,17 +75,23 @@ export function PlotSearchPage() {
                 Could not load plots. Move the map or refresh to try again.
               </p>
             )}
-            <ul className="space-y-2">
+            <ul className="space-y-2 lg:max-h-[34rem] lg:overflow-y-auto lg:pr-1">
               {plots.map((p) => (
                 <li key={p.properties.plotSeasonId}>
                   <button
                     type="button"
                     onClick={() => setSelectedId(p.properties.plotSeasonId)}
-                    className="w-full card px-4 py-3 text-left hover:border-primary"
+                    className="min-h-11 w-full card px-4 py-3 text-left hover:border-primary"
                   >
                     <span className="block font-display text-lg">{p.properties.title}</span>
                     <span className="block text-sm text-ink-soft">
-                      {p.properties.areaAcres} acres · {p.properties.season} · {rupees(p.properties.price)} per kg
+                      {Number(p.properties.areaAcres).toFixed(2)} acres · {p.properties.season}, {day(p.properties.startDate)} to {day(p.properties.endDate)}
+                    </span>
+                    <span className="mt-0.5 block text-sm">
+                      <strong>{rupees(p.properties.price)}</strong> per kg of harvest
+                      {p.properties.allowedCrops.length > 0 && (
+                        <span className="text-ink-soft"> · {p.properties.allowedCrops.map((c) => cropName.get(c) ?? c).join(', ')}</span>
+                      )}
                     </span>
                   </button>
                 </li>
@@ -145,7 +151,7 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
       </div>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
         <dt className="text-ink-soft">Size</dt>
-        <dd>{p.areaAcres} acres</dd>
+        <dd>{Number(p.areaAcres).toFixed(2)} acres</dd>
         <dt className="text-ink-soft">Season</dt>
         <dd>
           {p.season}, {day(p.startDate)} to {day(p.endDate)}

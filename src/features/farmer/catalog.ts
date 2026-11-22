@@ -1,5 +1,6 @@
 import type { Tone } from '@/components/ui'
 import { api } from '@/api/http'
+import { newId } from '@/api/id'
 
 export type Unit = 'kg' | 'quintal' | 'dozen' | 'piece' | 'bunch' | 'litre'
 export const UNITS: Unit[] = ['kg', 'quintal', 'dozen', 'piece', 'bunch', 'litre']
@@ -91,7 +92,7 @@ export const catalogApi = {
   crops: () => api<CatalogCrop[]>('/catalog/crops'),
   myFarms: () => api<Page<Farm>>('/catalog/farms/mine?limit=50').then((r) => r.items),
   createFarm: (body: FarmInput) =>
-    api<Farm>('/catalog/farms', { method: 'POST', body, headers: { 'Idempotency-Key': crypto.randomUUID() } }),
+    api<Farm>('/catalog/farms', { method: 'POST', body, headers: { 'Idempotency-Key': newId() } }),
   myListings: () => api<Page<Listing>>('/catalog/listings/mine?limit=100').then((r) => r.items),
   createListing: (body: ListingInput, idempotencyKey: string) =>
     api<Listing>('/catalog/listings', { method: 'POST', body, headers: { 'Idempotency-Key': idempotencyKey } }),

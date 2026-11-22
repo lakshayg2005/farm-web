@@ -57,6 +57,17 @@ export interface Reservation {
   expiresAt: string
 }
 
+/** The terms of an accepted reservation; it names the plot and season, which the reservation itself does not. */
+export interface Agreement {
+  reservationId: string
+  plotId: string
+  plotTitle: string
+  season: string
+  startDate: string
+  endDate: string
+  pricePerKg: number
+}
+
 export interface CropUpdate {
   id: string
   stage: 'SOWN' | 'GROWING' | 'FLOWERING'
@@ -105,6 +116,7 @@ export const landApi = {
   reserve: (plotSeasonId: string, cropId: string, expectedQtyKg: number) =>
     api<Reservation>('/land/reservations', { method: 'POST', body: { plotSeasonId, cropId, expectedQtyKg } }),
   myReservations: () => api<Reservation[]>('/land/reservations/mine'),
+  agreement: (id: string) => api<Agreement>(`/land/reservations/${id}/agreement`),
   cancel: (id: string) => api<Reservation>(`/land/reservations/${id}/cancel`, { method: 'POST' }),
   updates: (id: string) => api<CropUpdate[]>(`/land/reservations/${id}/updates`),
   payDeposit: (reservationId: string, amount: number) =>
