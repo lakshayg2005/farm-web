@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { AnimatePresence } from 'motion/react'
 import { useMemo, useState } from 'react'
 import { Icon } from '@/components/Icon'
+import { PlaceSearch } from '@/components/PlaceSearch'
 import {
   CATEGORIES,
   PLACES,
@@ -104,6 +105,12 @@ export function CatalogBrowser() {
     <div>
       {/* Search and filters */}
       <div className="card p-3 sm:p-4">
+        <div className="mb-3">
+          <PlaceSearch
+            placeholder="Find produce near any village, town or address…"
+            onPick={(r) => setPlace({ name: r.name.split(',').slice(0, 2).join(',').trim(), lat: r.lat, lng: r.lng })}
+          />
+        </div>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <label className="relative flex-1">
             <span className="sr-only">Search produce or farms</span>
@@ -126,7 +133,7 @@ export function CatalogBrowser() {
                 className={selectClass}
                 style={chevron}
               >
-                {place.name === 'My location' && <option>My location</option>}
+                {!PLACES.some((p) => p.name === place.name) && <option>{place.name}</option>}
                 {PLACES.map((p) => (
                   <option key={p.name}>{p.name}</option>
                 ))}

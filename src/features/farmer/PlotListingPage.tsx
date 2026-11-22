@@ -1,11 +1,18 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { api, ApiError } from '@/api/http'
+import { PlaceSearch } from '@/components/PlaceSearch'
 import { mediaUploadPayload, plotCreatePayload, seasonCreatePayload, type Polygon } from './plotPayloads'
 
 type PlotCreated = { id: string; areaAcres: number }
 
 function errorMessage(error: unknown) {
   if (error instanceof ApiError) {
+    if (Array.isArray(error.details) && error.details.length) {
+      const fields = (error.details as { field?: string; message?: string }[])
+        .map((d) => `${(d.field ?? '').replace(/^body\./, '')}: ${d.message ?? ''}`)
+        .join('; ')
+      return `${error.message} (${fields})`
+    }
     const details = error.details as { plotId?: string } | undefined
     return details?.plotId
       ? `${error.message} (overlapping plot: ${details.plotId})`
@@ -17,6 +24,7 @@ function errorMessage(error: unknown) {
 export function PlotListingPage() {
   const mapElement = useRef<HTMLDivElement>(null)
   const drawnLayers = useRef<LeafletFeatureGroup | null>(null)
+  const mapRef = useRef<LeafletMap | null>(null)
   const [boundary, setBoundary] = useState<Polygon | null>(null)
   const [mapError, setMapError] = useState(() =>
     typeof window === 'undefined' || !window.L
@@ -41,6 +49,7 @@ export function PlotListingPage() {
     if (!mapElement.current || !L) return
 
     const map = L.map(mapElement.current).setView([20.5937, 78.9629], 5)
+    mapRef.current = map
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors',
@@ -70,6 +79,7 @@ export function PlotListingPage() {
 
     return () => {
       drawnLayers.current = null
+      mapRef.current = null
       map.remove()
     }
   }, [])
@@ -143,7 +153,10 @@ export function PlotListingPage() {
           </div>
           <span className="rounded-full bg-paper-deep px-3 py-1 text-sm">{boundary ? 'Boundary drawn' : 'No boundary yet'}</span>
         </div>
-        <div ref={mapElement} className="mt-4 h-[360px] w-full overflow-hidden rounded-lg border border-line" />
+        <div className="mt-4">
+          <PlaceSearch onPick={(place) => mapRef.current?.flyTo([place.lat, place.lng], 16)} />
+        </div>
+        <div ref={mapElement} className="mt-4 h-[460px] w-full overflow-hidden rounded-lg border border-line" />
         {mapError && <p role="alert" className="mt-2 text-sm text-red-400">{mapError}</p>}
         <p className="mt-2 text-xs text-ink-soft">Map data &copy; OpenStreetMap contributors. The backend checks polygon validity, overlap and area.</p>
       </div>

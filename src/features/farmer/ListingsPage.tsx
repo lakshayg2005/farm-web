@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { FarmLocationPicker } from '@/components/FarmLocationPicker'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef, useState, type FormEvent } from 'react'
 import { ApiError } from '@/api/http'
@@ -561,6 +562,20 @@ function FarmSetup() {
             Longitude
             <input value={f.lng} onChange={set('lng')} inputMode="decimal" placeholder="81.63" className={input} />
           </label>
+          <FarmLocationPicker
+            lat={f.lat.trim() === '' ? null : Number(f.lat)}
+            lng={f.lng.trim() === '' ? null : Number(f.lng)}
+            onChange={(la, ln, place) =>
+              setF((cur) => ({
+                ...cur,
+                lat: String(la),
+                lng: String(ln),
+                village: place?.village && !cur.village ? place.village : cur.village,
+                district: place?.district && !cur.district ? place.district : cur.district,
+                state: place?.state && !cur.state ? place.state : cur.state,
+              }))
+            }
+          />
           <button type="button" onClick={useMyLocation} className="justify-self-start font-semibold text-indigo underline sm:col-span-2">
             Use my location
           </button>
