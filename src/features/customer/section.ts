@@ -1,4 +1,5 @@
 import { createElement } from 'react'
+import { notificationsPage } from '@/features/notifications/page'
 import type { Section } from '@/routes/types'
 import { PlotSearchPage } from './PlotSearchPage'
 import { ReservationsPage } from './ReservationsPage'
@@ -30,5 +31,6 @@ export const customerSection: Section = {
       },
       element: createElement(ReservationsPage),
     },
+    notificationsPage('customer'),
   ],
 }
