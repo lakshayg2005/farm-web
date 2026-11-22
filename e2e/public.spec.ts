@@ -50,3 +50,14 @@ test.describe('public pages and sign-in', () => {
     await expect(page.getByRole('heading', { name: 'This page does not exist' })).toBeVisible()
   })
 })
+
+test.describe('public catalog', () => {
+  test('anyone can browse produce and open a farm page without signing in', async ({ page, problems }) => {
+    await page.goto('/catalog')
+    await expect(page.getByRole('heading', { name: 'Fresh produce near you' })).toBeVisible()
+    await page.getByRole('list').getByRole('button', { name: /per (kg|quintal|piece|dozen|bunch)/ }).first().click()
+    await page.locator('dialog a[href^="/farm/"]').first().click()
+    await expect(page.getByRole('heading', { name: 'On sale now' })).toBeVisible()
+    expect(problems).toEqual([])
+  })
+})

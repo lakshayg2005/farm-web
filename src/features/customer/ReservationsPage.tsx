@@ -114,7 +114,15 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
       )}
       {FOLLOWED.includes(r.status) && <Timeline reservationId={r.id} />}
       {r.status === 'HARVEST_READY' && <HarvestChoice reservationId={r.id} onDone={refresh} />}
-      {r.status === 'FULFILLING' && <p className="mt-4">Your harvest order is in progress. Track it under your orders.</p>}
+      {r.status === 'FULFILLING' && (
+        <p className="mt-4">
+          Your harvest order is in progress.{' '}
+          <Link to="/customer/orders" className="font-semibold text-primary underline">
+            Track it under your orders
+          </Link>
+          .
+        </p>
+      )}
       {error && (
         <p role="alert" className="mt-3 font-semibold text-danger">
           {error}

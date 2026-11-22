@@ -5,8 +5,8 @@ import { DEMO, expect, noHorizontalScroll, signIn, test } from './helpers'
 const journeys = [
   { role: 'public', phone: null, pages: ['/', '/login', '/team'] },
   { role: 'farmer', phone: DEMO.farmer, pages: ['listings', 'orders', 'plots', 'reservations', 'crops', 'earnings', 'notifications'] },
-  { role: 'customer', phone: DEMO.customer, pages: ['plots', 'reservations', 'notifications'] },
-  { role: 'admin', phone: DEMO.admin.phone, pages: ['dashboard', 'orders', 'verification', 'pooling'] },
+  { role: 'customer', phone: DEMO.customer, pages: ['shop', 'cart', 'orders', 'plots', 'reservations', 'notifications'] },
+  { role: 'admin', phone: DEMO.admin.phone, pages: ['dashboard', 'orders', 'verification', 'users', 'pooling'] },
 ]
 const sizes = [
   { name: 'mobile', width: 390, height: 844 },
