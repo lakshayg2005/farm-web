@@ -42,6 +42,9 @@ export interface Payout {
 }
 
 export const ordersApi = {
+  /** Admin: every order on the platform, newest first (the API gives admins all orders without a role). */
+  all: (cursor?: string | null) =>
+    api<{ items: OrderSummary[]; nextCursor: string | null }>(`/order/orders?limit=100${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`),
   payouts: () => api<{ items: Payout[]; total: number }>('/order/orders/payouts?limit=500'),
   list: () => api<{ items: OrderSummary[]; nextCursor: string | null }>('/order/orders?role=farmer&limit=100'),
   get: (id: string) => api<OrderDetail>(`/order/orders/${id}`),
