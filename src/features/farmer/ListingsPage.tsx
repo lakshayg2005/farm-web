@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ListSkeleton, StatusChip } from '@/components/ui'
+import { ListSkeleton, Rating, StatusChip } from '@/components/ui'
+import { useI18n } from '@/i18n/i18n'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef, useState, type FormEvent } from 'react'
 import { ApiError } from '@/api/http'
@@ -9,6 +10,7 @@ import {
   catalogApi,
   day,
   farmPayload,
+  isLowStock,
   listingChanges,
   listingPayload,
   rupees,
@@ -37,6 +39,7 @@ const panel = { initial: { opacity: 0, y: -8 }, animate: { opacity: 1, y: 0 }, e
 const ORDER: Record<string, number> = { ACTIVE: 0, SOLD_OUT: 1, PAUSED: 2 }
 
 export function ListingsPage() {
+  const { t } = useI18n()
   const farms = useQuery({ queryKey: ['farms', 'mine'], queryFn: catalogApi.myFarms })
   const listings = useQuery({ queryKey: ['listings', 'mine'], queryFn: catalogApi.myListings, enabled: !!farms.data?.length })
   const crops = useQuery({ queryKey: ['catalog-crops'], queryFn: catalogApi.crops, staleTime: 3_600_000 })
@@ -48,7 +51,7 @@ export function ListingsPage() {
   if (farms.isError)
     return (
       <p role="alert" className="mt-8 font-semibold text-danger">
-        Could not load your farms. Refresh to try again.
+        {t('Could not load your farms. Refresh to try again.')}
       </p>
     )
   if (farms.data.length === 0) return <FarmSetup />
@@ -62,7 +65,8 @@ export function ListingsPage() {
     <div className="mt-8 max-w-4xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-ink-soft" role="status">
-          {listings.isSuccess && (live.length === 0 ? 'Nothing listed yet.' : `${onSale} of ${live.length} listings on sale.`)}
+          {listings.isSuccess &&
+            (live.length === 0 ? t('Nothing listed yet.') : t('{n} of {total} listings on sale.', { n: onSale, total: live.length }))}
           {notice && <span className="ml-2 font-semibold text-primary">{notice}</span>}
         </p>
         {editing === null && (
@@ -75,10 +79,19 @@ export function ListingsPage() {
               setEditing('new')
             }}
           >
-            Add a listing
+            {t('Add a listing')}
           </button>
         )}
       </div>
+
+      <ul aria-label={t('Your farms')} className="flex flex-wrap gap-x-6 gap-y-1">
+        {farms.data.map((f) => (
+          <li key={f.id} className="flex flex-wrap items-center gap-x-2">
+            <span className="font-semibold">{f.name}</span>
+            <Rating value={f.rating} count={f.ratingCount ?? 0} />
+          </li>
+        ))}
+      </ul>
 
       <AnimatePresence initial={false}>
         {editing !== null && (
@@ -107,22 +120,22 @@ export function ListingsPage() {
       </AnimatePresence>
 
       {listings.isPending ? (
-        <p className="text-ink-soft">Loading your listings…</p>
+        <p className="text-ink-soft">{t('Loading your listings…')}</p>
       ) : listings.isError ? (
         <p role="alert" className="font-semibold text-danger">
-          Could not load your listings. Refresh to try again.
+          {t('Could not load your listings. Refresh to try again.')}
         </p>
       ) : live.length === 0 ? (
         editing === null && (
           <div className="card border-dashed p-6">
-            <h2 className="text-lg font-semibold">Put your first produce up for sale</h2>
+            <h2 className="text-lg font-semibold">{t('Put your first produce up for sale')}</h2>
             <p className="mt-1 text-ink-soft">
-              Add the crop, how much you have, your price and a photo taken at the farm. Customers nearby see it straight away.
+              {t('Add the crop, how much you have, your price and a photo taken at the farm. Customers nearby see it straight away.')}
             </p>
           </div>
         )
       ) : (
-        <ul className="space-y-3" aria-label="Your listings">
+        <ul className="space-y-3" aria-label={t('Your listings')}>
           {live.map((l) => (
             <li key={l.id}>
               <ListingRow
@@ -141,6 +154,7 @@ export function ListingsPage() {
 }
 
 function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => void }) {
+  const { t } = useI18n()
   const queryClient = useQueryClient()
   const [stock, setStock] = useState(String(l.qtyAvailable))
   const [confirmRemove, setConfirmRemove] = useState(false)
@@ -173,7 +187,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
           {l.mediaIds.length > 0 ? (
             <OwnerPhotos ownerType="LISTING" ownerId={l.id} only={l.mediaIds.slice(0, 3)} size="sm" />
           ) : (
-            <p className="rounded-lg bg-paper-deep px-3 py-2 text-sm text-ink-soft">No photos yet. Listings with a farm photo sell faster.</p>
+            <p className="rounded-lg bg-paper-deep px-3 py-2 text-sm text-ink-soft">{t('No photos yet. Listings with a farm photo sell faster.')}</p>
           )}
         </div>
         <div className="min-w-0 flex-1">
@@ -182,21 +196,24 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
               {l.cropName}
               {l.variety && <span className="text-ink-soft">, {l.variety}</span>}
             </h2>
-            <StatusChip tone={status.tone}>{status.label}</StatusChip>
+            <span className="flex flex-wrap gap-1.5">
+              {isLowStock(l) && <StatusChip tone="warn">{t('Low stock')}</StatusChip>}
+              <StatusChip tone={status.tone}>{t(status.label)}</StatusChip>
+            </span>
           </div>
           <p className="mt-1 text-ink-soft">
             <span className="font-semibold text-ink">
-              {rupees(l.pricePerUnit)} per {l.unit}
+              {rupees(l.pricePerUnit)} {t('per')} {t(l.unit)}
             </span>
-            , harvested {day(l.harvestDate)}
-            {l.isOrganic && ', organic'}
-            {l.grade && `, grade ${l.grade}`}
+            , {t('harvested')} {day(l.harvestDate)}
+            {l.isOrganic && `, ${t('organic')}`}
+            {l.grade && `, ${t('grade')} ${l.grade}`}
           </p>
 
           <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-3">
             <form onSubmit={saveStock} className="flex items-end gap-2">
               <label className="text-sm font-semibold">
-                In stock ({l.unit})
+                {t('In stock')} ({t(l.unit)})
                 <input
                   type="number"
                   min="0"
@@ -209,43 +226,48 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
               </label>
               {stockChanged && (
                 <button type="submit" disabled={update.isPending} className={quiet}>
-                  {update.isPending ? 'Saving…' : 'Update stock'}
+                  {update.isPending ? t('Saving…') : t('Update stock')}
                 </button>
               )}
             </form>
             <div className="flex flex-wrap gap-2">
               <button type="button" onClick={onEdit} className={quiet}>
-                Edit
+                {t('Edit')}
               </button>
               {(l.status === 'ACTIVE' || l.status === 'SOLD_OUT') && (
                 <button type="button" disabled={update.isPending} onClick={() => update.mutate({ status: 'PAUSED' })} className={quiet}>
-                  Pause
+                  {t('Pause')}
                 </button>
               )}
               {l.status === 'PAUSED' && (
                 <button type="button" disabled={update.isPending} onClick={() => update.mutate({ status: 'ACTIVE' })} className={quiet}>
-                  Resume
+                  {t('Resume')}
                 </button>
               )}
               {confirmRemove ? (
                 <span className="flex items-center gap-2">
-                  <span className="text-sm">Remove this listing?</span>
+                  <span className="text-sm">{t('Remove this listing?')}</span>
                   <button type="button" disabled={remove.isPending} onClick={() => remove.mutate()} className={`${quiet} text-danger`}>
-                    {remove.isPending ? 'Removing…' : 'Remove'}
+                    {remove.isPending ? t('Removing…') : t('Remove')}
                   </button>
                   <button type="button" onClick={() => setConfirmRemove(false)} className="text-sm underline">
-                    Keep it
+                    {t('Keep it')}
                   </button>
                 </span>
               ) : (
                 <button type="button" onClick={() => setConfirmRemove(true)} className="px-2 text-sm text-ink-soft underline">
-                  Remove
+                  {t('Remove')}
                 </button>
               )}
             </div>
           </div>
+          {isLowStock(l) && (
+            <p className="mt-2 text-sm font-semibold text-warn" role="status">
+              {t('Only {n} {unit} left. Add stock before it sells out.', { n: l.qtyAvailable, unit: t(l.unit) })}
+            </p>
+          )}
           {l.qtyAvailable === 0 && l.status !== 'PAUSED' && (
-            <p className="mt-2 text-sm text-ink-soft">Sold out. Add stock to put it back on sale.</p>
+            <p className="mt-2 text-sm text-ink-soft">{t('Sold out. Add stock to put it back on sale.')}</p>
           )}
           {error && (
             <p role="alert" className="mt-2 font-semibold text-danger">

@@ -1,16 +1,23 @@
 import { useEffect, type ReactNode } from 'react'
 import { BrandMark } from '@/components/BrandMark'
+import { LanguageSwitch } from '@/i18n/I18nProvider'
+import { useI18n } from '@/i18n/i18n'
 
 export function AuthShell({ title, intro, children }: { title: string; intro: string; children: ReactNode }) {
+  const { t } = useI18n()
+  const shown = t(title)
   useEffect(() => {
-    document.title = `${title} | Farm Platform`
-  }, [title])
+    document.title = `${shown} | Farm Platform`
+  }, [shown])
   return (
     <div className="mx-auto min-h-dvh max-w-5xl px-4 pt-5 pb-12 sm:px-8">
-      <BrandMark />
+      <div className="flex items-center justify-between">
+        <BrandMark />
+        <LanguageSwitch />
+      </div>
       <div className="card mx-auto mt-8 max-w-lg p-6 sm:mt-14 sm:p-9">
-        <h1 className="font-display text-[2.4rem] leading-[1.05] sm:text-[2.9rem]">{title}</h1>
-        <p className="mt-3 text-ink-soft">{intro}</p>
+        <h1 className="font-display text-[2.4rem] leading-[1.05] sm:text-[2.9rem]">{shown}</h1>
+        <p className="mt-3 text-ink-soft">{t(intro)}</p>
         <div className="mt-7">{children}</div>
       </div>
     </div>
@@ -23,11 +30,12 @@ export function Field({
   hint,
   ...input
 }: { label: string; error?: string; hint?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+  const { t } = useI18n()
   const id = input.id ?? input.name
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-semibold">
-        {label}
+        {t(label)}
       </label>
       <input
         id={id}
@@ -38,12 +46,12 @@ export function Field({
       />
       {hint && !error && (
         <p id={`${id}-hint`} className="mt-1.5 text-sm text-ink-soft">
-          {hint}
+          {t(hint)}
         </p>
       )}
       {error && (
         <p id={`${id}-error`} role="alert" className="mt-1.5 text-sm font-semibold text-danger">
-          {error}
+          {t(error)}
         </p>
       )}
     </div>

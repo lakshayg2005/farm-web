@@ -5,6 +5,11 @@
 @import '@fontsource/instrument-sans/500.css';
 @import '@fontsource/instrument-sans/600.css';
 @import '@fontsource/instrument-sans/700.css';
+/* Instrument has no Devanagari; Mukta covers Hindi and sits behind it in the font stack. */
+@import '@fontsource/mukta/devanagari-400.css';
+@import '@fontsource/mukta/devanagari-500.css';
+@import '@fontsource/mukta/devanagari-600.css';
+@import '@fontsource/mukta/devanagari-700.css';
 
 /* Direction C, "Ledger": a calm, dense operator workspace. Tokens match docs/android-handoff.md section 11. */
 @theme {
@@ -20,8 +25,8 @@
   --color-warn: #b7791f;
   --color-danger: #c2412d;
 
-  --font-display: 'Instrument Serif', Georgia, serif;
-  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Instrument Serif', 'Mukta', Georgia, serif;
+  --font-sans: 'Instrument Sans', 'Mukta', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {

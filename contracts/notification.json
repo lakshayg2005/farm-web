@@ -193,6 +193,8 @@
           "PAYMENT_SUCCEEDED",
           "RESERVATION_ACCEPTED",
           "HARVEST_READY",
+          "LOW_STOCK",
+          "RATING_RECEIVED",
           "SYSTEM"
         ],
         "title": "NotificationType",

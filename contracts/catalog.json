@@ -165,6 +165,23 @@
             "title": "Name",
             "type": "string"
           },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Average score, 1 to 5; null until rated",
+            "title": "Rating"
+          },
+          "ratingCount": {
+            "default": 0,
+            "title": "Ratingcount",
+            "type": "integer"
+          },
           "state": {
             "anyOf": [
               {
@@ -630,6 +647,23 @@
             "title": "Farmname",
             "type": "string"
           },
+          "farmRating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The farm's average score, 1 to 5; null until it has been rated",
+            "title": "Farmrating"
+          },
+          "farmRatingCount": {
+            "default": 0,
+            "title": "Farmratingcount",
+            "type": "integer"
+          },
           "farmerId": {
             "format": "uuid",
             "title": "Farmerid",
@@ -810,6 +844,23 @@
           "farmName": {
             "title": "Farmname",
             "type": "string"
+          },
+          "farmRating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The farm's average score, 1 to 5; null until it has been rated",
+            "title": "Farmrating"
+          },
+          "farmRatingCount": {
+            "default": 0,
+            "title": "Farmratingcount",
+            "type": "integer"
           },
           "farmerId": {
             "format": "uuid",

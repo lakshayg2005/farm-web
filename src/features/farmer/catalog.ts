@@ -24,12 +24,17 @@ export interface Farm {
   district: string
   state: string | null
   location: GeoPoint
+  /** Average score from customers, 1 to 5; null until the farm has been rated */
+  rating?: number | null
+  ratingCount?: number
 }
 
 export interface Listing {
   id: string
   farmId: string
   farmName: string
+  farmRating?: number | null
+  farmRatingCount?: number
   cropId: string
   cropName: string
   variety: string | null
@@ -171,6 +176,11 @@ export const STATUS_TEXT: Record<ListingStatus, { label: string; tone: Tone }> =
   SOLD_OUT: { label: 'Sold out', tone: 'warn' },
   ARCHIVED: { label: 'Removed', tone: 'neutral' },
 }
+
+/** Mirrors the backend line: a listing at or below this is "low" and the farmer is told once. */
+export const LOW_STOCK: Record<Unit, number> = { kg: 10, quintal: 1, dozen: 3, piece: 10, bunch: 10, litre: 10 }
+export const isLowStock = (l: Pick<Listing, 'status' | 'qtyAvailable' | 'unit'>) =>
+  l.status === 'ACTIVE' && l.qtyAvailable > 0 && l.qtyAvailable <= LOW_STOCK[l.unit]
 
 export const rupees = (n: number) => `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
 export const day = (iso: string) =>
