@@ -6,7 +6,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage', 'src/api/generated']),
+  globalIgnores(['dist', 'coverage', 'src/api/generated', 'e2e/results', 'e2e/report']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -19,5 +19,10 @@ export default defineConfig([
       ecmaVersion: 2023,
       globals: globals.browser,
     },
+  },
+  {
+    // Playwright fixtures call `use(...)`, which the React hooks rule mistakes for a hook.
+    files: ['e2e/**/*.ts'],
+    rules: { 'react-hooks/rules-of-hooks': 'off' },
   },
 ])
