@@ -1,18 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { OwnerPhotos } from '@/components/OwnerPhotos'
+import { ListSkeleton, StatusChip, type Tone } from '@/components/ui'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { ApiError } from '@/api/http'
 import { day, landApi, rupees, type CropUpdate, type Reservation } from './land'
 
-const STATUS_TEXT: Record<string, { label: string; tone: string }> = {
-  PENDING: { label: 'Waiting for the farmer', tone: 'bg-amber-100' },
-  ACCEPTED: { label: 'Accepted: deposit due', tone: 'bg-sky-100' },
-  ACTIVE: { label: 'Growing', tone: 'bg-green-100' },
-  HARVEST_READY: { label: 'Harvest ready', tone: 'bg-green-200' },
-  FULFILLING: { label: 'Harvest on its way', tone: 'bg-green-200' },
-  REJECTED: { label: 'Declined', tone: 'bg-neutral-200' },
-  CANCELLED: { label: 'Cancelled', tone: 'bg-neutral-200' },
-  EXPIRED: { label: 'Expired', tone: 'bg-neutral-200' },
+const STATUS_TEXT: Record<string, { label: string; tone: Tone }> = {
+  PENDING: { label: 'Waiting for the farmer', tone: 'warn' },
+  ACCEPTED: { label: 'Accepted: deposit due', tone: 'info' },
+  ACTIVE: { label: 'Growing', tone: 'good' },
+  HARVEST_READY: { label: 'Harvest ready', tone: 'good' },
+  FULFILLING: { label: 'Harvest on its way', tone: 'good' },
+  REJECTED: { label: 'Declined', tone: 'neutral' },
+  CANCELLED: { label: 'Cancelled', tone: 'neutral' },
+  EXPIRED: { label: 'Expired', tone: 'neutral' },
 }
 const STAGE_TEXT = { SOWN: 'Sown', GROWING: 'Growing', FLOWERING: 'Flowering' } as const
 const FOLLOWED = ['ACTIVE', 'HARVEST_READY', 'FULFILLING']
@@ -24,10 +26,10 @@ export function ReservationsPage() {
   const crops = useQuery({ queryKey: ['crops'], queryFn: landApi.crops, staleTime: 3_600_000 })
   const names = new Map((crops.data ?? []).map((c) => [c.id, c.name]))
 
-  if (list.isPending) return <p className="mt-8 text-ink-soft">Loading your reservations…</p>
+  if (list.isPending) return <ListSkeleton label="Loading your reservations" />
   if (list.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-danger">
         Could not load your reservations. Refresh to try again.
       </p>
     )
@@ -35,7 +37,7 @@ export function ReservationsPage() {
     return (
       <p className="mt-8 text-ink-soft">
         No reservations yet.{' '}
-        <Link to="/customer/plots" className="font-semibold text-indigo underline">
+        <Link to="/customer/plots" className="font-semibold text-primary underline">
           Find a plot
         </Link>
       </p>
@@ -55,7 +57,7 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
   const queryClient = useQueryClient()
   const [error, setError] = useState<string>()
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['reservations'] })
-  const status = STATUS_TEXT[r.status] ?? { label: r.status, tone: 'bg-neutral-200' }
+  const status = STATUS_TEXT[r.status] ?? { label: r.status, tone: 'neutral' }
 
   const cancel = useMutation({ mutationFn: () => landApi.cancel(r.id), onSuccess: refresh, onError: (e) => setError(message(e)) })
   const pay = useMutation({
@@ -70,12 +72,12 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
   })
 
   return (
-    <article className="rounded-xl border border-line bg-white p-5">
+    <article className="card p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h2 className="font-display text-xl">
           {cropName}, {r.expectedQtyKg} kg
         </h2>
-        <span className={`rounded-full px-3 py-0.5 text-sm font-semibold ${status.tone}`}>{status.label}</span>
+        <StatusChip tone={status.tone}>{status.label}</StatusChip>
       </div>
       <p className="mt-1 text-sm text-ink-soft">
         {r.total !== null && <>Estimated total {rupees(r.total)}. </>}
@@ -84,7 +86,7 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
 
       {r.status === 'ACCEPTED' && r.deposit !== null && (
         <div className="mt-4">
-          <button type="button" disabled={pay.isPending} onClick={() => pay.mutate()} className="rounded-lg bg-indigo px-4 py-2 font-semibold text-white disabled:opacity-60">
+          <button type="button" disabled={pay.isPending} onClick={() => pay.mutate()} className="btn-primary">
             {pay.isPending ? 'Paying…' : `Pay deposit ${rupees(r.deposit)}`}
           </button>
           <p className="mt-1 text-sm text-ink-soft">Payments are simulated in this project. Pay before {day(r.expiresAt)}.</p>
@@ -99,7 +101,7 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
       {r.status === 'HARVEST_READY' && <HarvestChoice reservationId={r.id} onDone={refresh} />}
       {r.status === 'FULFILLING' && <p className="mt-4">Your harvest order is in progress. Track it under your orders.</p>}
       {error && (
-        <p role="alert" className="mt-3 font-semibold text-red-700">
+        <p role="alert" className="mt-3 font-semibold text-danger">
           {error}
         </p>
       )}
@@ -110,7 +112,7 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
 function Timeline({ reservationId }: { reservationId: string }) {
   const updates = useQuery({ queryKey: ['crop-updates', reservationId], queryFn: () => landApi.updates(reservationId) })
   if (updates.isPending) return <p className="mt-4 text-ink-soft">Loading crop updates…</p>
-  if (updates.isError) return <p className="mt-4 text-red-700">Could not load crop updates.</p>
+  if (updates.isError) return <p className="mt-4 text-danger">Could not load crop updates.</p>
   if (updates.data.length === 0) return <p className="mt-4 text-ink-soft">No updates from the farmer yet. They will appear here.</p>
   return (
     <ol aria-label="Crop updates" className="mt-4 space-y-3 border-l-2 border-line pl-4">
@@ -120,7 +122,11 @@ function Timeline({ reservationId }: { reservationId: string }) {
             {STAGE_TEXT[u.stage]} <span className="font-normal text-ink-soft">· {day(u.createdAt)}</span>
           </p>
           {u.note && <p>{u.note}</p>}
-          {u.mediaIds.length > 0 && <p className="text-sm text-ink-soft">{u.mediaIds.length} photo(s) attached</p>}
+          {u.mediaIds.length > 0 && (
+            <div className="mt-2">
+              <OwnerPhotos ownerType="RESERVATION" ownerId={reservationId} only={u.mediaIds} />
+            </div>
+          )}
         </li>
       ))}
     </ol>
@@ -169,7 +175,7 @@ function HarvestChoice({ reservationId, onDone }: { reservationId: string; onDon
     choose.mutate()
   }
 
-  const input = 'mt-1 w-full rounded-lg border border-line px-3 py-2'
+  const input = 'mt-1 w-full input'
   return (
     <form onSubmit={onSubmit} noValidate className="mt-5 space-y-3 rounded-lg bg-paper p-4">
       <fieldset>
@@ -211,17 +217,17 @@ function HarvestChoice({ reservationId, onDone }: { reservationId: string; onDon
             <span className="font-semibold">Longitude</span>
             <input value={f.lng} onChange={set('lng')} inputMode="decimal" className={input} />
           </label>
-          <button type="button" onClick={useMyLocation} className="text-left font-semibold text-indigo underline sm:col-span-2">
+          <button type="button" onClick={useMyLocation} className="text-left font-semibold text-primary underline sm:col-span-2">
             Use my location
           </button>
         </div>
       )}
       {error && (
-        <p role="alert" className="font-semibold text-red-700">
+        <p role="alert" className="font-semibold text-danger">
           {error}
         </p>
       )}
-      <button type="submit" disabled={choose.isPending} className="rounded-lg bg-indigo px-4 py-2 font-semibold text-white disabled:opacity-60">
+      <button type="submit" disabled={choose.isPending} className="btn-primary">
         {choose.isPending ? 'Saving…' : 'Confirm my choice'}
       </button>
     </form>

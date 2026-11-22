@@ -135,7 +135,7 @@ export function PlotListingPage() {
 
   return (
     <section className="mt-8 max-w-5xl space-y-6">
-      <div className="rounded-xl border border-line bg-white p-4 sm:p-6">
+      <div className="card p-4 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="font-display text-xl">Draw your plot boundary</h2>
@@ -144,51 +144,51 @@ export function PlotListingPage() {
           <span className="rounded-full bg-paper-deep px-3 py-1 text-sm">{boundary ? 'Boundary drawn' : 'No boundary yet'}</span>
         </div>
         <div ref={mapElement} className="mt-4 h-[360px] w-full overflow-hidden rounded-lg border border-line" />
-        {mapError && <p role="alert" className="mt-2 text-sm text-red-700">{mapError}</p>}
+        {mapError && <p role="alert" className="mt-2 text-sm text-danger">{mapError}</p>}
         <p className="mt-2 text-xs text-ink-soft">Map data &copy; OpenStreetMap contributors. The backend checks polygon validity, overlap and area.</p>
       </div>
 
-      <form onSubmit={submit} className="rounded-xl border border-line bg-white p-4 sm:p-6">
+      <form onSubmit={submit} className="card p-4 sm:p-6">
         <h2 className="font-display text-xl">Plot details and growing season</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="grid gap-1 text-sm font-semibold">
             Plot name
-            <input required minLength={2} maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} className="rounded-lg border border-line px-3 py-2 font-normal" placeholder="North field" />
+            <input required minLength={2} maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} className="input font-normal" placeholder="North field" />
           </label>
           <label className="grid gap-1 text-sm font-semibold">
             Soil type
-            <input value={soilType} onChange={(e) => setSoilType(e.target.value)} className="rounded-lg border border-line px-3 py-2 font-normal" placeholder="Black soil" />
+            <input value={soilType} onChange={(e) => setSoilType(e.target.value)} className="input font-normal" placeholder="Black soil" />
           </label>
           <label className="grid gap-1 text-sm font-semibold">
             Water source
-            <input value={waterSource} onChange={(e) => setWaterSource(e.target.value)} className="rounded-lg border border-line px-3 py-2 font-normal" placeholder="Borewell, canal, rain-fed..." />
+            <input value={waterSource} onChange={(e) => setWaterSource(e.target.value)} className="input font-normal" placeholder="Borewell, canal, rain-fed..." />
           </label>
           <label className="grid gap-1 text-sm font-semibold">
             Season
-            <select value={season} onChange={(e) => setSeason(e.target.value)} className="rounded-lg border border-line px-3 py-2 font-normal">
+            <select value={season} onChange={(e) => setSeason(e.target.value)} className="input font-normal">
               <option>Kharif</option><option>Rabi</option><option>Zaid</option><option>Summer</option><option>Winter</option>
             </select>
           </label>
           <label className="grid gap-1 text-sm font-semibold">
             Season start
-            <input required type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="rounded-lg border border-line px-3 py-2 font-normal" />
+            <input required type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="input font-normal" />
           </label>
           <label className="grid gap-1 text-sm font-semibold">
             Season end
-            <input required type="date" min={startDate || undefined} value={endDate} onChange={(e) => setEndDate(e.target.value)} className="rounded-lg border border-line px-3 py-2 font-normal" />
+            <input required type="date" min={startDate || undefined} value={endDate} onChange={(e) => setEndDate(e.target.value)} className="input font-normal" />
           </label>
           <label className="grid gap-1 text-sm font-semibold">
             Season price (INR)
-            <input required type="number" min="0.01" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-lg border border-line px-3 py-2 font-normal" placeholder="12000" />
+            <input required type="number" min="0.01" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} className="input font-normal" placeholder="12000" />
           </label>
           <label className="grid gap-1 text-sm font-semibold">
             Allowed crops
-            <input value={crops} onChange={(e) => setCrops(e.target.value)} className="rounded-lg border border-line px-3 py-2 font-normal" placeholder="rice, maize, soybean" />
+            <input value={crops} onChange={(e) => setCrops(e.target.value)} className="input font-normal" placeholder="rice, maize, soybean" />
             <span className="font-normal text-xs text-ink-soft">Separate crop IDs with commas.</span>
           </label>
           <label className="grid gap-1 text-sm font-semibold sm:col-span-2">
             Plot photo (optional)
-            <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} className="rounded-lg border border-line px-3 py-2 font-normal" />
+            <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} className="input font-normal" />
             <span className="font-normal text-xs text-ink-soft">JPEG, PNG or WebP, up to 5 MB. Uploaded securely through the media service.</span>
           </label>
         </div>

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ListSkeleton, StatusChip } from '@/components/ui'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { ApiError } from '@/api/http'
@@ -15,8 +16,8 @@ import {
 } from './reservations'
 
 const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not reach the server. Try again.')
-const primary = 'rounded-lg bg-indigo px-4 py-2 font-semibold text-white hover:bg-indigo/90 disabled:opacity-60'
-const quiet = 'rounded-lg border border-line bg-white px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
+const primary = 'btn-primary'
+const quiet = 'btn-secondary hover:border-ink-soft disabled:opacity-60'
 
 /** Re-renders every `ms` so countdowns stay current. */
 function useNow(ms: number) {
@@ -35,10 +36,10 @@ export function RequestsPage() {
   const crops = useQuery({ queryKey: ['crops'], queryFn: landApi.crops, staleTime: 3_600_000 })
   const cropName = (id: string) => crops.data?.find((c) => c.id === id)?.name ?? id
 
-  if (reservations.isPending) return <p className="mt-8 text-ink-soft">Loading reservation requests…</p>
+  if (reservations.isPending) return <ListSkeleton label="Loading reservation requests" />
   if (reservations.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-danger">
         Could not load reservation requests. Refresh to try again.
       </p>
     )
@@ -46,12 +47,12 @@ export function RequestsPage() {
   const all = reservations.data
   if (all.length === 0)
     return (
-      <div className="mt-8 max-w-xl rounded-xl border border-dashed border-line bg-white/60 p-6">
+      <div className="mt-8 max-w-xl card border-dashed p-6">
         <h2 className="text-lg font-semibold">No reservation requests yet</h2>
         <p className="mt-1 text-ink-soft">
           Customers find your plots on the map when a season is open. Each request waits 48 hours for your answer.
         </p>
-        <Link to="/farmer/plots" className="mt-3 inline-block font-semibold text-indigo underline">
+        <Link to="/farmer/plots" className="mt-3 inline-block font-semibold text-primary underline">
           Add a plot and season
         </Link>
       </div>
@@ -103,7 +104,7 @@ export function RequestsPage() {
       {past.length > 0 && (
         <details className="group">
           <summary className="cursor-pointer font-semibold text-ink-soft hover:text-ink">Past requests ({past.length})</summary>
-          <ul className="mt-3 divide-y divide-line rounded-xl border border-line bg-white">
+          <ul className="mt-3 divide-y divide-line card">
             {past.map((r) => {
               const s = info(r)
               return (
@@ -155,7 +156,7 @@ function RequestCard({
   const busy = accept.isPending || reject.isPending
 
   return (
-    <article className="rounded-xl border border-line bg-white p-4 sm:p-5">
+    <article className="card p-4 sm:p-5">
       <h3 className="font-display text-xl leading-tight">
         {cropName}, {r.expectedQtyKg} kg
       </h3>
@@ -164,13 +165,13 @@ function RequestCard({
       {r.total !== null && <p className="mt-1">Estimated value {rupees(r.total)}</p>}
 
       <div className="mt-4">
-        <p className={`text-sm font-semibold ${urgent ? 'text-red-700' : ''}`}>
+        <p className={`text-sm font-semibold ${urgent ? 'text-danger' : ''}`}>
           {timeLeft(r.expiresAt, now)} to answer
           <span className="font-normal text-ink-soft">, until {new Date(r.expiresAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}</span>
         </p>
         <div aria-hidden="true" className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-paper-deep">
           <div
-            className={`h-full origin-left rounded-full transition-transform duration-300 ${urgent ? 'bg-red-600' : 'bg-[var(--role)]'}`}
+            className={`h-full origin-left rounded-full transition-transform duration-300 ${urgent ? 'bg-danger' : 'bg-[var(--color-primary)]'}`}
             style={{ transform: `scaleX(${left})` }}
           />
         </div>
@@ -180,7 +181,7 @@ function RequestCard({
         {confirmDecline ? (
           <>
             <span>Decline this request? The customer is told and the season opens again.</span>
-            <button type="button" disabled={busy} onClick={() => reject.mutate()} className={`${quiet} text-red-700`}>
+            <button type="button" disabled={busy} onClick={() => reject.mutate()} className={`${quiet} text-danger`}>
               {reject.isPending ? 'Declining…' : 'Decline'}
             </button>
             <button type="button" onClick={() => setConfirmDecline(false)} className="underline">
@@ -199,7 +200,7 @@ function RequestCard({
         )}
       </div>
       {error && (
-        <p role="alert" className="mt-3 font-semibold text-red-700">
+        <p role="alert" className="mt-3 font-semibold text-danger">
           {error}
         </p>
       )}
@@ -210,12 +211,12 @@ function RequestCard({
 function AgreementCard({ reservation: r, info, cropName }: { reservation: Reservation; info: SeasonInfo | undefined; cropName: string }) {
   const status = AGREEMENT_TEXT[r.status] ?? { label: r.status, next: '' }
   return (
-    <article className="rounded-xl border border-line bg-white p-4 sm:p-5">
+    <article className="card p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h3 className="font-display text-xl leading-tight">
           {cropName}, {r.expectedQtyKg} kg
         </h3>
-        <span className="rounded-full bg-[color-mix(in_oklab,var(--role)_22%,white)] px-3 py-0.5 text-sm font-semibold">{status.label}</span>
+        <StatusChip tone="good">{status.label}</StatusChip>
       </div>
       <p className="mt-0.5 font-semibold">{info ? `${info.plotTitle}, ${info.areaAcres} acres` : 'One of your plots'}</p>
       <SeasonLine info={info} />
@@ -235,7 +236,7 @@ function AgreementCard({ reservation: r, info, cropName }: { reservation: Reserv
       </dl>
       <p className="mt-3 text-ink-soft">{status.next}</p>
       {(r.status === 'ACTIVE' || r.status === 'HARVEST_READY') && (
-        <Link to="/farmer/crops" className="mt-2 inline-block font-semibold text-indigo underline">
+        <Link to="/farmer/crops" className="mt-2 inline-block font-semibold text-primary underline">
           Open crop updates
         </Link>
       )}

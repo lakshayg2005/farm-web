@@ -1,16 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router'
+import { Figure } from '@/components/ui'
 import { adminApi, passRate, todayISO, totalSavedKm } from './admin'
 
-function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-xl border border-line bg-white p-5">
-      <p className="text-sm text-ink-soft">{label}</p>
-      <p className="mt-1 font-display text-4xl">{value}</p>
-      {hint && <p className="mt-1 text-sm text-ink-soft">{hint}</p>}
-    </div>
-  )
-}
+const Tile = Figure
 
 /** Each number comes from the service that owns it; one that is down shows a dash instead of breaking the page. */
 export function DashboardPage() {
@@ -22,7 +15,7 @@ export function DashboardPage() {
   const count = (q: typeof waiting) => (q.data ? String(q.data.items.length) : '–')
   const rate = inspections.data ? passRate(inspections.data) : null
   return (
-    <div className="mt-8 grid max-w-3xl gap-4 sm:grid-cols-2">
+    <div className="mt-8 grid max-w-4xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <Tile label="Farmers waiting to be verified" value={count(waiting)} />
       <Tile label="Verified farmers" value={count(verified)} />
       <Tile
@@ -35,12 +28,12 @@ export function DashboardPage() {
         value={pools.data ? `${totalSavedKm(pools.data)} km` : '–'}
         hint={pools.data ? `${pools.data.length} pools` : undefined}
       />
-      <p className="text-ink-soft sm:col-span-2">
-        <Link to="/admin/verification" className="font-semibold text-indigo underline">
+      <p className="text-ink-soft sm:col-span-2 lg:col-span-4">
+        <Link to="/admin/verification" className="font-semibold text-primary underline">
           Review farmers
         </Link>{' '}
         ·{' '}
-        <Link to="/admin/pooling" className="font-semibold text-indigo underline">
+        <Link to="/admin/pooling" className="font-semibold text-primary underline">
           Run pooling
         </Link>
       </p>

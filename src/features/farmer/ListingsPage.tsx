@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ListSkeleton, StatusChip } from '@/components/ui'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef, useState, type FormEvent } from 'react'
 import { ApiError } from '@/api/http'
@@ -27,9 +28,9 @@ const message = (e: unknown) =>
   e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not reach the server. Try again.'
 
 const input =
-  'mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 font-normal disabled:bg-paper disabled:text-ink-soft'
-const primary = 'rounded-lg bg-indigo px-4 py-2 font-semibold text-white hover:bg-indigo/90 disabled:opacity-60'
-const quiet = 'rounded-lg border border-line bg-white px-3 py-1.5 font-semibold hover:border-ink-soft disabled:opacity-60'
+  'mt-1 w-full input font-normal disabled:bg-paper disabled:text-ink-soft'
+const primary = 'btn-primary'
+const quiet = 'btn-secondary min-h-9 px-3 py-1.5'
 const panel = { initial: { opacity: 0, y: -8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: 0.2 } }
 
 /** Order: on sale first, then sold out, then paused; newest change first within each. */
@@ -43,10 +44,10 @@ export function ListingsPage() {
   const [notice, setNotice] = useState<string>()
   const [editorError, setEditorError] = useState<string>()
 
-  if (farms.isPending) return <p className="mt-8 text-ink-soft">Loading your farms…</p>
+  if (farms.isPending) return <ListSkeleton label="Loading your farms" />
   if (farms.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-700">
+      <p role="alert" className="mt-8 font-semibold text-danger">
         Could not load your farms. Refresh to try again.
       </p>
     )
@@ -62,7 +63,7 @@ export function ListingsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-ink-soft" role="status">
           {listings.isSuccess && (live.length === 0 ? 'Nothing listed yet.' : `${onSale} of ${live.length} listings on sale.`)}
-          {notice && <span className="ml-2 font-semibold text-leaf">{notice}</span>}
+          {notice && <span className="ml-2 font-semibold text-primary">{notice}</span>}
         </p>
         {editing === null && (
           <button
@@ -108,12 +109,12 @@ export function ListingsPage() {
       {listings.isPending ? (
         <p className="text-ink-soft">Loading your listings…</p>
       ) : listings.isError ? (
-        <p role="alert" className="font-semibold text-red-700">
+        <p role="alert" className="font-semibold text-danger">
           Could not load your listings. Refresh to try again.
         </p>
       ) : live.length === 0 ? (
         editing === null && (
-          <div className="rounded-xl border border-dashed border-line bg-white/60 p-6">
+          <div className="card border-dashed p-6">
             <h2 className="text-lg font-semibold">Put your first produce up for sale</h2>
             <p className="mt-1 text-ink-soft">
               Add the crop, how much you have, your price and a photo taken at the farm. Customers nearby see it straight away.
@@ -166,7 +167,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
   }
 
   return (
-    <article className="rounded-xl border border-line bg-white p-4 sm:p-5">
+    <article className="card p-4 sm:p-5">
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="sm:w-60 sm:shrink-0">
           {l.mediaIds.length > 0 ? (
@@ -181,7 +182,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
               {l.cropName}
               {l.variety && <span className="text-ink-soft">, {l.variety}</span>}
             </h2>
-            <span className={`rounded-full px-3 py-0.5 text-sm font-semibold ${status.tone}`}>{status.label}</span>
+            <StatusChip tone={status.tone}>{status.label}</StatusChip>
           </div>
           <p className="mt-1 text-ink-soft">
             <span className="font-semibold text-ink">
@@ -203,7 +204,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
                   inputMode="decimal"
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
-                  className="mt-1 block w-28 rounded-lg border border-line px-3 py-1.5 font-normal"
+                  className="mt-1 block w-28 input font-normal"
                 />
               </label>
               {stockChanged && (
@@ -229,7 +230,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
               {confirmRemove ? (
                 <span className="flex items-center gap-2">
                   <span className="text-sm">Remove this listing?</span>
-                  <button type="button" disabled={remove.isPending} onClick={() => remove.mutate()} className={`${quiet} text-red-700`}>
+                  <button type="button" disabled={remove.isPending} onClick={() => remove.mutate()} className={`${quiet} text-danger`}>
                     {remove.isPending ? 'Removing…' : 'Remove'}
                   </button>
                   <button type="button" onClick={() => setConfirmRemove(false)} className="text-sm underline">
@@ -247,7 +248,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
             <p className="mt-2 text-sm text-ink-soft">Sold out. Add stock to put it back on sale.</p>
           )}
           {error && (
-            <p role="alert" className="mt-2 font-semibold text-red-700">
+            <p role="alert" className="mt-2 font-semibold text-danger">
               {error}
             </p>
           )}
@@ -379,7 +380,7 @@ function ListingEditor({
 
   const title = listing ? `Edit ${listing.cropName}` : 'Add a listing'
   return (
-    <form onSubmit={submit} noValidate className="rounded-xl border border-line bg-white p-4 sm:p-6" aria-label={title}>
+    <form onSubmit={submit} noValidate className="card p-4 sm:p-6" aria-label={title}>
       <h2 className="font-display text-2xl">{title}</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {farms.length > 1 && (
@@ -435,7 +436,7 @@ function ListingEditor({
           <input type="date" value={f.harvestDate} onChange={set('harvestDate')} className={input} />
         </label>
         <label className="flex items-center gap-3 self-end pb-2 font-semibold">
-          <input type="checkbox" checked={f.isOrganic} onChange={(e) => setF({ ...f, isOrganic: e.target.checked })} className="size-5 accent-leaf" />
+          <input type="checkbox" checked={f.isOrganic} onChange={(e) => setF({ ...f, isOrganic: e.target.checked })} className="size-5 accent-primary" />
           Grown organically
         </label>
         <label className="font-semibold sm:col-span-2">
@@ -485,7 +486,7 @@ function ListingEditor({
       </div>
 
       {error && (
-        <p role="alert" className="mt-4 font-semibold text-red-700">
+        <p role="alert" className="mt-4 font-semibold text-danger">
           {error}
         </p>
       )}
@@ -529,7 +530,7 @@ function FarmSetup() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="mt-8 max-w-2xl rounded-xl border border-line bg-white p-4 sm:p-6" aria-label="Add your farm">
+    <form onSubmit={submit} noValidate className="mt-8 max-w-2xl card p-4 sm:p-6" aria-label="Add your farm">
       <h2 className="font-display text-2xl">Add your farm first</h2>
       <p className="mt-1 text-ink-soft">
         Produce is picked up from your farm gate, and photos are checked against its location. You only do this once.
@@ -561,13 +562,13 @@ function FarmSetup() {
             Longitude
             <input value={f.lng} onChange={set('lng')} inputMode="decimal" placeholder="81.63" className={input} />
           </label>
-          <button type="button" onClick={useMyLocation} className="justify-self-start font-semibold text-indigo underline sm:col-span-2">
+          <button type="button" onClick={useMyLocation} className="justify-self-start font-semibold text-primary underline sm:col-span-2">
             Use my location
           </button>
         </fieldset>
       </div>
       {error && (
-        <p role="alert" className="mt-4 font-semibold text-red-700">
+        <p role="alert" className="mt-4 font-semibold text-danger">
           {error}
         </p>
       )}

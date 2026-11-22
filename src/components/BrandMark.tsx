@@ -2,10 +2,10 @@ import { Link } from 'react-router'
 
 export function BrandMark({ className = '' }: { className?: string }) {
   return (
-    <Link to="/" className={`inline-flex items-center gap-2.5 font-display text-lg leading-none ${className}`}>
-      <svg viewBox="0 0 32 32" className="size-7 shrink-0 rounded-md" aria-hidden="true">
-        <rect width="32" height="32" fill="var(--color-indigo)" />
-        <path d="M-4 30 30-4M2 36 36 2M-10 24 24-10" stroke="var(--color-mustard)" strokeWidth="3.2" />
+    <Link to="/" className={`inline-flex items-center gap-2.5 text-lg leading-none font-bold ${className}`}>
+      <svg viewBox="0 0 26 26" className="size-[26px] shrink-0" aria-hidden="true">
+        <rect width="26" height="26" rx="6" fill="var(--color-ink)" />
+        <path d="M7 18V8m6 10v-6m6 6V10" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
       </svg>
       Farm Platform
     </Link>

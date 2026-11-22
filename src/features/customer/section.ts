@@ -7,7 +7,6 @@ export const customerSection: Section = {
   role: 'customer',
   label: 'Customer',
   audience: 'Find farmland near you, reserve a plot and follow your crop.',
-  accent: 'var(--color-indigo)',
   pages: [
     {
       path: 'plots',

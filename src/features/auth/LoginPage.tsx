@@ -40,7 +40,7 @@ export function LoginPage() {
         <Field label="Phone number" name="phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} error={errors.phone} />
         <Field label="Password" name="password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} />
         {errors.form && (
-          <p role="alert" className="font-semibold text-red-700">
+          <p role="alert" className="font-semibold text-danger">
             {errors.form}
           </p>
         )}
@@ -50,7 +50,7 @@ export function LoginPage() {
       </form>
       <p className="mt-6 text-ink-soft">
         New here?{' '}
-        <Link to="/register" className="font-semibold text-indigo underline">
+        <Link to="/register" className="font-semibold text-primary underline">
           Create an account
         </Link>
       </p>

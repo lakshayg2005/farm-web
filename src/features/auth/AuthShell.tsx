@@ -1,23 +1,17 @@
 import { useEffect, type ReactNode } from 'react'
 import { BrandMark } from '@/components/BrandMark'
-import { CropRows } from '@/components/CropRows'
 
 export function AuthShell({ title, intro, children }: { title: string; intro: string; children: ReactNode }) {
   useEffect(() => {
     document.title = `${title} | Farm Platform`
   }, [title])
   return (
-    <div className="mx-auto grid min-h-dvh max-w-5xl content-start gap-10 px-4 pt-6 pb-12 sm:px-8 lg:grid-cols-[1fr_24rem] lg:pt-10">
-      <div className="lg:col-span-2">
-        <BrandMark />
-      </div>
-      <div className="max-w-md">
-        <h1 className="font-display text-[2.2rem] leading-[1.1]">{title}</h1>
+    <div className="mx-auto min-h-dvh max-w-5xl px-4 pt-5 pb-12 sm:px-8">
+      <BrandMark />
+      <div className="card mx-auto mt-8 max-w-lg p-6 sm:mt-14 sm:p-9">
+        <h1 className="font-display text-[2.4rem] leading-[1.05] sm:text-[2.9rem]">{title}</h1>
         <p className="mt-3 text-ink-soft">{intro}</p>
-        <div className="mt-8">{children}</div>
-      </div>
-      <div className="relative hidden min-h-64 overflow-hidden rounded-xl lg:block" style={{ '--role': 'var(--color-leaf)' } as React.CSSProperties}>
-        <CropRows className="absolute inset-0" />
+        <div className="mt-7">{children}</div>
       </div>
     </div>
   )
@@ -32,23 +26,23 @@ export function Field({
   const id = input.id ?? input.name
   return (
     <div>
-      <label htmlFor={id} className="block font-semibold">
+      <label htmlFor={id} className="block text-sm font-semibold">
         {label}
       </label>
       <input
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2.5"
+        className={`input mt-1.5 ${error ? 'border-danger' : ''}`}
         {...input}
       />
       {hint && !error && (
-        <p id={`${id}-hint`} className="mt-1 text-sm text-ink-soft">
+        <p id={`${id}-hint`} className="mt-1.5 text-sm text-ink-soft">
           {hint}
         </p>
       )}
       {error && (
-        <p id={`${id}-error`} role="alert" className="mt-1 text-sm font-semibold text-red-700">
+        <p id={`${id}-error`} role="alert" className="mt-1.5 text-sm font-semibold text-danger">
           {error}
         </p>
       )}
@@ -56,5 +50,4 @@ export function Field({
   )
 }
 
-export const primaryButton =
-  'w-full rounded-lg bg-indigo px-4 py-2.5 font-semibold text-white transition-opacity disabled:opacity-60'
+export const primaryButton = 'btn-primary w-full min-h-12 text-base'

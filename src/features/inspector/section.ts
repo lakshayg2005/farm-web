@@ -6,7 +6,6 @@ export const inspectorSection: Section = {
   role: 'inspector',
   label: 'Inspector',
   audience: 'Check packed produce and harvests, then grade them with photos.',
-  accent: 'var(--color-leaf)',
   pages: [
     {
       path: 'inspections',

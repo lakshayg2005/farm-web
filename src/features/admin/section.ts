@@ -8,7 +8,6 @@ export const adminSection: Section = {
   role: 'admin',
   label: 'Admin',
   audience: 'Verify farmers, plan delivery pools and watch the platform.',
-  accent: 'var(--color-soil)',
   pages: [
     {
       path: 'dashboard',

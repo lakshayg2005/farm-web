@@ -1,52 +1,67 @@
 @import 'tailwindcss';
 
-@import '@fontsource/young-serif/400.css';
-@import '@fontsource/mukta/400.css';
-@import '@fontsource/mukta/500.css';
-@import '@fontsource/mukta/600.css';
-@import '@fontsource/mukta/700.css';
+@import '@fontsource/instrument-serif/400.css';
+@import '@fontsource/instrument-sans/400.css';
+@import '@fontsource/instrument-sans/500.css';
+@import '@fontsource/instrument-sans/600.css';
+@import '@fontsource/instrument-sans/700.css';
 
+/* Direction C, "Ledger": a calm, dense operator workspace. Tokens match docs/android-handoff.md section 11. */
 @theme {
-  --color-paper: #f5f6f1;
-  --color-paper-deep: #ebede4;
-  --color-ink: #1c2620;
-  --color-ink-soft: #4b5751;
-  --color-line: #d6dace;
-  --color-indigo: #2e3a87;
-  --color-mustard: #d9a404;
-  --color-leaf: #3d7a4a;
-  --color-soil: #7a5230;
+  --color-paper: #f2f4f5;
+  --color-paper-deep: #e6e9eb;
+  --color-ink: #171a1d;
+  --color-ink-soft: #4b5258;
+  --color-line: #dfe3e6;
+  --color-line-strong: #c9cfd4;
+  --color-primary: #1d7a4d;
+  --color-primary-deep: #166039;
+  --color-focus: #2f5fd0;
+  --color-warn: #b7791f;
+  --color-danger: #c2412d;
 
-  --font-display: 'Young Serif', Georgia, serif;
-  --font-sans: 'Mukta', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
   html {
-    font-size: 106.25%; /* 17px: Mukta sets small */
     -webkit-text-size-adjust: 100%;
   }
 
   body {
     @apply bg-paper font-sans text-ink antialiased;
-    line-height: 1.55;
+    line-height: 1.5;
+  }
+
+  h1,
+  h2 {
+    text-wrap: balance;
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-indigo);
+    outline: 3px solid var(--color-focus);
     outline-offset: 2px;
     border-radius: 4px;
   }
 }
 
-/* Signature detail: furrowed field rows, seen from above, in the section's colour. */
-@utility crop-rows {
-  background-color: color-mix(in oklab, var(--role) 22%, var(--color-paper));
-  background-image: repeating-linear-gradient(
-    var(--rows-angle, -58deg),
-    var(--role) 0 5px,
-    transparent 5px 9px,
-    color-mix(in oklab, var(--role) 55%, var(--color-paper)) 9px 11px,
-    transparent 11px 16px
-  );
+/* Shared component classes: buttons, inputs and cards look the same on every screen. */
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 font-semibold transition-[background-color,opacity,transform] duration-150 disabled:cursor-not-allowed disabled:opacity-60 active:enabled:translate-y-px;
+}
+@utility btn-primary {
+  @apply btn bg-primary text-white hover:enabled:bg-primary-deep;
+}
+@utility btn-secondary {
+  @apply btn border border-line-strong bg-white text-ink hover:enabled:bg-paper;
+}
+@utility btn-danger {
+  @apply btn border border-line-strong bg-white text-danger hover:enabled:bg-paper;
+}
+@utility input {
+  @apply min-h-11 w-full rounded-lg border-[1.5px] border-line-strong bg-white px-3 py-2 text-ink placeholder:text-ink-soft/70;
+}
+@utility card {
+  @apply rounded-xl border border-line bg-white;
 }

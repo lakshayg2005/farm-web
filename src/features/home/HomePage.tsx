@@ -1,19 +1,24 @@
-import { useEffect, type CSSProperties } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router'
 import { BrandMark } from '@/components/BrandMark'
-import { CropRows } from '@/components/CropRows'
+import { StatusRail } from '@/components/ui'
 import { useAuth } from '@/features/auth/authContext'
 import { homePathFor } from '@/features/auth/roles'
+import { STAGES } from '@/features/farmer/orders'
 import { sections } from '@/routes/sections'
-import type { Role } from '@/routes/types'
 
-/** Each section is drawn as a field in an aerial patchwork: its own size and furrow angle. */
-const fieldShape: Record<Role, { area: string; angle: string }> = {
-  farmer: { area: 'lg:col-span-4 lg:row-span-2', angle: '-58deg' },
-  customer: { area: 'lg:col-span-2 lg:row-span-2', angle: '24deg' },
-  inspector: { area: 'lg:col-span-3', angle: '90deg' },
-  admin: { area: 'lg:col-span-3', angle: '-24deg' },
-}
+/** An example order, to show what "one clear status" means. The real thing lives on the Orders pages. */
+const EXAMPLE: readonly (readonly [string, string])[] = [
+  ['Customer', 'Thu 7:12 pm'],
+  ['Payment taken', 'Thu 7:12 pm'],
+  ['Farmer', 'Sat 6:40 am'],
+  ['Inspector, grade A', 'Sat 9:05 am'],
+  ['System', 'Sat 9:05 am'],
+  ['Shared route with 4 stops', ''],
+  ['Delivery partner', ''],
+  ['Photo and OTP', ''],
+]
+const DONE = 4
 
 export function HomePage() {
   const { user, logout } = useAuth()
@@ -22,70 +27,100 @@ export function HomePage() {
   }, [])
 
   return (
-    <div className="mx-auto min-h-dvh max-w-6xl px-4 pt-6 pb-12 sm:px-8 lg:pt-10">
-      <div className="flex items-center justify-between gap-4">
+    <div className="mx-auto min-h-dvh max-w-6xl px-4 pb-14 sm:px-8 lg:px-10">
+      <header className="flex flex-wrap items-center gap-x-7 gap-y-3 py-5">
         <BrandMark />
-        {user ? (
-          <p className="flex items-center gap-4">
-            <Link to={homePathFor(user)} className="font-semibold">
-              {user.name}
-            </Link>
-            <button type="button" onClick={() => void logout()} className="text-ink-soft underline">
-              Sign out
-            </button>
-          </p>
-        ) : (
-          <p className="flex items-center gap-4">
-            <Link to="/login" className="font-semibold">
-              Sign in
-            </Link>
-            <Link to="/register" className="rounded-lg bg-indigo px-3 py-1.5 font-semibold text-white">
-              Register
-            </Link>
-          </p>
-        )}
-      </div>
+        <nav aria-label="Site" className="ml-auto flex items-center gap-5 text-[0.95rem] font-medium">
+          <Link to="/team" className="hover:text-primary">
+            Team
+          </Link>
+          {user ? (
+            <>
+              <Link to={homePathFor(user)} className="font-semibold hover:text-primary">
+                {user.name}
+              </Link>
+              <button type="button" onClick={() => void logout()} className="text-ink-soft hover:text-ink">
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="font-semibold hover:text-primary">
+                Sign in
+              </Link>
+              <Link to="/register" className="btn-primary min-h-10 px-4 py-1.5">
+                Register
+              </Link>
+            </>
+          )}
+        </nav>
+      </header>
 
-      <div className="mt-12 grid gap-10 lg:mt-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
-        <header className="max-w-md lg:pt-4">
-          <h1 className="font-display text-[2.6rem] leading-[1.05] sm:text-[3.4rem]">
-            From the farmer’s field to your table
-          </h1>
-          <p className="mt-5 text-lg text-ink-soft">
-            Farmers sell fresh produce and rent out plots of their land. Customers buy produce, or reserve a plot and
-            follow their crop until harvest.
+      <section className="grid gap-6 pt-6 pb-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-8 lg:pt-10">
+        <div className="card p-6 sm:p-9">
+          <h1 className="font-display text-[2.6rem] leading-[1.03] sm:text-[3.2rem]">From the farmer’s field to your table</h1>
+          <p className="mt-4 max-w-md text-ink-soft">
+            Farmers sell fresh produce and rent out plots of their land. Customers buy produce, or reserve a plot and follow
+            their crop until harvest. One account for selling, buying, inspecting and running deliveries.
           </p>
-          <p className="mt-8 font-semibold">Choose your section to get started.</p>
-        </header>
-
-        <nav aria-label="Sections">
-          <ul className="grid gap-3 lg:auto-rows-[11rem] lg:grid-cols-6">
-            {sections.map((section, i) => {
-              const shape = fieldShape[section.role]
-              return (
-                <li key={section.role} className={shape.area}>
+          <h2 className="mt-8 text-lg font-bold">Choose your workspace</h2>
+          <nav aria-label="Sections">
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+              {sections.map((section) => (
+                <li key={section.role}>
                   <Link
                     to={`/${section.role}`}
-                    style={{ '--role': section.accent, '--rows-angle': shape.angle } as CSSProperties}
-                    className="group relative flex h-full min-h-36 flex-col justify-end overflow-hidden rounded-xl bg-paper-deep p-3"
+                    className="group block h-full rounded-lg border border-line-strong bg-white px-4 py-3 transition-colors duration-150 hover:border-ink hover:bg-paper"
                   >
-                    <CropRows delay={0.1 + i * 0.12} className="absolute inset-0" />
-                    <span className="relative block max-w-xs rounded-lg bg-paper/95 px-4 py-3 shadow-[0_1px_0_var(--color-line)] transition-transform duration-200 group-hover:-translate-y-0.5">
-                      <span className="block font-display text-xl leading-tight">{section.label}</span>
-                      <span className="mt-0.5 block text-[0.94rem] leading-snug text-ink-soft">{section.audience}</span>
+                    <span className="flex items-center justify-between font-bold">
+                      {section.label}
+                      <span aria-hidden="true" className="text-ink-soft transition-transform duration-150 group-hover:translate-x-0.5">
+                        →
+                      </span>
                     </span>
+                    <span className="mt-0.5 block text-sm leading-snug text-ink-soft">{section.audience}</span>
                   </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+
+        <div className="card p-6 sm:p-9">
+          <h2 className="text-lg font-bold">Every order has one clear status</h2>
+          <p className="mt-1 text-ink-soft">Example: tomato 12 kg and brinjal 5 kg, due Sunday.</p>
+          <div className="mt-5">
+            <StatusRail stage={DONE} label={`Stage ${DONE} of ${STAGES.length}: ${STAGES[DONE - 1]}`} />
+          </div>
+          <ol className="mt-6">
+            {STAGES.map((name, i) => {
+              const done = i < DONE
+              const current = i === DONE
+              return (
+                <li key={name} className="flex min-h-[3.1rem] gap-4">
+                  <div className="flex flex-col items-center">
+                    <span
+                      aria-hidden="true"
+                      className={`size-4 shrink-0 rounded-full border-2 ${done ? 'border-primary bg-primary' : current ? 'border-primary bg-white' : 'border-line-strong bg-white'}`}
+                    />
+                    {i < STAGES.length - 1 && <span aria-hidden="true" className={`w-0.5 flex-1 ${done ? 'bg-primary' : 'bg-line'}`} />}
+                  </div>
+                  <div className="-mt-0.5 flex flex-1 flex-wrap justify-between gap-x-3 pb-3">
+                    <div>
+                      <p className={current ? 'font-bold' : 'font-medium'}>
+                        {name}
+                        {current && <span className="sr-only"> (current stage)</span>}
+                      </p>
+                      <p className="text-sm text-ink-soft">{EXAMPLE[i]?.[0]}</p>
+                    </div>
+                    <p className="text-sm whitespace-nowrap text-ink-soft">{EXAMPLE[i]?.[1]}</p>
+                  </div>
                 </li>
               )
             })}
-          </ul>
-        </nav>
-      </div>
-      <p className="mt-12 text-center text-ink-soft">
-        <Link to="/team" className="font-semibold text-indigo underline">
-          Meet the team
-        </Link>
-      </p>
+          </ol>
+        </div>
+      </section>
     </div>
   )
 }

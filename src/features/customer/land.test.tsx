@@ -148,11 +148,19 @@ describe('my reservations', () => {
           { id: 'u1', stage: 'SOWN', note: 'Seeds in the ground', mediaIds: [], createdAt: '2026-07-01T08:00:00Z' },
           { id: 'u2', stage: 'FLOWERING', note: null, mediaIds: ['m1', 'm2'], createdAt: '2026-08-20T08:00:00Z' },
         ]),
+      'GET /media/owners/RESERVATION/r1': () =>
+        jsonResponse({
+          items: ['m1', 'm2'].map((id) => ({
+            id, ownerType: 'RESERVATION', ownerId: 'r1', status: 'READY', url: `http://img.test/${id}`, thumbUrl: `http://img.test/${id}-t`,
+            gpsVerified: true, gpsDistanceM: 10,
+          })),
+          nextCursor: null,
+        }),
     })
     renderAt('/customer/reservations')
     const timeline = await screen.findByRole('list', { name: 'Crop updates' })
     expect(within(timeline).getByText('Seeds in the ground')).toBeInTheDocument()
-    expect(within(timeline).getByText('2 photo(s) attached')).toBeInTheDocument()
+    expect(await within(timeline).findByRole('list', { name: 'Photos' })).toBeInTheDocument()
   })
 
   it('sends a buy-back choice without an address', async () => {

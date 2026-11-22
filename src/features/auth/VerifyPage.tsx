@@ -71,7 +71,7 @@ export function VerifyPage() {
         </button>
       </form>
       <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-ink-soft">
-        <button type="button" onClick={resend} disabled={wait > 0} className="font-semibold text-indigo underline disabled:text-ink-soft disabled:no-underline">
+        <button type="button" onClick={resend} disabled={wait > 0} className="font-semibold text-primary underline disabled:text-ink-soft disabled:no-underline">
           {wait > 0 ? `Send a new code in ${wait}s` : 'Send a new code'}
         </button>
         {user && (

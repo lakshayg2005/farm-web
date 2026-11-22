@@ -10,7 +10,6 @@ export const farmerSection: Section = {
   role: 'farmer',
   label: 'Farmer',
   audience: 'List produce for sale, rent out plots and post crop updates.',
-  accent: 'var(--color-mustard)',
   pages: [
     {
       path: 'listings',

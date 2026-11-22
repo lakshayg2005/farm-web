@@ -1,3 +1,4 @@
+import type { Tone } from '@/components/ui'
 import { api } from '@/api/http'
 
 export type Unit = 'kg' | 'quintal' | 'dozen' | 'piece' | 'bunch' | 'litre'
@@ -164,11 +165,11 @@ export function farmPayload(f: FarmForm): FarmInput | string {
   return body
 }
 
-export const STATUS_TEXT: Record<ListingStatus, { label: string; tone: string }> = {
-  ACTIVE: { label: 'On sale', tone: 'bg-green-100 text-green-900' },
-  PAUSED: { label: 'Paused', tone: 'bg-neutral-200 text-ink' },
-  SOLD_OUT: { label: 'Sold out', tone: 'bg-amber-100 text-amber-900' },
-  ARCHIVED: { label: 'Removed', tone: 'bg-neutral-200 text-ink-soft' },
+export const STATUS_TEXT: Record<ListingStatus, { label: string; tone: Tone }> = {
+  ACTIVE: { label: 'On sale', tone: 'good' },
+  PAUSED: { label: 'Paused', tone: 'neutral' },
+  SOLD_OUT: { label: 'Sold out', tone: 'warn' },
+  ARCHIVED: { label: 'Removed', tone: 'neutral' },
 }
 
 export const rupees = (n: number) => `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`

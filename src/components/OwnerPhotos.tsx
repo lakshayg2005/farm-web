@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 import { isProcessing, mediaApi, photoBadge, type Media, type OwnerType } from '@/api/media'
 
 const BADGE_TONE = {
-  verified: 'bg-leaf text-white',
+  verified: 'bg-primary text-white',
   unverified: 'bg-amber-200 text-ink',
   checking: 'bg-white/90 text-ink',
-  failed: 'bg-red-100 text-red-800',
+  failed: 'bg-danger/10 text-danger',
 } as const
 
 /** The photos attached to a listing, reservation, ...; each shows whether its location was verified. */
