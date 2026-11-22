@@ -21,6 +21,8 @@ export interface Produce {
   distanceM: number
   lat: number
   lng: number
+  /** Photos held by the media service (object storage); empty for sample produce */
+  mediaIds?: string[]
   updatedAt: string
 }
 

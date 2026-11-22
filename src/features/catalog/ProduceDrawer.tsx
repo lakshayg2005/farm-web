@@ -1,4 +1,5 @@
 import { motion } from 'motion/react'
+import { useProducePhoto } from './useProducePhoto'
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import { Icon, type IconName } from '@/components/Icon'
@@ -20,6 +21,7 @@ export function ProduceDrawer({
   onClose: () => void
 }) {
   const look = cropLook(item.cropId)
+  const photo = useProducePhoto(item.id, item.mediaIds)
   const closeRef = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     closeRef.current?.focus()
@@ -66,7 +68,10 @@ export function ProduceDrawer({
         className="absolute inset-y-0 right-0 flex w-full max-w-lg flex-col overflow-y-auto bg-paper shadow-2xl"
       >
         <div className="relative grid h-56 shrink-0 place-items-center bg-neutral-900">
-          <span aria-hidden className="animate-float text-[6.5rem] drop-shadow-[0_12px_16px_rgb(0_0_0/0.18)]">
+          {photo.url && (
+            <img src={photo.url} alt={`${item.cropName} from ${item.farmName}`} className="absolute inset-0 size-full object-cover" />
+          )}
+          <span aria-hidden className={`${photo.url ? 'hidden ' : ''}animate-float text-[6.5rem] drop-shadow-[0_12px_16px_rgb(0_0_0/0.18)]`}>
             {look.emoji}
           </span>
           <button

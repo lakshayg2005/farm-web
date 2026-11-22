@@ -2,6 +2,7 @@ import { motion } from 'motion/react'
 import { Icon } from '@/components/Icon'
 import { type Delivery, type Freshness, type Produce, cropLook, formatKm, rupees } from './catalog'
 import { FreshMeter } from './FreshMeter'
+import { useProducePhoto } from './useProducePhoto'
 
 export function ProduceCard({
   item,
@@ -17,6 +18,7 @@ export function ProduceCard({
   onOpen: () => void
 }) {
   const look = cropLook(item.cropId)
+  const photo = useProducePhoto(item.id, item.mediaIds)
   return (
     <motion.li
       layout
@@ -31,9 +33,17 @@ export function ProduceCard({
         className="card group flex h-full w-full flex-col overflow-hidden text-left transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]"
       >
         <div className="relative grid h-40 place-items-center overflow-hidden bg-neutral-900">
+          {photo.thumbUrl && (
+            <img
+              src={photo.thumbUrl}
+              alt={`${item.cropName} from ${item.farmName}`}
+              loading="lazy"
+              className="absolute inset-0 size-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          )}
           <span
             aria-hidden
-            className="text-[4.5rem] drop-shadow-[0_8px_12px_rgb(0_0_0/0.15)] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
+            className={`${photo.thumbUrl ? 'hidden ' : ''}text-[4.5rem] drop-shadow-[0_8px_12px_rgb(0_0_0/0.15)] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6`}
           >
             {look.emoji}
           </span>
