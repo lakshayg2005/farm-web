@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import type { Section } from '@/routes/types'
 import { DashboardPage } from './DashboardPage'
+import { AdminOrdersPage } from './OrdersPage'
 import { PoolingPage } from './PoolingPage'
 import { VerificationPage } from './VerificationPage'
 
@@ -19,6 +20,14 @@ export const adminSection: Section = {
         body: 'Orders, reservations and sign-ups are counted here as they come in.',
       },
       element: createElement(DashboardPage),
+    },
+    {
+      path: 'orders',
+      label: 'Orders',
+      icon: 'box',
+      summary: 'Every order on the platform: where it is stuck, and a way to cancel and refund one.',
+      empty: { title: 'No orders yet', body: 'Orders appear here as customers place them.' },
+      element: createElement(AdminOrdersPage),
     },
     {
       path: 'verification',

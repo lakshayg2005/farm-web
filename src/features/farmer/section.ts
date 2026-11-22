@@ -1,6 +1,8 @@
 import { createElement } from 'react'
+import { notificationsPage } from '@/features/notifications/page'
 import type { Section } from '@/routes/types'
 import { CropsPage } from './CropsPage'
+import { EarningsPage } from './EarningsPage'
 import { ListingsPage } from './ListingsPage'
 import { OrdersPage } from './OrdersPage'
 import { PlotListingPage } from './PlotListingPage'
@@ -66,5 +68,14 @@ export const farmerSection: Section = {
       },
       element: createElement(CropsPage),
     },
+    {
+      path: 'earnings',
+      label: 'Earnings',
+      icon: 'rupee',
+      summary: 'Every payout you have received, month by month, and what is still on its way.',
+      empty: { title: 'No earnings yet', body: 'Payouts appear here once your orders are delivered.' },
+      element: createElement(EarningsPage),
+    },
+    notificationsPage('farmer'),
   ],
 }

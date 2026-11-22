@@ -32,6 +32,16 @@ src/
   routes/       route definitions and role guards
 ```
 
+## End-to-end tests
+
+`pnpm e2e` runs Playwright journeys for every role against a real stack with the curated demo data
+(`scripts/reset-demo.sh` in farm-backend; logins in its `docs/DEMO.md`). It builds the app and serves it on
+`http://localhost:4173` (an origin the gateway allows), API from `VITE_API_BASE_URL`. Against a deployed site:
+`E2E_BASE_URL=http://10.1.75.79:3501 pnpm e2e`. First time: `pnpm exec playwright install chromium`.
+Every test fails on a console error, an uncaught exception or a 5xx answer; `responsive.spec.ts` visits every page at
+390 px and 1440 px, checks nothing scrolls sideways and leaves screenshots in `e2e/screenshots/`.
+`pnpm test` is unit tests only.
+
 ## Workflow (all repos)
 
 - `main` is protected: changes go in only through a pull request with 1 approval.

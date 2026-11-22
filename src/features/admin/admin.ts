@@ -1,4 +1,5 @@
 import type { LogisticsComponents } from '@/api/generated'
+import { ordersApi, type OrderSummary } from '@/features/farmer/orders'
 import { api } from '@/api/http'
 import type { User } from '@/features/auth/types'
 
@@ -114,5 +115,41 @@ export const POOL_STATUS: Record<string, string> = {
   COMPLETED: 'Delivered',
 }
 
-export const todayISO = () => new Date().toISOString().slice(0, 10)
-export const tomorrowISO = () => new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
+/** The calendar date on the admin's clock (not UTC, which is yesterday in India before 5:30 am). */
+const localISO = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+export const todayISO = () => localISO(new Date())
+
+/** The orders the stats below look at: the newest `pages` x 100, enough for a dashboard at this scale. */
+export async function loadAllOrders(pages = 5): Promise<OrderSummary[]> {
+  const out: OrderSummary[] = []
+  let cursor: string | null | undefined
+  for (let i = 0; i < pages; i++) {
+    const page = await ordersApi.all(cursor)
+    out.push(...page.items)
+    cursor = page.nextCursor
+    if (!cursor) break
+  }
+  return out
+}
+
+export interface DayStat {
+  date: string
+  orders: number
+  sales: number
+}
+
+/** Orders placed and sales (cancelled orders excluded) for each of the last `days` days, oldest first. */
+export function dailyStats(orders: OrderSummary[], days = 14, now = new Date()): DayStat[] {
+  const stats = new Map<string, DayStat>()
+  for (let i = days - 1; i >= 0; i--) {
+    const date = localISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - i))
+    stats.set(date, { date, orders: 0, sales: 0 })
+  }
+  for (const o of orders) {
+    const stat = stats.get(localISO(new Date(o.createdAt)))
+    if (!stat || o.status === 'CANCELLED') continue
+    stat.orders += 1
+    stat.sales += o.total
+  }
+  return [...stats.values()].map((d) => ({ ...d, sales: Math.round(d.sales * 100) / 100 }))
+}

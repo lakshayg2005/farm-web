@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { ApiError } from '@/api/http'
-import { adminApi, orderedStops, POOL_STATUS, poolSummary, tomorrowISO, type Pool } from './admin'
+import { adminApi, orderedStops, POOL_STATUS, poolSummary, todayISO, type Pool } from './admin'
 import { PoolMap } from './PoolMap'
 
 /** The gateway answers 404 for a route the logistics service does not have yet, 502/503 when it is down. */
@@ -11,7 +11,7 @@ const time = (iso: string | null) =>
 
 export function PoolingPage() {
   const queryClient = useQueryClient()
-  const [date, setDate] = useState(tomorrowISO())
+  const [date, setDate] = useState(todayISO())
   const [selected, setSelected] = useState<string | null>(null)
   const pools = useQuery({ queryKey: ['pools', date], queryFn: () => adminApi.pools(date), retry: false })
   const run = useMutation({
@@ -102,7 +102,7 @@ export function PoolingPage() {
                             <span className="text-sm text-ink-soft">{POOL_STATUS[pool.status] ?? pool.status}</span>
                           </span>
                           <span className="block text-sm text-ink-soft">
-                            {pool.stops.filter((s) => s.kind === 'DROP').length} deliveries, {pool.totalKm} km route,{' '}
+                            {pool.stops.filter((s) => s.kind === 'DROP').length === 1 ? '1 delivery' : `${pool.stops.filter((s) => s.kind === 'DROP').length} deliveries`}, {pool.totalKm} km route,{' '}
                             <span className="font-semibold text-primary">{pool.savedKm} km saved</span>
                           </span>
                         </button>
