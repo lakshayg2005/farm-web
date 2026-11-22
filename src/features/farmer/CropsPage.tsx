@@ -113,7 +113,7 @@ function CropCard({ reservation: r, info, cropName }: { reservation: Reservation
 
       {r.status === 'HARVEST_READY' && (
         <p className="mt-4 rounded-lg bg-paper p-3">
-          Marked ready to harvest. An inspector grades the harvest next, then the customer chooses delivery or buy-back.
+          Marked ready to harvest. The harvest is graded next, then the customer chooses delivery or buy-back.
         </p>
       )}
       {r.status === 'FULFILLING' && <p className="mt-4 rounded-lg bg-paper p-3">The harvest order is on its way to the customer.</p>}
