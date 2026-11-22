@@ -102,7 +102,7 @@ export function PoolingPage() {
                             <span className="text-sm text-ink-soft">{POOL_STATUS[pool.status] ?? pool.status}</span>
                           </span>
                           <span className="block text-sm text-ink-soft">
-                            {pool.stops.filter((s) => s.kind === 'DROP').length} deliveries, {pool.totalKm} km route,{' '}
+                            {pool.stops.filter((s) => s.kind === 'DROP').length === 1 ? '1 delivery' : `${pool.stops.filter((s) => s.kind === 'DROP').length} deliveries`}, {pool.totalKm} km route,{' '}
                             <span className="font-semibold text-primary">{pool.savedKm} km saved</span>
                           </span>
                         </button>
