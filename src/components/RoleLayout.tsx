@@ -2,6 +2,7 @@ import { motion } from 'motion/react'
 import { useEffect } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router'
 import { useAuth } from '@/features/auth/authContext'
+import { useUnreadCount } from '@/features/notifications/notifications'
 import type { Section } from '@/routes/types'
 import { BrandMark } from './BrandMark'
 import { Icon } from './Icon'
@@ -16,7 +17,17 @@ export function RoleLayout({ section }: { section: Section }) {
   const { pathname } = useLocation()
   const { user, logout } = useAuth()
   const current = section.pages.find((p) => pathname.endsWith(`/${p.path}`))
-  const hasTabs = section.pages.length > 1
+  const unread = useUnreadCount().data?.count ?? 0
+  const inbox = section.pages.find((p) => p.path === 'notifications')
+  const tabPages = section.pages.filter((p) => p.path !== 'notifications')
+  const hasTabs = tabPages.length > 1
+  const badge = (page: { path: string }) =>
+    page.path === 'notifications' && unread > 0 ? (
+      <span className="relative ml-auto grid min-w-5 place-items-center rounded-full bg-primary px-1.5 text-xs font-bold text-white">
+        {unread > 99 ? '99+' : unread}
+        <span className="sr-only"> unread</span>
+      </span>
+    ) : null
 
   useEffect(() => {
     document.title = current ? `${current.label} | ${section.label} | Farm Platform` : 'Farm Platform'
@@ -50,6 +61,7 @@ export function RoleLayout({ section }: { section: Section }) {
                         )}
                         <Icon name={page.icon} className="relative size-5" />
                         <span className="relative">{page.label}</span>
+                        {badge(page)}
                       </>
                     )}
                   </NavLink>
@@ -76,6 +88,12 @@ export function RoleLayout({ section }: { section: Section }) {
         <div className="flex h-14 items-center justify-between px-4">
           <BrandMark className="text-base" />
           <span className="flex items-center gap-3 text-sm">
+            {inbox && (
+              <NavLink to={inbox.path} aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'} className="relative grid size-10 place-items-center">
+                <Icon name="bell" className="size-5" />
+                {unread > 0 && <span aria-hidden="true" className="absolute top-1.5 right-1.5 size-2.5 rounded-full bg-primary ring-2 ring-white" />}
+              </NavLink>
+            )}
             <span className="font-semibold">{section.label}</span>
             <button type="button" onClick={() => void logout()} className="text-ink-soft underline">
               Sign out
@@ -102,8 +120,8 @@ export function RoleLayout({ section }: { section: Section }) {
           aria-label={`${section.label} pages`}
           className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] lg:hidden"
         >
-          <ul className="grid" style={{ gridTemplateColumns: `repeat(${section.pages.length}, minmax(0, 1fr))` }}>
-            {section.pages.map((page) => (
+          <ul className="grid" style={{ gridTemplateColumns: `repeat(${tabPages.length}, minmax(0, 1fr))` }}>
+            {tabPages.map((page) => (
               <li key={page.path}>
                 <NavLink
                   to={page.path}
