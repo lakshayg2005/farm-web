@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { photoBadge, type Media } from '@/api/media'
 import { session } from '@/features/auth/session'
 import { jsonResponse, mockApi, renderAt, tokens } from '@/test/auth'
-import { farmPayload, listingChanges, listingPayload, type Listing, type ListingForm } from './catalog'
+import { farmPayload, isLowStock, listingChanges, listingPayload, type Listing, type ListingForm } from './catalog'
 
 const FARM = {
   id: 'farm-1',
@@ -242,5 +242,48 @@ describe('farmer listings page', () => {
     expect(screen.getByText('Remove this listing?')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Remove' }))
     await waitFor(() => expect(calls.some((c) => c.key === 'DELETE /catalog/listings/l1')).toBe(true))
+  })
+
+  it('shows the farm rating, and says so when the farm has none yet', async () => {
+    const calls = farmer({
+      'GET /catalog/listings/mine': () => jsonResponse({ items: [LISTING], nextCursor: null }),
+      'GET /catalog/farms/mine': () => jsonResponse({ items: [{ ...FARM, rating: 4.5, ratingCount: 12 }], nextCursor: null }),
+    })
+    renderAt('/farmer/listings')
+    const farms = await screen.findByRole('list', { name: 'Your farms' })
+    expect(within(farms).getByText('Verma Farms')).toBeInTheDocument()
+    expect(within(farms).getByText('4.5')).toBeInTheDocument()
+    expect(within(farms).getByText('(12 ratings)')).toBeInTheDocument()
+    expect(calls.length).toBeGreaterThan(0)
+  })
+
+  it('shows "Not rated yet" for a farm without ratings', async () => {
+    farmer({ 'GET /catalog/listings/mine': () => jsonResponse({ items: [LISTING], nextCursor: null }) })
+    renderAt('/farmer/listings')
+    expect(await screen.findByText('Not rated yet')).toBeInTheDocument()
+  })
+
+  it('warns when stock is low, and only then', async () => {
+    farmer({
+      'GET /catalog/listings/mine': () =>
+        jsonResponse({ items: [{ ...LISTING, qtyAvailable: 6 }, { ...LISTING, id: 'l2', cropName: 'Onion', variety: null }], nextCursor: null }),
+    })
+    renderAt('/farmer/listings')
+    const [tomato, onion] = within(await screen.findByRole('list', { name: 'Your listings' })).getAllByRole('article')
+    expect(within(tomato!).getByText('Low stock')).toBeInTheDocument()
+    expect(within(tomato!).getByText('Only 6 kg left. Add stock before it sells out.')).toBeInTheDocument()
+    expect(within(onion!).queryByText('Low stock')).not.toBeInTheDocument()
+  })
+})
+
+describe('isLowStock', () => {
+  const base = { status: 'ACTIVE' as const, unit: 'kg' as const }
+  it('uses a line per unit and ignores paused or empty listings', () => {
+    expect(isLowStock({ ...base, qtyAvailable: 10 })).toBe(true)
+    expect(isLowStock({ ...base, qtyAvailable: 10.5 })).toBe(false)
+    expect(isLowStock({ ...base, unit: 'quintal', qtyAvailable: 1 })).toBe(true)
+    expect(isLowStock({ ...base, unit: 'quintal', qtyAvailable: 2 })).toBe(false)
+    expect(isLowStock({ ...base, qtyAvailable: 0 })).toBe(false) // sold out has its own message
+    expect(isLowStock({ ...base, status: 'PAUSED', qtyAvailable: 3 })).toBe(false)
   })
 })

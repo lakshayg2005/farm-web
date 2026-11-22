@@ -341,6 +341,16 @@ export interface components {
             location: components["schemas"]["GeoPoint"];
             /** Name */
             name: string;
+            /**
+             * Rating
+             * @description Average score, 1 to 5; null until rated
+             */
+            rating?: number | null;
+            /**
+             * Ratingcount
+             * @default 0
+             */
+            ratingCount: number;
             /** State */
             state: string | null;
             /**
@@ -515,6 +525,16 @@ export interface components {
             /** Farmname */
             farmName: string;
             /**
+             * Farmrating
+             * @description The farm's average score, 1 to 5; null until it has been rated
+             */
+            farmRating?: number | null;
+            /**
+             * Farmratingcount
+             * @default 0
+             */
+            farmRatingCount: number;
+            /**
              * Farmerid
              * Format: uuid
              */
@@ -586,6 +606,16 @@ export interface components {
             farmId: string;
             /** Farmname */
             farmName: string;
+            /**
+             * Farmrating
+             * @description The farm's average score, 1 to 5; null until it has been rated
+             */
+            farmRating?: number | null;
+            /**
+             * Farmratingcount
+             * @default 0
+             */
+            farmRatingCount: number;
             /**
              * Farmerid
              * Format: uuid

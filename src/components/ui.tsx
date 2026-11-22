@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useI18n } from '@/i18n/i18n'
 
 /** Status colours: a tone is always shown with text and a dot, never as colour alone. */
 export type Tone = 'neutral' | 'good' | 'info' | 'warn' | 'danger'
@@ -41,8 +42,9 @@ export function Skeleton({ className = '' }: { className?: string }) {
 
 /** A list-shaped placeholder shown while a page's first request is in flight. */
 export function ListSkeleton({ rows = 3, label = 'Loading' }: { rows?: number; label?: string }) {
+  const { t } = useI18n()
   return (
-    <div role="status" aria-label={label} className="mt-8 space-y-3">
+    <div role="status" aria-label={t(label)} className="mt-8 space-y-3">
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className="card space-y-3 p-4">
           <Skeleton className="h-4 w-1/3" />
@@ -54,13 +56,14 @@ export function ListSkeleton({ rows = 3, label = 'Loading' }: { rows?: number; l
 }
 
 export function ErrorState({ title, body, onRetry }: { title: string; body?: string; onRetry?: () => void }) {
+  const { t } = useI18n()
   return (
     <div role="alert" className="card mt-8 max-w-xl border-danger/40 p-5">
-      <h2 className="font-semibold text-danger">{title}</h2>
-      {body && <p className="mt-1 text-ink-soft">{body}</p>}
+      <h2 className="font-semibold text-danger">{t(title)}</h2>
+      {body && <p className="mt-1 text-ink-soft">{t(body)}</p>}
       {onRetry && (
         <button type="button" onClick={onRetry} className="btn-secondary mt-3">
-          Try again
+          {t('Try again')}
         </button>
       )}
     </div>
@@ -69,11 +72,30 @@ export function ErrorState({ title, body, onRetry }: { title: string; body?: str
 
 /** Label above a number, used for the summary figures at the top of a page. */
 export function Figure({ label, value, hint }: { label: string; value: ReactNode; hint?: ReactNode }) {
+  const { t } = useI18n()
   return (
     <div className="card p-4 sm:p-5">
-      <p className="text-sm text-ink-soft">{label}</p>
+      <p className="text-sm text-ink-soft">{t(label)}</p>
       <p className="mt-1 text-2xl font-bold tabular-nums">{value}</p>
       {hint && <p className="mt-1 text-sm text-ink-soft">{hint}</p>}
     </div>
+  )
+}
+
+/** A farm's average score: five stars, the number and how many ratings it rests on. */
+export function Rating({ value, count }: { value: number | null | undefined; count: number }) {
+  const { t } = useI18n()
+  if (value == null || count === 0) return <span className="text-sm text-ink-soft">{t('Not rated yet')}</span>
+  const filled = Math.round(value)
+  return (
+    <span className="inline-flex items-center gap-1.5 text-sm" title={t('{n} out of 5', { n: value.toFixed(1) })}>
+      <span aria-hidden="true" className="tracking-tight text-warn">
+        {'★'.repeat(filled)}
+        <span className="text-line-strong">{'★'.repeat(5 - filled)}</span>
+      </span>
+      <span className="font-semibold tabular-nums">{value.toFixed(1)}</span>
+      <span className="text-ink-soft">({t(count === 1 ? '{n} rating' : '{n} ratings', { n: count })})</span>
+      <span className="sr-only">{t('{n} out of 5', { n: value.toFixed(1) })}</span>
+    </span>
   )
 }

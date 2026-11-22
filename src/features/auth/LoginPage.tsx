@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { ApiError } from '@/api/http'
+import { useI18n } from '@/i18n/i18n'
 import { useAuth } from './authContext'
 import { AuthShell, Field, primaryButton } from './AuthShell'
 import { toE164 } from './phone'
@@ -8,6 +9,7 @@ import { homePathFor } from './roles'
 
 export function LoginPage() {
   const { login } = useAuth()
+  const { t } = useI18n()
   const navigate = useNavigate()
   const from = (useLocation().state as { from?: string } | null)?.from
   const [phone, setPhone] = useState('')
@@ -41,17 +43,17 @@ export function LoginPage() {
         <Field label="Password" name="password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} />
         {errors.form && (
           <p role="alert" className="font-semibold text-danger">
-            {errors.form}
+            {t(errors.form)}
           </p>
         )}
         <button type="submit" disabled={busy} className={primaryButton}>
-          {busy ? 'Signing in…' : 'Sign in'}
+          {busy ? t('Signing in…') : t('Sign in')}
         </button>
       </form>
       <p className="mt-6 text-ink-soft">
-        New here?{' '}
+        {t('New here?')}{' '}
         <Link to="/register" className="font-semibold text-primary underline">
-          Create an account
+          {t('Create an account')}
         </Link>
       </p>
     </AuthShell>

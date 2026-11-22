@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { session } from '@/features/auth/session'
 import { jsonResponse, mockApi, renderAt, tokens } from '@/test/auth'
@@ -64,5 +64,46 @@ describe('inspections page', () => {
     await waitFor(() => expect(calls.some((c) => c.key === 'POST /quality/inspections/i1/report')).toBe(true))
     const sent = calls.find((c) => c.key === 'POST /quality/inspections/i1/report')
     expect(sent?.body).toMatchObject({ grade: 'A', moisturePct: 14, weightKg: 38, result: 'PASS' })
+  })
+})
+
+describe('report form on a phone', () => {
+  it('picks grade and result with big buttons and sends them', async () => {
+    const calls = mockApi({
+      'POST /identity/refresh': () => jsonResponse(tokens(['inspector'])),
+      'GET /quality/inspections': () => jsonResponse([{ ...BASE, id: 'i1', inspectorId: 'u1' }]),
+      'POST /quality/inspections/i1/report': () => jsonResponse({ ...BASE, id: 'i1', inspectorId: 'u1', status: 'REPORTED' }),
+    })
+    renderAt('/inspector/inspections')
+    await userEvent.type(await screen.findByLabelText('Moisture (%)'), '11')
+    await userEvent.type(screen.getByLabelText('Weight (kg)'), '30')
+    const grade = screen.getByRole('radiogroup', { name: 'Grade' })
+    expect(within(grade).getByRole('radio', { name: 'A' })).toBeChecked()
+    await userEvent.click(within(grade).getByRole('radio', { name: 'C' }))
+    expect(within(grade).getByRole('radio', { name: 'C' })).toBeChecked()
+    await userEvent.click(screen.getByRole('radio', { name: 'Fail' }))
+    await userEvent.selectOptions(screen.getByLabelText('What happens next'), 'REHARVEST')
+    await userEvent.click(screen.getByRole('button', { name: 'Submit report' }))
+    await waitFor(() => expect(calls.some((c) => c.key === 'POST /quality/inspections/i1/report')).toBe(true))
+    expect(calls.find((c) => c.key === 'POST /quality/inspections/i1/report')?.body).toMatchObject({
+      grade: 'C',
+      result: 'FAIL',
+      resolution: 'REHARVEST',
+    })
+  })
+
+  it('offers the camera and the gallery, and shows how many photos are picked', async () => {
+    mockApi({
+      'POST /identity/refresh': () => jsonResponse(tokens(['inspector'])),
+      'GET /quality/inspections': () => jsonResponse([{ ...BASE, id: 'i1', inspectorId: 'u1' }]),
+    })
+    renderAt('/inspector/inspections')
+    expect(await screen.findByRole('button', { name: 'Take photo' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Choose photos' })).toBeInTheDocument()
+    expect(screen.getByText('0 of 10 photos. JPEG, PNG or WebP, 5 MB each.')).toBeInTheDocument()
+    await userEvent.upload(screen.getByLabelText('Choose photos', { selector: 'input' }), new File(['x'], 'leaf.jpg', { type: 'image/jpeg' }))
+    expect(await screen.findByText('1 of 10 photos. JPEG, PNG or WebP, 5 MB each.')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Remove photo 1' }))
+    expect(screen.getByText('0 of 10 photos. JPEG, PNG or WebP, 5 MB each.')).toBeInTheDocument()
   })
 })

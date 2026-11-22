@@ -28,6 +28,7 @@ export function useUnreadCount() {
 /** Where a notification leads, by its type and the section the reader is in. */
 export function notificationTarget(n: AppNotification, role: string): string | null {
   if (n.type.startsWith('ORDER_') || n.type === 'PAYMENT_SUCCEEDED') return role === 'farmer' ? '/farmer/orders' : null
+  if (n.type === 'LOW_STOCK' || n.type === 'RATING_RECEIVED') return role === 'farmer' ? '/farmer/listings' : null
   if (n.type === 'RESERVATION_ACCEPTED' || n.type === 'HARVEST_READY')
     return role === 'farmer' ? '/farmer/crops' : role === 'customer' ? '/customer/reservations' : null
   return null
