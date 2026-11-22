@@ -114,5 +114,6 @@ export const POOL_STATUS: Record<string, string> = {
   COMPLETED: 'Delivered',
 }
 
-export const todayISO = () => new Date().toISOString().slice(0, 10)
-export const tomorrowISO = () => new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
+/** The calendar date on the admin's clock (not UTC, which is yesterday in India before 5:30 am). */
+const localISO = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+export const todayISO = () => localISO(new Date())
