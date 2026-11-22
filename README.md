@@ -5,6 +5,19 @@ Website for the Farm Platform, built by **Team 2**. One React app with role-base
 All data comes from the shared backend ([farm-backend](https://github.com/lakshayg2005/farm-backend)) through the API gateway at `/api/v1`.
 The typed API client is generated from the backend's OpenAPI specs (`pnpm gen:api`), and a mock server built from the same specs (`pnpm mock`) lets screens be built before a service is ready.
 
+## Links
+
+| What | URL |
+| --- | --- |
+| Website, team VM | <http://10.1.75.79:3501> (college network or VPN) |
+| API gateway, team VM | <http://10.1.75.79:4501/api/v1> |
+| Website, local | <http://localhost:5173> (`pnpm dev`) |
+| API gateway, local | <http://localhost/api/v1> (`docker compose up -d` in farm-backend) |
+| Demo logins for every role | [farm-backend/docs/DEMO.md](https://github.com/lakshayg2005/farm-backend/blob/main/docs/DEMO.md) |
+| Demo walkthrough | [farm-backend/docs/DEMO-SCRIPT.md](https://github.com/lakshayg2005/farm-backend/blob/main/docs/DEMO-SCRIPT.md) |
+| Backend repo | <https://github.com/lakshayg2005/farm-backend> |
+| Apps repo (Kotlin in `android/`) | <https://github.com/lakshayg2005/farm-mobile> |
+
 ## Stack
 
 React 18 + Vite + TypeScript, React Router, TanStack Query, Tailwind CSS, React-Leaflet (+ leaflet-draw), Vitest + Playwright, pnpm.
