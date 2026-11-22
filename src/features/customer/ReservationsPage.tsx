@@ -42,9 +42,13 @@ export function ReservationsPage() {
         </Link>
       </p>
     )
+  // What needs the customer first: pay a deposit, choose a harvest option, then the rest.
+  const order = ['ACCEPTED', 'HARVEST_READY', 'ACTIVE', 'FULFILLING', 'PENDING']
+  const rank = (r: Reservation) => (order.includes(r.status) ? order.indexOf(r.status) : order.length)
+  const sorted = [...list.data].sort((a, b) => rank(a) - rank(b))
   return (
-    <ul className="mt-8 space-y-4">
-      {list.data.map((r) => (
+    <ul className="mt-8 max-w-3xl space-y-4">
+      {sorted.map((r) => (
         <li key={r.id}>
           <ReservationCard reservation={r} cropName={names.get(r.cropId) ?? r.cropId} />
         </li>
@@ -58,6 +62,9 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
   const [error, setError] = useState<string>()
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['reservations'] })
   const status = STATUS_TEXT[r.status] ?? { label: r.status, tone: 'neutral' }
+  // Only an accepted reservation has an agreement that names the plot.
+  const named = ['ACCEPTED', 'ACTIVE', 'HARVEST_READY', 'FULFILLING'].includes(r.status)
+  const agreement = useQuery({ queryKey: ['agreement', r.id], queryFn: () => landApi.agreement(r.id), enabled: named, staleTime: 300_000, retry: false })
 
   const cancel = useMutation({ mutationFn: () => landApi.cancel(r.id), onSuccess: refresh, onError: (e) => setError(message(e)) })
   const pay = useMutation({
@@ -79,6 +86,14 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
         </h2>
         <StatusChip tone={status.tone}>{status.label}</StatusChip>
       </div>
+      {agreement.data && (
+        <p className="mt-0.5 font-semibold">
+          {agreement.data.plotTitle}
+          <span className="font-normal text-ink-soft">
+            {' '}· {agreement.data.season}, {day(agreement.data.startDate)} to {day(agreement.data.endDate)}
+          </span>
+        </p>
+      )}
       <p className="mt-1 text-sm text-ink-soft">
         {r.total !== null && <>Estimated total {rupees(r.total)}. </>}
         {r.status === 'PENDING' && <>The farmer can answer until {day(r.expiresAt)}.</>}

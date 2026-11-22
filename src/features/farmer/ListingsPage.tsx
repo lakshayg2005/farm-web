@@ -4,6 +4,7 @@ import { useI18n } from '@/i18n/i18n'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef, useState, type FormEvent } from 'react'
 import { ApiError } from '@/api/http'
+import { newId } from '@/api/id'
 import { MAX_PHOTOS, photoProblem, uploadPhoto } from '@/api/media'
 import { OwnerPhotos } from '@/components/OwnerPhotos'
 import {
@@ -329,7 +330,7 @@ function ListingEditor({
   const [files, setFiles] = useState<File[]>([])
   const [error, setError] = useState<string | undefined>(initialError)
   // One key per "Add a listing" form, so a retried request never lists the produce twice.
-  const idempotencyKey = useRef(crypto.randomUUID())
+  const idempotencyKey = useRef(newId())
   // Set as soon as a new listing exists, so a failed photo upload can continue as an edit.
   const created = useRef<Listing | null>(null)
 

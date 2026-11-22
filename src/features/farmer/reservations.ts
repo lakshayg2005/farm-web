@@ -33,6 +33,10 @@ export const farmerLandApi = {
   reservations: () => api<Reservation[]>('/land/reservations/mine'),
   plots: () => api<MyPlot[]>('/land/plots/mine'),
   seasons: (plotId: string) => api<Season[]>(`/land/plots/${plotId}/seasons`),
+  addSeason: (plotId: string, body: Omit<Season, 'id' | 'plotId'>) =>
+    api<Season>(`/land/plots/${plotId}/seasons`, { method: 'POST', body }),
+  removeSeason: (plotId: string, seasonId: string) => api<void>(`/land/plots/${plotId}/seasons/${seasonId}`, { method: 'DELETE' }),
+  removePlot: (plotId: string) => api<void>(`/land/plots/${plotId}`, { method: 'DELETE' }),
   accept: (id: string) => api<Reservation>(`/land/reservations/${id}/accept`, { method: 'POST' }),
   reject: (id: string) => api<Reservation>(`/land/reservations/${id}/reject`, { method: 'POST' }),
   updates: (id: string) => api<CropUpdate[]>(`/land/reservations/${id}/updates`),
@@ -64,6 +68,22 @@ export function stageReached(status: string, updates: { stage: Stage }[]): numbe
 /** The stage a new update most likely reports: the latest one posted, or Sown for the first. */
 export function suggestedStage(updates: { stage: Stage }[]): Stage {
   return updates.at(-1)?.stage ?? 'SOWN'
+}
+
+export interface PlotWithSeasons {
+  plot: MyPlot & { soilType: string | null; waterSource: string | null; createdAt: string }
+  seasons: Season[]
+}
+
+/** Every plot the farmer has listed, newest first, with its growing seasons. */
+export async function loadMyPlots(): Promise<PlotWithSeasons[]> {
+  const plots = (await farmerLandApi.plots()) as PlotWithSeasons['plot'][]
+  const lists = await Promise.all(
+    plots.map(async (plot) => ({ plot, seasons: await farmerLandApi.seasons(plot.id).catch(() => [] as Season[]) })),
+  )
+  return lists
+    .map((x) => ({ ...x, seasons: [...x.seasons].sort((a, b) => a.startDate.localeCompare(b.startDate)) }))
+    .sort((a, b) => (b.plot.createdAt ?? '').localeCompare(a.plot.createdAt ?? ''))
 }
 
 /** All the farmer's plot-seasons by id, so a reservation (which only has plotSeasonId) can be named. */
