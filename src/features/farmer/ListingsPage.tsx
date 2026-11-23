@@ -284,7 +284,7 @@ function formFrom(listing: Listing | null, farms: Farm[]): ListingForm {
   }
 }
 
-function ListingEditor({
+export function ListingEditor({
   farms,
   crops,
   listing,
@@ -502,7 +502,7 @@ function ListingEditor({
   )
 }
 
-function FarmSetup() {
+export function FarmSetup() {
   const queryClient = useQueryClient()
   const [f, setF] = useState<FarmForm>({ name: '', village: '', district: '', state: '', lat: '', lng: '' })
   const [error, setError] = useState<string>()

@@ -144,7 +144,7 @@ describe('farmer listings page', () => {
     expect(post.body).toEqual({ name: 'Verma Farms', district: 'Raipur', location: { type: 'Point', coordinates: [81.63, 21.25] } })
   })
 
-  it('shows each listing with its photos and their verified badges', async () => {
+  it('shows each listing with its price, stock and status', async () => {
     farmer({
       'GET /catalog/listings/mine': () =>
         jsonResponse({ items: [LISTING, { ...LISTING, id: 'l2', cropName: 'Banana', variety: null, status: 'PAUSED', mediaIds: [] }], nextCursor: null }),
@@ -152,14 +152,11 @@ describe('farmer listings page', () => {
         jsonResponse({ items: [MEDIA('m1', {}), MEDIA('m2', { isGeoVerified: false, geoStatus: 'NO_GPS' })], nextCursor: null }),
     })
     renderAt('/farmer/listings')
-    const list = await screen.findByRole('list', { name: 'Your listings' })
-    const [tomato, banana] = within(list).getAllByRole('article')
-    expect(within(tomato!).getByText('₹28 per kg')).toBeInTheDocument()
-    expect(await within(tomato!).findByText('Verified')).toBeInTheDocument()
-    expect(within(tomato!).getByText('Unverified')).toBeInTheDocument()
-    expect(within(banana!).getByText('Paused')).toBeInTheDocument()
-    expect(within(banana!).getByRole('button', { name: 'Resume' })).toBeInTheDocument()
-    expect(screen.getByText('1 of 2 listings on sale.')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 3, name: 'Tomato, Hybrid 501' })).toBeInTheDocument()
+    expect(screen.getAllByText('₹28')).toHaveLength(2)
+    expect(screen.getByText('Paused')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Resume' })).toBeInTheDocument()
+    expect(screen.getByText(/Active Inventory Catalogue \(1 on sale\)/)).toBeInTheDocument()
   })
 
   it('lists new produce, uploads its photo and attaches it', async () => {
@@ -174,7 +171,7 @@ describe('farmer listings page', () => {
       'PATCH /catalog/listings/l9': () => jsonResponse({ ...created, mediaIds: ['m9'] }),
     })
     renderAt('/farmer/listings')
-    await userEvent.click(await screen.findByRole('button', { name: 'Add a listing' }))
+    await userEvent.click(await screen.findByRole('button', { name: /Add a listing/ }))
     const form = screen.getByRole('form', { name: 'Add a listing' })
     await userEvent.selectOptions(within(form).getByLabelText('Crop'), 'banana')
     expect(within(form).getByLabelText('Unit')).toHaveValue('dozen')
@@ -200,7 +197,7 @@ describe('farmer listings page', () => {
       'POST /media/upload-url': () => jsonResponse({ error: { code: 'MEDIA_TOO_LARGE', message: 'File is too large.' } }, 422),
     })
     renderAt('/farmer/listings')
-    await userEvent.click(await screen.findByRole('button', { name: 'Add a listing' }))
+    await userEvent.click(await screen.findByRole('button', { name: /Add a listing/ }))
     const form = screen.getByRole('form', { name: 'Add a listing' })
     await userEvent.selectOptions(within(form).getByLabelText('Crop'), 'tomato')
     await userEvent.type(within(form).getByLabelText('In stock'), '10')
@@ -219,15 +216,12 @@ describe('farmer listings page', () => {
       'PATCH /catalog/listings/l1': (body) => jsonResponse({ ...LISTING, mediaIds: [], ...(body as object) }),
     })
     renderAt('/farmer/listings')
-    const stock = await screen.findByLabelText('In stock (kg)')
-    await userEvent.clear(stock)
-    await userEvent.type(stock, '80')
-    await userEvent.click(screen.getByRole('button', { name: 'Update stock' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Increase stock' }))
     await waitFor(() => expect(calls.some((c) => c.key === 'PATCH /catalog/listings/l1')).toBe(true))
-    expect(calls.find((c) => c.key === 'PATCH /catalog/listings/l1')!.body).toEqual({ qtyAvailable: 80 })
+    expect(calls.find((c) => c.key === 'PATCH /catalog/listings/l1')!.body).toEqual({ qtyAvailable: 121 })
 
     await userEvent.click(screen.getByRole('button', { name: 'Pause' }))
-    expect(await screen.findByText('Paused')).toBeInTheDocument()
+    await waitFor(() => expect(calls.filter((c) => c.key === 'PATCH /catalog/listings/l1')).toHaveLength(2))
     expect(calls.filter((c) => c.key === 'PATCH /catalog/listings/l1').at(-1)!.body).toEqual({ status: 'PAUSED' })
   })
 
@@ -237,10 +231,9 @@ describe('farmer listings page', () => {
       'DELETE /catalog/listings/l1': () => jsonResponse(null, 204),
     })
     renderAt('/farmer/listings')
-    await userEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Remove listing' }))
     expect(calls.some((c) => c.key === 'DELETE /catalog/listings/l1')).toBe(false)
-    expect(screen.getByText('Remove this listing?')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Remove' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm remove' }))
     await waitFor(() => expect(calls.some((c) => c.key === 'DELETE /catalog/listings/l1')).toBe(true))
   })
 })

@@ -37,9 +37,8 @@ describe('farmer orders page', () => {
       },
     })
     renderAt('/farmer/orders')
-    await userEvent.click(await screen.findByRole('button', { name: 'Mark packed' }))
+    await userEvent.click(await screen.findByRole('button', { name: /Mark packed/ }))
     await waitFor(() => expect(calls.some((c) => c.key === 'POST /order/orders/o1/pack')).toBe(true))
-    await userEvent.click(await screen.findByRole('tab', { name: /In progress \(1\)/ }))
     expect(await screen.findByText(/Packed: waiting for quality check/)).toBeInTheDocument()
     expect(calls.find((c) => c.key === 'GET /order/orders')).toBeDefined()
   })
@@ -57,7 +56,7 @@ describe('farmer orders page', () => {
         }),
     })
     renderAt('/farmer/orders')
-    await userEvent.click(await screen.findByRole('button', { name: 'Details' }))
-    expect(await screen.findByText(/Tomato: 5 kg/)).toBeInTheDocument()
+    await userEvent.click(await screen.findByRole('button', { name: /Details/ }))
+    expect(await screen.findByText(/Tomato · 5 kg/)).toBeInTheDocument()
   })
 })

@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { session } from '@/features/auth/session'
 import { jsonResponse, mockApi, renderAt } from '@/test/auth'
@@ -82,12 +82,10 @@ describe('catalog page', () => {
         }),
     })
     renderAt('/catalog')
-    const card = await screen.findByRole('button', { name: 'Tomato from Hariyali Farms' })
-    expect(within(card).getByRole('meter', { name: 'Freshness' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Tomato/, level: 3 })).toBeInTheDocument()
     expect(screen.queryByText(/Showing sample produce/)).not.toBeInTheDocument()
-    await userEvent.click(card)
-    expect(await screen.findByRole('dialog')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'When will it arrive?' })).toBeInTheDocument()
+    expect(screen.getByText('Verified Traceability')).toBeInTheDocument()
+    expect(screen.getByText(/1 listings/)).toBeInTheDocument()
   })
 
   it('falls back to labelled sample produce when the catalog is unreachable', async () => {
@@ -97,8 +95,8 @@ describe('catalog page', () => {
     })
     renderAt('/catalog')
     expect(await screen.findByText(/Showing sample produce/)).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: /Leafy greens/ }))
-    expect(screen.getByRole('button', { name: /Spinach \(Palak\) from/ })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^Tomato from/ })).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: /Fruits/ }))
+    expect(screen.getAllByRole('heading', { level: 3, name: /Mango/ }).length).toBeGreaterThan(0)
+    expect(screen.queryByRole('heading', { level: 3, name: /^Tomato/ })).not.toBeInTheDocument()
   })
 })

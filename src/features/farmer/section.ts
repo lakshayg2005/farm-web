@@ -1,8 +1,7 @@
 import { createElement } from 'react'
 import type { Section } from '@/routes/types'
 import { CropsPage } from './CropsPage'
-import { ListingsPage } from './ListingsPage'
-import { OrdersPage } from './OrdersPage'
+import { FarmerHubPage } from './FarmerHubPage'
 import { PlotListingPage } from './PlotListingPage'
 import { RequestsPage } from './RequestsPage'
 
@@ -21,7 +20,8 @@ export const farmerSection: Section = {
         title: 'No listings yet',
         body: 'Add your first produce listing with a photo, price and how much you have in stock.',
       },
-      element: createElement(ListingsPage),
+      element: createElement(FarmerHubPage, { tab: 'listings' }),
+      bare: true,
     },
     {
       path: 'orders',
@@ -32,7 +32,8 @@ export const farmerSection: Section = {
         title: 'No orders yet',
         body: 'When a customer buys from your listings, the order shows here for you to accept and pack.',
       },
-      element: createElement(OrdersPage),
+      element: createElement(FarmerHubPage, { tab: 'orders' }),
+      bare: true,
     },
     {
       path: 'plots',

@@ -21,18 +21,18 @@ describe('routes', () => {
     'opens the %s section on its first page',
     async (role, firstPath, firstLabel) => {
       const router = renderAt(`/${role}`)
-      expect(await screen.findByRole('heading', { level: 1, name: firstLabel })).toBeInTheDocument()
+      expect(await screen.findByRole('heading', { level: 1, name: new RegExp(firstLabel) })).toBeInTheDocument()
       expect(router.state.location.pathname).toBe(`/${role}/${firstPath}`)
     },
   )
 
   it('moves between pages from the section navigation', async () => {
     const router = renderAt('/farmer/listings')
-    await screen.findByRole('heading', { level: 1, name: 'Listings' })
+    await screen.findByRole('heading', { level: 1, name: /Listings/ })
     const [railNav] = screen.getAllByRole('navigation', { name: 'Farmer pages' })
-    await userEvent.click(within(railNav!).getByRole('link', { name: 'Orders' }))
+    await userEvent.click(within(railNav!).getByRole('link', { name: /Orders/ }))
     expect(router.state.location.pathname).toBe('/farmer/orders')
-    expect(screen.getByRole('heading', { level: 1, name: 'Orders' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Orders/ })).toBeInTheDocument()
   })
 
   it('shows a not-found page for unknown paths', () => {
