@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
-import { BrandMark } from '@/components/BrandMark'
+import { SiteFooter } from '@/components/SiteFooter'
+import { SiteHeader } from '@/components/SiteHeader'
 import data from './team.json'
 
 function Photo({ name, src }: { name: string; src: string }) {
   const [missing, setMissing] = useState(false)
   if (missing)
     return (
-      <span aria-hidden className="grid size-32 place-items-center rounded-2xl bg-paper-deep font-display text-4xl text-ink-soft">
+      <span aria-hidden className="grid size-32 place-items-center rounded-2xl border border-border bg-surface-card font-serif text-4xl text-ink-soft">
         {name.replace(/^Dr\s+/, '').charAt(0)}
       </span>
     )
@@ -20,28 +20,25 @@ export function TeamPage() {
   }, [])
   const { guide, teams } = data
   return (
-    <div className="mx-auto min-h-dvh max-w-5xl px-4 pt-6 pb-12 sm:px-8 lg:pt-10">
-      <div className="flex items-center justify-between gap-4">
-        <BrandMark />
-        <Link to="/" className="font-semibold text-primary underline">
-          Back to home
-        </Link>
-      </div>
+    <>
+    <SiteHeader />
+    <main className="mx-auto w-full max-w-5xl flex-1 px-6 pt-8 pb-16 lg:px-12">
+      <span className="text-xs font-medium tracking-widest text-primary uppercase">Research Collective &amp; Protocol</span>
 
-      <section aria-labelledby="thanks" className="mt-12 flex flex-col gap-6 sm:flex-row sm:items-center">
+      <section aria-labelledby="thanks" className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-center">
         <Photo name={guide.name} src={guide.photo} />
         <div className="max-w-xl">
-          <h1 id="thanks" className="font-display text-[2rem] leading-tight sm:text-[2.5rem]">
+          <h1 id="thanks" className="font-serif text-3xl leading-tight font-normal sm:text-5xl">
             With thanks to {guide.name}
           </h1>
           <p className="mt-1 font-semibold text-ink-soft">{guide.role}</p>
-          <p className="mt-3 text-lg">{guide.thanks}</p>
+          <p className="mt-3 text-base font-light text-ink-soft">{guide.thanks}</p>
         </div>
       </section>
 
       {teams.map((team) => (
         <section key={team.name} aria-label={team.name} className="mt-14">
-          <h2 className="font-display text-2xl">{team.name}</h2>
+          <h2 className="font-serif text-2xl font-normal">{team.name}</h2>
           <p className="text-ink-soft">{team.about}</p>
           <ul className="mt-5 grid gap-4 sm:grid-cols-2">
             {team.members.map((m) => (
@@ -57,6 +54,8 @@ export function TeamPage() {
           </ul>
         </section>
       ))}
-    </div>
+    </main>
+    <SiteFooter />
+    </>
   )
 }

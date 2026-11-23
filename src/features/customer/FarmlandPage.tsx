@@ -30,7 +30,6 @@ export function FarmlandPage() {
   const [placeText, setPlaceText] = useState('')
   const [focus, setFocus] = useState<{ lat: number; lng: number } | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
     document.title = 'Reserve farmland | Farm Platform'
@@ -62,250 +61,243 @@ export function FarmlandPage() {
     }
   }
 
-  function open(plot: PlotFeature) {
-    setSelectedId(plot.properties.plotSeasonId)
-    setModalOpen(true)
-  }
+  const input = 'h-10 w-full appearance-none rounded-xl border border-border bg-surface px-3 pr-8 text-xs text-on-surface outline-none transition-colors hover:border-outline focus:border-primary'
 
   return (
     <>
       <SiteHeader />
-      <div className="flex w-full flex-col">
-        <section className="w-full bg-surface-container-low px-6 py-8 shadow-sm lg:px-12">
-          <div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-6 xl:flex-row xl:items-end">
-            <div className="max-w-2xl space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-primary"></span>
-                <span className="text-label-sm tracking-widest text-primary uppercase">Seasonal Land Protocol · Live Plots</span>
+      <main className="flex w-full flex-1 flex-col bg-background">
+        <section className="mx-auto w-full max-w-[1440px] px-6 pt-8 pb-4 lg:px-12">
+          <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-end">
+            <div>
+              <div className="mb-2 flex items-center gap-2">
+                <span className="size-1.5 rounded-full bg-primary" />
+                <span className="text-xs font-medium tracking-[0.2em] text-on-surface-variant uppercase">Cadastral Registry Protocol</span>
+                <span className="text-xs text-outline/60">/</span>
+                <span className="text-xs text-on-surface-variant">Live plots on the map</span>
               </div>
-              <h1 className="font-headline-xl text-headline-xl text-on-surface">Find land</h1>
-              <p className="text-body-md text-on-surface-variant">
-                Search the verified grid for nutrient-dense plots near you and secure acreage for the impending cultivation cycle.
+              <h1 className="font-serif text-3xl font-normal tracking-tight text-on-surface sm:text-4xl">Find &amp; reserve farmland.</h1>
+              <p className="mt-1.5 max-w-xl text-sm font-light text-on-surface-variant">
+                Audited boundaries, a clear season window, and a transparent deposit before cultivation.
               </p>
             </div>
-
-            {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative min-w-[260px] flex-1 sm:flex-initial">
-                <span className="material-symbols-outlined absolute top-1/2 left-3.5 -translate-y-1/2 text-[20px] text-outline">pin_drop</span>
-                <input
-                  className="h-12 w-full rounded-xl bg-surface-container pr-4 pl-10 text-body-sm text-on-surface outline-none transition-all placeholder:text-outline focus:bg-surface-container-highest"
-                  placeholder="Search a village, town or address"
-                  value={placeText}
-                  onChange={(e) => setPlaceText(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') void findPlace()
-                  }}
-                />
-              </div>
-              <div className="relative min-w-[150px]">
-                <select
-                  value={season}
-                  onChange={(e) => setSeason(e.target.value)}
-                  aria-label="Season"
-                  className="h-12 w-full cursor-pointer appearance-none rounded-xl bg-surface-container px-4 pr-10 text-label-lg text-on-surface outline-none hover:bg-surface-container-high"
-                >
-                  {SEASONS.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-                <span className="material-symbols-outlined pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-outline">expand_more</span>
-              </div>
-              <div className="relative min-w-[150px]">
-                <select
-                  value={crop}
-                  onChange={(e) => setCrop(e.target.value)}
-                  aria-label="Crop"
-                  className="h-12 w-full cursor-pointer appearance-none rounded-xl bg-surface-container px-4 pr-10 text-label-lg text-on-surface outline-none hover:bg-surface-container-high"
-                >
-                  <option value="">Any crop</option>
-                  {(crops.data ?? []).map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-                <span className="material-symbols-outlined pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-outline">expand_more</span>
-              </div>
-              <button
-                onClick={() => {
-                  setSeason('')
-                  setCrop('')
-                  setPlaceText('')
-                  notify('Filters reset to default')
-                }}
-                aria-label="Reset filters"
-                className="flex h-12 w-12 items-center justify-center rounded-xl bg-surface-container text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
-              >
-                <span className="material-symbols-outlined text-[20px]">filter_alt_off</span>
-              </button>
+            <div className="flex shrink-0 items-center gap-3 text-xs text-on-surface-variant">
+              <span className="flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-primary" />
+                <strong className="font-medium text-on-surface">{plots.length} plots</strong> in view
+              </span>
+              <span className="text-outline/50">•</span>
+              <span>{acres.toFixed(1)} acres open</span>
             </div>
           </div>
         </section>
 
-        {/* Map and Plot Cards */}
-        <section className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-12">
-          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-            {/* Map Left View */}
-            <div className="sticky top-24 flex flex-col gap-4 lg:col-span-7">
-              <div className="relative h-[620px] w-full overflow-hidden rounded-2xl bg-surface-container shadow-xl">
+        <section className="mx-auto w-full max-w-[1440px] px-6 pb-20 lg:px-12">
+          <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+            {/* Map and controls */}
+            <div className="flex flex-col gap-4 lg:col-span-7">
+              <div className="flex flex-col items-stretch gap-2.5 rounded-2xl border border-border bg-surface-card p-3.5 sm:flex-row sm:items-center">
+                <div className="relative flex-1">
+                  <span className="material-symbols-outlined absolute top-1/2 left-3.5 -translate-y-1/2 text-[18px] text-on-surface-variant">search</span>
+                  <input
+                    className="h-10 w-full rounded-xl border border-border bg-surface pr-3 pl-10 text-xs text-on-surface transition-colors placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none"
+                    placeholder="Search village, tehsil, or address..."
+                    aria-label="Search a place"
+                    value={placeText}
+                    onChange={(e) => setPlaceText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') void findPlace()
+                    }}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <select value={season} onChange={(e) => setSeason(e.target.value)} aria-label="Season" className={input}>
+                      {SEASONS.map((x) => (
+                        <option key={x.value} value={x.value}>
+                          {x.label}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="material-symbols-outlined pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-[16px] text-on-surface-variant">expand_more</span>
+                  </div>
+                  <div className="relative">
+                    <select value={crop} onChange={(e) => setCrop(e.target.value)} aria-label="Crop" className={input}>
+                      <option value="">Any crop</option>
+                      {(crops.data ?? []).map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="material-symbols-outlined pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-[16px] text-on-surface-variant">expand_more</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setSeason('')
+                      setCrop('')
+                      setPlaceText('')
+                      notify('Filters reset')
+                    }}
+                    title="Reset filters"
+                    aria-label="Reset filters"
+                    className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-on-surface-variant transition-colors hover:border-outline hover:text-on-surface"
+                  >
+                    <span className="material-symbols-outlined text-[17px]">tune</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="relative h-[580px] w-full overflow-hidden rounded-2xl border border-border bg-surface-container">
                 {hasMap ? (
                   <div className="h-full w-full [&>div]:!h-full [&>div]:!rounded-none">
                     <PlotMap plots={plots} selectedId={selectedId} onSelect={(id) => setSelectedId(id)} onBoundsChange={setBounds} focus={focus} />
                   </div>
                 ) : (
-                  <p className="grid h-full place-items-center px-6 text-center text-on-surface-variant">
-                    The map could not load. Refresh the page to try again.
-                  </p>
+                  <p className="grid h-full place-items-center px-6 text-center text-on-surface-variant">The map could not load. Refresh the page to try again.</p>
                 )}
                 <div className="pointer-events-none absolute inset-x-4 top-4 z-[500] flex items-center justify-between">
-                  <div className="pointer-events-auto ml-12 flex items-center gap-2 rounded-full bg-surface/90 px-3 py-1.5 shadow-md backdrop-blur-md">
-                    <span className="h-2 w-2 rounded-full bg-secondary"></span>
-                    <span className="text-label-sm text-on-surface">Layer: Open plots in view</span>
+                  <div className="pointer-events-auto ml-12 flex items-center gap-2 rounded-full border border-border bg-header px-3 py-1.5 backdrop-blur-md">
+                    <span className="size-2 rounded-full bg-primary" />
+                    <span className="text-xs font-medium text-on-surface">Layer: Open plots in view</span>
                   </div>
-                  <div className="pointer-events-auto flex items-center gap-3 rounded-full bg-surface/90 px-3 py-1.5 text-label-sm shadow-md backdrop-blur-md">
-                    <div className="flex items-center gap-1.5">
-                      <span className="h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-primary/30"></span>
-                      <span className="text-on-surface">Open Plot</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="h-2.5 w-2.5 rounded-full bg-secondary"></span>
+                  <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-border bg-header px-3 py-1.5 text-xs backdrop-blur-md">
+                    <span className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-primary" />
+                      <span className="text-on-surface">Open plot</span>
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="size-2 rounded-full bg-secondary" />
                       <span className="text-on-surface">Selected</span>
-                    </div>
+                    </span>
                   </div>
                 </div>
                 <div className="pointer-events-none absolute right-4 bottom-4 left-4 z-[500] flex items-center justify-between">
-                  <div className="pointer-events-auto flex items-center gap-3 rounded-xl bg-surface-container-high/90 px-3 py-1.5 shadow-lg backdrop-blur-md">
-                    <span className="text-label-sm text-outline">
+                  <div className="pointer-events-auto flex items-center gap-2 rounded-xl border border-border bg-header px-3 py-1.5 text-xs text-on-surface-variant backdrop-blur-md">
+                    <span className="font-mono text-[11px]">
                       {bounds
-                        ? `Lat ${((bounds.north + bounds.south) / 2).toFixed(4)}° N, Lon ${((bounds.east + bounds.west) / 2).toFixed(4)}° E`
+                        ? `${((bounds.north + bounds.south) / 2).toFixed(4)}° N, ${((bounds.east + bounds.west) / 2).toFixed(4)}° E`
                         : 'Move the map to search an area'}
                     </span>
-                    <span className="text-outline-variant">•</span>
-                    <span className="text-label-sm text-primary">{plots.length} plots in view</span>
+                    <span className="text-outline">•</span>
+                    <span className="font-medium text-on-surface">{plots.length} plots in view</span>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
-                <div className="flex flex-col justify-between rounded-xl bg-surface-container p-4 shadow-sm">
-                  <span className="text-label-sm tracking-wider text-on-surface-variant uppercase">Plots In View</span>
-                  <div className="mt-1 flex items-baseline gap-1">
-                    <span className="font-headline-sm text-headline-sm font-bold text-on-surface">{plots.length}</span>
-                    <span className="text-label-sm text-primary">open</span>
+                <div className="rounded-xl border border-border bg-surface-card p-3.5">
+                  <span className="mb-1 block text-[11px] tracking-wider text-on-surface-variant uppercase">Plots in view</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-serif text-lg text-on-surface">{plots.length}</span>
+                    <span className="text-xs font-medium text-primary">open</span>
                   </div>
-                  <span className="mt-1 text-label-sm text-outline">Updates as you move the map</span>
+                  <span className="mt-0.5 block text-[11px] text-on-surface-variant">Updates as you move the map</span>
                 </div>
-                <div className="flex flex-col justify-between rounded-xl bg-surface-container p-4 shadow-sm">
-                  <span className="text-label-sm tracking-wider text-on-surface-variant uppercase">Open Acreage</span>
-                  <div className="mt-1 flex items-baseline gap-1">
-                    <span className="font-headline-sm text-headline-sm font-bold text-on-surface">{acres.toFixed(1)}</span>
-                    <span className="text-label-sm text-secondary">acres</span>
+                <div className="rounded-xl border border-border bg-surface-card p-3.5">
+                  <span className="mb-1 block text-[11px] tracking-wider text-on-surface-variant uppercase">Open acreage</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-serif text-lg text-on-surface">{acres.toFixed(1)}</span>
+                    <span className="text-xs font-medium text-secondary">acres</span>
                   </div>
-                  <span className="mt-1 text-label-sm text-outline">Measured from the drawn boundaries</span>
+                  <span className="mt-0.5 block text-[11px] text-on-surface-variant">From the drawn boundaries</span>
                 </div>
-                <div className="flex flex-col justify-between rounded-xl bg-surface-container p-4 shadow-sm">
-                  <span className="text-label-sm tracking-wider text-on-surface-variant uppercase">Avg Season Rate</span>
-                  <div className="mt-1 flex items-baseline gap-1">
-                    <span className="font-headline-sm text-headline-sm font-bold text-primary">{rupees(Math.round(avgRate))}</span>
-                    <span className="text-label-sm text-on-surface-variant">/ kg</span>
+                <div className="rounded-xl border border-border bg-surface-card p-3.5">
+                  <span className="mb-1 block text-[11px] tracking-wider text-on-surface-variant uppercase">Avg season rate</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-serif text-lg text-on-surface">{rupees(Math.round(avgRate))}</span>
+                    <span className="text-xs text-on-surface-variant">/ kg</span>
                   </div>
-                  <span className="mt-1 text-label-sm text-outline">Paid on the harvest you take</span>
+                  <span className="mt-0.5 block text-[11px] text-on-surface-variant">Paid on the harvest you take</span>
                 </div>
               </div>
             </div>
 
-            {/* Right Plot List */}
-            <div className="flex flex-col gap-4 lg:col-span-5">
-              <div className="flex items-center justify-between pb-1">
-                <div>
-                  <span className="font-headline-sm text-headline-sm text-on-surface">Available plots</span>
-                  <p className="text-label-sm text-on-surface-variant" aria-live="polite">
-                    {search.isPending && ready ? 'Searching…' : `${plots.length} plots open in this area`}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1 rounded-xl bg-surface-container-high p-1">
-                  <button className="rounded-lg bg-surface-container-highest px-2.5 py-1 text-label-sm text-primary">Active</button>
-                </div>
-              </div>
-
-              {search.isError && (
-                <p role="alert" className="font-semibold text-error">
-                  Could not load plots. Move the map or refresh to try again.
-                </p>
-              )}
-
-              <div className="flex max-h-[760px] flex-col gap-3.5 overflow-y-auto pr-1">
-                {plots.map((item, idx) => {
-                  const p = item.properties
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => open(item)}
-                      className={`group relative cursor-pointer rounded-2xl bg-surface-container p-4 shadow-md transition-all hover:bg-surface-container-high ${
-                        idx === 0 || item.properties.plotSeasonId === selectedId ? 'bg-gradient-to-r from-surface-container via-surface-container to-primary/5 ring-1 ring-primary/40' : ''
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-label-sm font-bold text-primary">
-                              <span className="material-symbols-outlined text-[14px]">verified</span>
-                              Boundary Verified
-                            </span>
-                            <span className="text-label-sm text-outline">{plotCode(item.id)}</span>
-                          </div>
-                          <h2 className="font-headline-sm text-headline-sm text-on-surface transition-colors group-hover:text-primary">{p.title}</h2>
-                          <p className="text-body-sm text-on-surface-variant">
-                            {p.areaAcres} acres • {p.season} Season • {day(p.startDate)} to {day(p.endDate)}
-                          </p>
-                        </div>
-                        <div className="shrink-0 text-right">
-                          <span className="font-headline-sm text-headline-sm font-bold text-primary">{rupees(p.price)}</span>
-                          <span className="block text-label-sm text-on-surface-variant">per kg of harvest</span>
-                        </div>
+            {/* Plot record panel */}
+            <aside className="sticky top-28 flex max-h-[calc(100vh-8rem)] flex-col gap-6 overflow-y-auto rounded-2xl border border-border bg-surface-card p-6 lg:col-span-5 lg:p-7">
+              {selected ? (
+                <PlotRecord plot={selected} cropName={cropName} signedIn={!!user} onBack={() => setSelectedId(null)} />
+              ) : (
+                <>
+                  <div className="flex items-center justify-between border-b border-border pb-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="size-1.5 rounded-full bg-primary" />
+                        <span className="text-[11px] font-medium tracking-widest text-on-surface-variant uppercase">Available plots</span>
                       </div>
-
-                      <div className="mt-3 flex flex-wrap gap-1.5 rounded-xl bg-surface-container-lowest/40 p-2.5 pt-3">
-                        {p.allowedCrops.length === 0 && <span className="text-label-sm text-on-surface-variant">Crops decided with the farmer</span>}
-                        {p.allowedCrops.map((c) => (
-                          <span key={c} className="inline-flex items-center gap-1 rounded-lg bg-surface-container px-2.5 py-1 text-label-sm text-on-surface">
-                            <span className="material-symbols-outlined text-[14px] text-secondary">water_drop</span> {cropName.get(c) ?? c}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="mt-3 flex items-center justify-between pt-1">
-                        <span className="text-label-sm text-on-surface-variant">Reservation ends {day(p.endDate)}</span>
-                        <button className="flex items-center gap-1 rounded-xl bg-primary px-3 py-1.5 text-label-sm font-bold text-on-primary shadow-sm transition-all hover:brightness-110">
-                          <span>View & Reserve</span>
-                          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                        </button>
-                      </div>
+                      <h2 className="mt-0.5 font-serif text-2xl font-normal text-on-surface">Pick a plot to inspect</h2>
                     </div>
-                  )
-                })}
-                {!search.isPending && plots.length === 0 && !search.isError && (
-                  <p className="text-on-surface-variant">No open plots here. Zoom out, move the map, or reset the filters.</p>
-                )}
-              </div>
-            </div>
+                    <span className="rounded-lg border border-border bg-surface px-2.5 py-1 font-mono text-xs text-on-surface-variant" aria-live="polite">
+                      {search.isPending && ready ? '…' : plots.length}
+                    </span>
+                  </div>
+                  {search.isError && (
+                    <p role="alert" className="text-sm font-semibold text-error">
+                      Could not load plots. Move the map or refresh to try again.
+                    </p>
+                  )}
+                  <div className="flex flex-col gap-3">
+                    {plots.map((item) => {
+                      const p = item.properties
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => setSelectedId(p.plotSeasonId)}
+                          className="group rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-outline"
+                        >
+                          <span className="flex items-start justify-between gap-3">
+                            <span>
+                              <span className="flex items-center gap-2">
+                                <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-[10px] text-on-surface">
+                                  <span className="size-1.5 rounded-full bg-primary" /> Boundary verified
+                                </span>
+                                <span className="font-mono text-[11px] text-on-surface-variant">{plotCode(item.id)}</span>
+                              </span>
+                              <span className="mt-1.5 block font-serif text-lg text-on-surface">{p.title}</span>
+                              <span className="block text-xs font-light text-on-surface-variant">
+                                {p.areaAcres} acres • {p.season} • {day(p.startDate)} to {day(p.endDate)}
+                              </span>
+                            </span>
+                            <span className="shrink-0 text-right">
+                              <span className="block font-serif text-xl text-on-surface">{rupees(p.price)}</span>
+                              <span className="block text-[11px] text-on-surface-variant">per kg of harvest</span>
+                            </span>
+                          </span>
+                          <span className="mt-3 flex flex-wrap gap-1.5">
+                            {p.allowedCrops.length === 0 && <span className="text-[11px] text-on-surface-variant">Crops decided with the farmer</span>}
+                            {p.allowedCrops.map((c) => (
+                              <span key={c} className="rounded-md border border-border px-2 py-0.5 text-[11px] text-on-surface-variant">
+                                {cropName.get(c) ?? c}
+                              </span>
+                            ))}
+                          </span>
+                          <span className="mt-3 flex items-center justify-between text-xs">
+                            <span className="text-on-surface-variant">Reservation ends {day(p.endDate)}</span>
+                            <span className="flex items-center gap-1 font-medium text-primary">
+                              View &amp; Reserve <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                            </span>
+                          </span>
+                        </button>
+                      )
+                    })}
+                    {!search.isPending && plots.length === 0 && !search.isError && (
+                      <p className="text-sm text-on-surface-variant">No open plots here. Zoom out, move the map, or reset the filters.</p>
+                    )}
+                  </div>
+                </>
+              )}
+            </aside>
           </div>
         </section>
-
-        {modalOpen && selected && (
-          <PlotModal plot={selected} cropName={cropName} signedIn={!!user} onClose={() => setModalOpen(false)} />
-        )}
-      </div>
+      </main>
       <SiteFooter />
     </>
   )
 }
 
-/** Slide-over for one plot: its record and the request to reserve it. */
-function PlotModal({ plot, cropName, signedIn, onClose }: { plot: PlotFeature; cropName: Map<string, string>; signedIn: boolean; onClose: () => void }) {
+/** One plot's record and the request to reserve it, in the side panel. */
+function PlotRecord({ plot, cropName, signedIn, onBack }: { plot: PlotFeature; cropName: Map<string, string>; signedIn: boolean; onBack: () => void }) {
   const notify = useToast()
   const p = plot.properties
   const [crop, setCrop] = useState(p.allowedCrops[0] ?? '')
@@ -327,129 +319,123 @@ function PlotModal({ plot, cropName, signedIn, onClose }: { plot: PlotFeature; c
     reserve.mutate()
   }
 
+  const field = 'mt-1 h-10 w-full rounded-xl border border-border bg-surface px-3 text-xs text-on-surface outline-none focus:border-primary'
+
   return (
-    <div className="fixed inset-0 z-[1500] flex justify-end bg-background/80 backdrop-blur-md">
-      <div className="flex-1 cursor-pointer" onClick={onClose}></div>
-      <div className="flex h-full w-full max-w-2xl flex-col justify-between overflow-y-auto bg-surface-container-low p-6 shadow-2xl lg:p-8" role="dialog" aria-label={p.title}>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between pb-4">
-            <div className="flex items-center gap-3">
-              <span className="h-3 w-3 rounded-full bg-primary shadow-[0_0_8px_#2ec47a]"></span>
-              <div>
-                <span className="text-label-sm font-bold tracking-wider text-primary uppercase">Plot Record</span>
-                <h2 className="font-headline-md text-headline-md text-on-surface">{p.title}</h2>
-              </div>
-            </div>
-            <button onClick={onClose} aria-label="Close" className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">
-              <span className="material-symbols-outlined text-[20px]">close</span>
-            </button>
+    <>
+      <div className="flex items-start justify-between gap-3 border-b border-border pb-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="size-1.5 rounded-full bg-primary" />
+            <span className="text-[11px] font-medium tracking-widest text-on-surface-variant uppercase">Plot Inspection Record</span>
           </div>
-
-          <div className="relative h-48 w-full overflow-hidden rounded-2xl bg-surface-container shadow-md">
-            <img className="h-full w-full object-cover" alt="Farmland" src="/img/p15.jpg" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent"></div>
-            <div className="absolute right-4 bottom-3 left-4 flex items-center justify-between">
-              <span className="rounded-full bg-primary/20 px-2.5 py-1 text-label-sm font-bold text-primary backdrop-blur-md">✓ Boundary verified · {plotCode(plot.id)}</span>
-              <span className="text-label-sm font-semibold text-on-surface">{p.areaAcres} Net Acres</span>
-            </div>
-          </div>
-
-          {/* Season profile */}
-          <div className="space-y-3 rounded-2xl bg-surface-container p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-label-md tracking-wider text-on-surface uppercase">Season Profile</span>
-              <span className="text-label-sm text-primary">{p.season}</span>
-            </div>
-            <div className="grid grid-cols-4 gap-2 text-center">
-              <div className="rounded-xl bg-surface-container-high p-2.5">
-                <span className="block text-label-sm text-on-surface-variant">Season</span>
-                <span className="font-headline-sm text-headline-sm font-bold text-on-surface">{p.season}</span>
-              </div>
-              <div className="rounded-xl bg-surface-container-high p-2.5">
-                <span className="block text-label-sm text-on-surface-variant">Starts</span>
-                <span className="font-headline-sm text-headline-sm font-bold text-on-surface">{day(p.startDate)}</span>
-              </div>
-              <div className="rounded-xl bg-surface-container-high p-2.5">
-                <span className="block text-label-sm text-on-surface-variant">Ends</span>
-                <span className="font-headline-sm text-headline-sm font-bold text-on-surface">{day(p.endDate)}</span>
-              </div>
-              <div className="rounded-xl bg-surface-container-high p-2.5">
-                <span className="block text-label-sm text-on-surface-variant">Crops</span>
-                <span className="font-headline-sm text-headline-sm font-bold text-on-surface">{p.allowedCrops.length}</span>
-                <span className="block text-label-sm text-secondary">allowed</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Request */}
-          <div className="space-y-3 rounded-2xl bg-surface-container-high p-4">
-            <span className="text-label-md tracking-wider text-on-surface uppercase">Your Request</span>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="block text-label-sm text-on-surface-variant">
-                Crop to grow
-                <select value={crop} onChange={(e) => setCrop(e.target.value)} className="mt-1 h-12 w-full rounded-xl bg-surface-container px-4 text-body-md text-on-surface">
-                  {p.allowedCrops.length === 0 && <option value="">No crops listed</option>}
-                  {p.allowedCrops.map((c) => (
-                    <option key={c} value={c}>
-                      {cropName.get(c) ?? c}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block text-label-sm text-on-surface-variant">
-                Expected harvest (kg)
-                <input type="number" min="1" step="any" inputMode="decimal" value={qty} onChange={(e) => setQty(e.target.value)} className="mt-1 h-12 w-full rounded-xl bg-surface-container px-4 text-body-md text-on-surface" />
-              </label>
-            </div>
-            <div className="space-y-1.5 pt-1 text-sm">
-              <div className="flex justify-between text-on-surface-variant">
-                <span>Price per kg of harvest</span>
-                <span className="font-semibold text-on-surface">{rupees(p.price)}</span>
-              </div>
-              <div className="flex justify-between text-on-surface-variant">
-                <span>Estimated seasonal value</span>
-                <span className="text-on-surface">{total ? rupees(total) : '—'}</span>
-              </div>
-              <div className="mt-2 flex items-center justify-between rounded-xl bg-primary/10 p-3 text-primary">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">lock</span>
-                  <span className="text-label-md font-bold">Deposit once accepted (20%)</span>
-                </div>
-                <span className="font-headline-sm text-headline-sm font-bold">{total ? rupees(deposit) : '—'}</span>
-              </div>
-            </div>
-            {error && (
-              <p role="alert" className="font-semibold text-error">
-                {error}
-              </p>
-            )}
-            {!signedIn && (
-              <p className="rounded-lg bg-surface-container px-3 py-2 text-body-sm text-on-surface-variant">
-                <Link to="/login" className="font-semibold text-primary underline">Sign in</Link> as a customer to request this plot.
-              </p>
-            )}
-            {reserve.isSuccess && (
-              <p role="status" className="rounded-lg bg-primary/10 px-3 py-2 text-body-sm text-primary">
-                Request sent. <Link to="/customer/reservations" className="font-semibold underline">Go to my reservations</Link>
-              </p>
-            )}
-          </div>
+          <h2 className="mt-0.5 font-serif text-2xl font-normal text-on-surface">{p.title}</h2>
         </div>
+        <span className="rounded-lg border border-border bg-surface px-2.5 py-1 font-mono text-xs text-on-surface-variant">{plotCode(plot.id).replace('Plot ', '')}</span>
+      </div>
 
-        <div className="mt-6 flex items-center gap-4 border-t border-surface-container pt-6">
-          <button onClick={onClose} className="h-12 flex-1 rounded-xl bg-surface-container text-label-lg text-on-surface transition-colors hover:bg-surface-container-high">
-            Cancel
-          </button>
-          <button
-            onClick={submit}
-            disabled={reserve.isPending || reserve.isSuccess || !signedIn}
-            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-primary text-label-lg font-bold text-on-primary shadow-lg transition-all hover:brightness-110 disabled:opacity-60"
-          >
-            <span>{reserve.isPending ? 'Sending…' : total ? `Request plot · ${rupees(deposit)} deposit` : 'Request this plot'}</span>
-            <span className="material-symbols-outlined text-[18px]">verified_user</span>
-          </button>
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-border bg-surface-container">
+        <img alt="Farmland plot" className="h-full w-full object-cover" src="/img/p15.jpg" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+        <div className="absolute right-3 bottom-3 left-3 flex items-center justify-between text-xs text-white">
+          <span className="flex items-center gap-1.5 rounded-md border border-white/10 bg-black/60 px-2.5 py-1 font-mono text-[11px] backdrop-blur-md">
+            <span className="size-1.5 rounded-full bg-emerald-400" />
+            Boundary verified
+          </span>
+          <span className="rounded-md border border-white/10 bg-black/60 px-2.5 py-1 font-medium backdrop-blur-md">{p.areaAcres} Net Acres</span>
         </div>
       </div>
-    </div>
+
+      <div>
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-[11px] font-medium tracking-wider text-on-surface-variant uppercase">Season window ({p.season})</span>
+          <span className="font-mono text-[11px] text-on-surface-variant">Registry</span>
+        </div>
+        <div className="grid grid-cols-4 gap-2 text-center">
+          {[
+            ['Season', p.season, ''],
+            ['Starts', day(p.startDate), ''],
+            ['Ends', day(p.endDate), ''],
+            ['Crops', String(p.allowedCrops.length), 'allowed'],
+          ].map(([k, v, n]) => (
+            <div key={k} className="rounded-xl border border-border bg-surface p-2.5">
+              <span className="mb-1 block text-[11px] text-on-surface-variant">{k}</span>
+              <span className="block font-serif text-sm leading-tight text-on-surface">{v}</span>
+              {n && <span className="mt-0.5 block text-[10px] text-primary">{n}</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-border bg-surface p-3.5">
+        <span className="text-[11px] font-medium tracking-wider text-on-surface-variant uppercase">Your request</span>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block text-[11px] text-on-surface-variant">
+            Crop to grow
+            <select value={crop} onChange={(e) => setCrop(e.target.value)} className={field}>
+              {p.allowedCrops.length === 0 && <option value="">No crops listed</option>}
+              {p.allowedCrops.map((c) => (
+                <option key={c} value={c}>
+                  {cropName.get(c) ?? c}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-[11px] text-on-surface-variant">
+            Expected harvest (kg)
+            <input type="number" min="1" step="any" inputMode="decimal" value={qty} onChange={(e) => setQty(e.target.value)} className={field} />
+          </label>
+        </div>
+      </div>
+
+      <div className="space-y-2.5 border-t border-border pt-4">
+        <span className="block text-[11px] font-medium tracking-wider text-on-surface-variant uppercase">Settlement &amp; deposit</span>
+        <div className="space-y-1.5 text-xs font-light text-on-surface-variant">
+          <div className="flex justify-between">
+            <span>Price per kg of harvest</span>
+            <span className="font-mono text-on-surface">{rupees(p.price)}</span>
+          </div>
+          <div className="flex items-baseline justify-between border-t border-border pt-2 text-on-surface">
+            <span className="text-xs font-medium">Estimated seasonal value</span>
+            <span className="font-serif text-2xl font-normal">{total ? rupees(total) : '—'}</span>
+          </div>
+        </div>
+
+        {error && (
+          <p role="alert" className="text-xs font-semibold text-error">
+            {error}
+          </p>
+        )}
+        {!signedIn && (
+          <p className="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-on-surface-variant">
+            <Link to="/login" className="font-semibold text-primary underline">Sign in</Link> as a customer to request this plot.
+          </p>
+        )}
+        {reserve.isSuccess && (
+          <p role="status" className="rounded-lg bg-primary/10 px-3 py-2 text-xs text-primary">
+            Request sent. <Link to="/customer/reservations" className="font-semibold underline">Go to my reservations</Link>
+          </p>
+        )}
+
+        <button
+          onClick={submit}
+          disabled={reserve.isPending || reserve.isSuccess || !signedIn}
+          className="mt-2 flex h-11 w-full items-center justify-between rounded-xl bg-primary px-4 text-xs font-medium text-on-primary transition-all hover:opacity-95 active:scale-[0.99] disabled:opacity-60"
+        >
+          <span className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[16px]">lock</span>
+            <span>{reserve.isPending ? 'Sending…' : 'Authorize 20% deposit to lock parcel'}</span>
+          </span>
+          <span className="font-mono font-semibold">{total ? rupees(deposit) : '—'}</span>
+        </button>
+        <p className="mt-1 flex items-center justify-center gap-1 text-center text-[11px] text-on-surface-variant">
+          <span className="material-symbols-outlined text-xs text-primary">verified_user</span>
+          The farmer has 48 hours to accept before any deposit is asked
+        </p>
+        <button type="button" onClick={onBack} className="w-full text-center text-xs text-on-surface-variant underline hover:text-on-surface">
+          Back to all plots
+        </button>
+      </div>
+    </>
   )
 }

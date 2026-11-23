@@ -164,10 +164,10 @@ describe('farmer listings page', () => {
     })
     renderAt('/farmer/listings')
     expect(await screen.findByRole('heading', { level: 3, name: 'Tomato, Hybrid 501' })).toBeInTheDocument()
-    expect(screen.getAllByText('₹28')).toHaveLength(2)
+    expect(screen.getAllByText(/₹28 \/ kg/)).toHaveLength(2)
     expect(screen.getByText('Paused')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Resume' })).toBeInTheDocument()
-    expect(screen.getByText(/Active Inventory Catalogue \(1 on sale\)/)).toBeInTheDocument()
+    expect(screen.getByText('Active Listings')).toBeInTheDocument()
   })
 
   it('lists new produce, uploads its photo and attaches it', async () => {

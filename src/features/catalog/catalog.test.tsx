@@ -84,7 +84,7 @@ describe('catalog page', () => {
     renderAt('/catalog')
     expect(await screen.findByRole('heading', { name: /Tomato/, level: 3 })).toBeInTheDocument()
     expect(screen.queryByText(/Showing sample produce/)).not.toBeInTheDocument()
-    expect(screen.getByText('Verified Traceability')).toBeInTheDocument()
+    expect(screen.getByText('Batch Inspection')).toBeInTheDocument()
     expect(screen.getByText(/1 listings/)).toBeInTheDocument()
   })
 
@@ -95,7 +95,7 @@ describe('catalog page', () => {
     })
     renderAt('/catalog')
     expect(await screen.findByText(/Showing sample produce/)).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: /Fruits/ }))
+    await userEvent.click(screen.getByRole('button', { name: /Orchard fruits/ }))
     expect(screen.getAllByRole('heading', { level: 3, name: /Mango/ }).length).toBeGreaterThan(0)
     expect(screen.queryByRole('heading', { level: 3, name: /^Tomato/ })).not.toBeInTheDocument()
   })

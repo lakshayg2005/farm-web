@@ -7,6 +7,7 @@ import { useUnreadCount } from '@/features/notifications/notifications'
 import { useCart } from '@/features/shop/shop'
 import type { Section } from '@/routes/types'
 import { materialIcon } from './materialIcon'
+import { ThemeToggle } from './ThemeSwitch'
 
 const ROLE_NAME: Record<string, string> = {
   farmer: 'Farmer Partner',
@@ -14,13 +15,6 @@ const ROLE_NAME: Record<string, string> = {
   inspector: 'Field Inspector',
   admin: 'Operations Admin',
 }
-
-const navClass = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-label-lg transition-all ${
-    isActive
-      ? 'bg-primary-container font-bold text-on-primary-container shadow-[0_0_24px_rgba(46,196,122,0.18)]'
-      : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
-  }`
 
 /**
  * Shell shared by every role section ("My workspace"): a fixed sidebar with the section's pages,
@@ -52,89 +46,101 @@ export function RoleLayout({ section }: { section: Section }) {
     document.title = current ? `${current.label} | ${section.label} | Farm Platform` : 'Farm Platform'
   }, [current, section.label])
 
+  const navItem = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${
+      isActive ? 'border border-emerald-500/20 bg-[#1d3525] font-medium text-emerald-300' : 'border border-transparent text-[#9aa89e] hover:bg-[#152219] hover:text-[#ecf3ed]'
+    }`
+
   return (
     <div className="flex min-h-dvh bg-background text-on-surface">
-      {/* Sidebar */}
-      <aside className="fixed top-0 left-0 z-50 hidden h-full w-72 flex-col justify-between bg-surface-container-low px-4 py-6 shadow-[0_1px_8px_rgba(0,0,0,0.3)] lg:flex">
-        <div className="flex flex-col gap-6">
-          <Link to="/" className="flex items-center gap-3 px-3">
-            <span className="grid size-8 place-items-center rounded-lg bg-primary text-on-primary">
-              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
-            </span>
-            <span className="flex flex-col">
-              <span className="font-headline-sm text-headline-sm leading-none font-semibold tracking-tight text-on-surface">Farm Platform</span>
-              <span className="mt-1 text-label-sm tracking-widest text-primary uppercase">Operations Hub</span>
-            </span>
+      {/* Sidebar (always dark, as in the prototype) */}
+      <aside className="fixed top-0 left-0 z-50 hidden h-full w-64 flex-col justify-between border-r border-[#1b261f] bg-[#0d1611] px-4 py-6 lg:flex">
+        <div className="flex flex-col gap-7">
+          <Link to="/" className="flex items-center gap-3 px-2 pt-1">
+            <div className="flex size-8 items-center justify-center rounded-lg border border-emerald-600/30 bg-emerald-700/20 text-emerald-400">
+              <span className="material-symbols-outlined text-[19px]">potted_plant</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-serif text-lg leading-tight font-medium tracking-tight text-[#ecf3ed]">Farm Platform</span>
+              <span className="text-[11px] font-semibold tracking-wider text-emerald-500 uppercase">{ROLE_NAME[section.role] ?? section.label} portal</span>
+            </div>
           </Link>
-          <div className="flex items-center justify-between rounded-xl bg-surface-container px-3 py-2.5">
-            <span className="flex items-center gap-2">
-              <span className="size-2.5 rounded-full bg-secondary"></span>
-              <span className="text-label-md text-on-surface">Role: {ROLE_NAME[section.role] ?? section.label}</span>
-            </span>
-            <span className="material-symbols-outlined text-[18px] text-on-surface-variant">expand_more</span>
-          </div>
-          <nav aria-label={`${section.label} pages`} className="flex flex-col gap-1.5">
+          <nav aria-label={`${section.label} pages`} className="flex flex-col gap-1">
+            <Link to="/" className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2 text-sm text-[#9aa89e] transition-all hover:bg-[#152219] hover:text-[#ecf3ed]">
+              <span className="material-symbols-outlined text-[18px]">space_dashboard</span>
+              <span>{t('All sections')}</span>
+            </Link>
             {section.pages.map((page) => (
-              <NavLink key={page.path} to={page.path} className={navClass}>
-                <span className="material-symbols-outlined text-[20px]">{materialIcon(page.icon)}</span>
+              <NavLink key={page.path} to={page.path} className={navItem}>
+                <span className="material-symbols-outlined text-[18px]">{materialIcon(page.icon)}</span>
                 <span>{t(page.label)}</span>
                 {badge(page)}
               </NavLink>
             ))}
-            <Link to="/catalog" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-label-lg text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-on-surface">
-              <span className="material-symbols-outlined text-[20px]">storefront</span>
+            <Link to="/catalog" className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2 text-sm text-[#9aa89e] transition-all hover:bg-[#152219] hover:text-[#ecf3ed]">
+              <span className="material-symbols-outlined text-[18px]">storefront</span>
               <span>Marketplace</span>
             </Link>
           </nav>
         </div>
 
-        <div className="flex flex-col gap-2 pt-4">
-          <Link to="/" className="flex items-center gap-3 rounded-xl px-3 py-2 text-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">
-            <span className="material-symbols-outlined text-[18px]">home</span>
-            <span>{t('All sections')}</span>
-          </Link>
-          <LanguageSwitch className="px-3" />
-          <div className="flex items-center justify-between rounded-xl bg-surface-container p-3">
-            <span className="flex min-w-0 items-center gap-3">
-              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-on-primary">
-                <span className="material-symbols-outlined text-[18px]">person</span>
+        <div className="flex flex-col gap-3 border-t border-[#1a261e] pt-4">
+          <div className="flex items-center justify-between px-2 text-xs text-[#9aa89e]">
+            <span className="flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
+              Farm network
+            </span>
+            <span className="text-[11px] text-emerald-400">Online</span>
+          </div>
+          <LanguageSwitch className="px-2" />
+          <div className="flex items-center justify-between rounded-lg border border-[#1e2d22] bg-[#141f17] p-2.5">
+            <span className="flex min-w-0 items-center gap-2.5 overflow-hidden">
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-800/40 text-xs font-semibold text-emerald-300">
+                {(user?.name ?? section.label).charAt(0)}
               </span>
-              <span className="flex min-w-0 flex-col overflow-hidden">
-                <span className="truncate text-label-md text-on-surface">{user?.name ?? section.label}</span>
-                <button type="button" onClick={() => void logout()} className="text-left text-label-sm text-on-surface-variant hover:text-primary">
+              <span className="flex min-w-0 flex-col">
+                <span className="truncate text-xs font-medium text-[#ecf3ed]">{user?.name ?? section.label}</span>
+                <button type="button" onClick={() => void logout()} className="text-left text-[11px] text-[#9aa89e] hover:text-emerald-400">
                   {t('Sign out')}
                 </button>
               </span>
             </span>
-            <span className="material-symbols-outlined text-[18px] text-on-surface-variant">unfold_more</span>
+            <NavLink to="/profile" aria-label={t('Profile')} className="text-[#9aa89e] hover:text-[#ecf3ed]">
+              <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+            </NavLink>
           </div>
         </div>
       </aside>
 
       {/* Main space */}
-      <div className="flex min-w-0 flex-1 flex-col lg:pl-72">
-        <header className="fixed top-0 right-0 left-0 z-40 flex h-16 items-center justify-between bg-surface/85 px-4 shadow-[0_1px_8px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:px-8 lg:left-72">
-          <div className="flex items-center gap-4 text-on-surface-variant">
-            <Link to="/" className="font-headline-sm text-headline-sm font-semibold text-on-surface lg:hidden">Farm Platform</Link>
-            <span className="material-symbols-outlined hidden text-[20px] sm:inline">agriculture</span>
-            <span className="hidden text-label-sm tracking-wider uppercase sm:inline">Soil Station Network: Online</span>
+      <div className="flex min-w-0 flex-1 flex-col lg:pl-64">
+        <header className="fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-b border-border bg-header px-4 backdrop-blur-md sm:px-8 lg:left-64">
+          <div className="flex items-center gap-3 text-xs text-on-surface-variant">
+            <Link to="/" className="font-serif text-base text-on-surface lg:hidden">Farm Platform</Link>
+            <span className="hidden lg:inline">Operations</span>
+            <span className="hidden text-on-surface-variant/40 lg:inline">/</span>
+            <span className="font-medium text-on-surface">{current ? t(current.label) : t(section.label)}</span>
           </div>
-          <div className="flex items-center gap-4">
-            <LanguageSwitch />
-            <span className="rounded-full bg-surface-container-high px-3 py-0.5 text-sm text-on-surface-variant lg:hidden">{t(section.label)}</span>
-            <NavLink to={inbox?.path ?? '/profile'} aria-label={unread > 0 ? t('Notifications, {n} unread', { n: unread }) : t('Notifications')} className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-surface-container text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">
-              <span className="material-symbols-outlined text-[20px]">notifications</span>
-              {unread > 0 && <span aria-hidden="true" className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-secondary"></span>}
-              </NavLink>
-            <NavLink to="/profile" aria-label={t('Profile')} className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-on-primary">
-              <span className="material-symbols-outlined text-[18px]">person</span>
+          <div className="flex items-center gap-2.5">
+            <ThemeToggle />
+            <LanguageSwitch className="lg:hidden" />
+            <NavLink
+              to={inbox?.path ?? '/profile'}
+              aria-label={unread > 0 ? t('Notifications, {n} unread', { n: unread }) : t('Notifications')}
+              className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-container text-on-surface-variant transition-colors hover:border-outline hover:text-on-surface"
+            >
+              <span className="material-symbols-outlined text-[17px]">notifications</span>
+              {unread > 0 && <span aria-hidden="true" className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-primary" />}
+            </NavLink>
+            <NavLink to="/profile" aria-label={t('Profile')} className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-surface-card text-on-surface-variant lg:hidden">
+              <span className="material-symbols-outlined text-[17px]">person</span>
             </NavLink>
           </div>
         </header>
 
-        <main className="w-full px-4 pt-20 pb-28 sm:px-8 sm:py-8 sm:pt-24 lg:pb-12">
+        <main className="mx-auto w-full max-w-6xl px-4 pt-20 pb-28 sm:px-8 lg:pb-16">
           {section.role === 'farmer' && user && !user.farmerVerified && (
-            <p role="note" className="mb-5 rounded-xl bg-secondary/15 p-3 text-secondary">
+            <p role="note" className="mb-5 rounded-lg border border-border bg-surface-card p-3 text-xs text-secondary">
               <strong>{t('Waiting for verification')}.</strong> {t('An admin checks every new farmer before they can list produce or offer land. You will get a notification once you are verified.')}
             </p>
           )}
@@ -144,7 +150,7 @@ export function RoleLayout({ section }: { section: Section }) {
 
       {/* Mobile tab bar */}
       {tabPages.length > 1 && (
-        <nav aria-label={`${section.label} pages (mobile)`} className="fixed inset-x-0 bottom-0 z-40 bg-surface-container-low pb-[env(safe-area-inset-bottom)] lg:hidden">
+        <nav aria-label={`${section.label} pages (mobile)`} className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden">
           <ul className="grid" style={{ gridTemplateColumns: `repeat(${tabPages.length}, minmax(0, 1fr))` }}>
             {tabPages.map((page) => (
               <li key={page.path}>

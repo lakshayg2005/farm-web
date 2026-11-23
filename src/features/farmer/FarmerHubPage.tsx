@@ -58,130 +58,117 @@ export function FarmerHubPage({ tab: initialTab }: { tab: Tab }) {
 
   const setTab = (t: Tab) => navigate(`/farmer/${t}`)
 
+  const [filter, setFilter] = useState('')
+  const [newest, setNewest] = useState(true)
+  const shown = live
+    .filter((l) => !filter || `${l.cropName} ${l.variety ?? ''}`.toLowerCase().includes(filter.toLowerCase()))
+    .sort((a, b) => (newest ? 0 : a.cropName.localeCompare(b.cropName)))
+  const kpi = 'rounded-lg border border-border bg-surface-card p-4'
+  const kpiLabel = 'mb-1 text-[11px] font-medium tracking-wider text-on-surface-variant uppercase'
+
   return (
     <div>
-      <div className="mb-8 flex flex-col gap-6">
-        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="font-headline-xl text-headline-xl tracking-tight text-on-surface">Listings & Orders</h1>
-              <span className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-label-sm tracking-wider text-primary uppercase">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary"></span>
-                Live Hub
-              </span>
-            </div>
-            <p className="max-w-2xl text-body-md text-on-surface-variant">
-              Produce currently listed for sale, farm-gate lot inspection statuses, packing queues, and automated escrow payouts.
-            </p>
-          </div>
-          <button
-            hidden={gate !== null}
-            onClick={() => {
-              setEditorError(undefined)
-              setEditing('new')
-            }}
-            className="flex h-12 items-center gap-2 rounded-xl bg-primary-container px-6 text-label-lg text-on-primary-container shadow-[0_0_24px_rgba(46,196,122,0.2)] transition-all hover:bg-primary"
-          >
-            <span className="material-symbols-outlined text-[20px]">add_circle</span>
-            <span>Add a listing</span>
-          </button>
+      <div className="mb-8 flex flex-col justify-between gap-4 border-b border-border pb-6 sm:flex-row sm:items-baseline">
+        <div>
+          <h1 className="font-serif text-3xl font-medium tracking-tight text-on-surface">Listings &amp; Orders</h1>
+          <p className="mt-1 text-sm text-on-surface-variant">Real-time produce lot inventory, packaging queue, and direct buyer settlements.</p>
         </div>
-
-        {gate === null && (<>
-        {/* Metrics */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="relative flex flex-col justify-between overflow-hidden rounded-xl bg-surface-container p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between gap-2">
-              <span className="text-label-sm tracking-wider text-on-surface-variant uppercase">
-                Paid out to you ({payouts.data?.items.length ?? 0} completed)
-              </span>
-              <span className="flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-label-sm text-primary">
-                <span className="material-symbols-outlined text-[14px]">check_circle</span>
-                Settled
-              </span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="font-headline-xl text-headline-xl text-secondary">{rupees(payouts.data?.total ?? money.earned)}</span>
-              <span className="text-label-sm text-on-surface-variant">INR • Direct to Bank</span>
-            </div>
-            <div className="mt-3 flex items-center justify-between pt-3 text-label-sm text-on-surface-variant">
-              <span>{payouts.data?.items[0] ? `Last payout ${day(payouts.data.items[0].paidAt)}` : 'Paid when an order is delivered'}</span>
-            </div>
-          </div>
-
-          <div className="relative flex flex-col justify-between overflow-hidden rounded-xl bg-surface-container p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between gap-2">
-              <span className="text-label-sm tracking-wider text-on-surface-variant uppercase">On the way (escrow held)</span>
-              <span className="flex items-center gap-1 rounded-full bg-secondary/15 px-2 py-0.5 text-label-sm text-secondary">
-                <span className="material-symbols-outlined text-[14px]">lock_clock</span>
-                Escrow Held
-              </span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="font-headline-xl text-headline-xl text-secondary">{rupees(money.pending)}</span>
-              <span className="text-label-sm text-on-surface-variant">INR • {shipping} pending shipments</span>
-            </div>
-            <div className="mt-3 flex items-center justify-between pt-3 text-label-sm text-on-surface-variant">
-              <span>Releases upon delivery</span>
-              <span className="flex items-center gap-1 text-label-md text-secondary">Next: Tomorrow 11:00 AM</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-between rounded-xl bg-surface-container p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between gap-2">
-              <span className="text-label-sm tracking-wider text-on-surface-variant uppercase">Stock & Freshness</span>
-              <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm text-on-surface">{farms.data?.[0]?.name ?? 'Farm'}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg bg-surface-container-low p-3">
-                <span className="mb-1 block text-label-sm text-on-surface-variant">Lots In Stock</span>
-                <span className="font-headline-sm text-headline-sm font-bold text-on-surface">{inStock} / {live.length}</span>
-              </div>
-              <div className="rounded-lg bg-surface-container-low p-3">
-                <span className="mb-1 block text-label-sm text-on-surface-variant">Harvest Age</span>
-                <span className="font-headline-sm text-headline-sm font-bold text-primary">~{ageDays.toFixed(1)} Days</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        </>)}
+        <button
+          hidden={gate !== null}
+          onClick={() => {
+            setEditorError(undefined)
+            setEditing('new')
+          }}
+          className="flex h-9 shrink-0 items-center gap-2 rounded-lg bg-emerald-600 px-4 text-xs font-medium tracking-wide text-white shadow-sm transition-colors hover:bg-emerald-500"
+        >
+          <span className="material-symbols-outlined text-[16px]">add</span>
+          <span>Add a listing</span>
+        </button>
       </div>
+
+      {gate === null && (
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className={kpi}>
+            <div className={kpiLabel}>Active Listings</div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-semibold tracking-tight text-on-surface">{live.filter((l) => l.status === 'ACTIVE').length}</span>
+              <span className="text-xs font-medium text-primary">{inStock} in stock</span>
+            </div>
+            <div className="mt-2 border-t border-border pt-2 text-xs text-on-surface-variant">
+              {farms.data?.[0]?.name ?? 'Your farm'} • harvest age ~{ageDays.toFixed(1)} days
+            </div>
+          </div>
+          <button type="button" onClick={() => setTab('orders')} className={`${kpi} text-left transition-colors hover:border-outline`}>
+            <div className={kpiLabel}>Orders to Pack</div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-semibold tracking-tight text-on-surface">{toPack.length}</span>
+              <span className="text-xs font-medium text-secondary">Waiting for you</span>
+            </div>
+            <div className="mt-2 border-t border-border pt-2 text-xs text-on-surface-variant">{shipping} more on the way to customers</div>
+          </button>
+          <div className={kpi}>
+            <div className={kpiLabel}>Paid out to you</div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-semibold tracking-tight text-on-surface">{rupees(payouts.data?.total ?? money.earned)}</span>
+              <span className="text-xs text-on-surface-variant">INR</span>
+            </div>
+            <div className="mt-2 border-t border-border pt-2 text-xs text-on-surface-variant">
+              {rupees(money.pending)} in transit • {payouts.data?.items[0] ? `last payout ${day(payouts.data.items[0].paidAt)}` : 'released when an order is delivered'}
+            </div>
+          </div>
+        </div>
+      )}
 
       {gate}
 
-      {/* Tabs Switcher */}
-      {gate === null && <div className="mb-6 flex flex-col justify-between gap-4 pb-2 lg:flex-row lg:items-center">
-        <div role="tablist" className="flex max-w-fit items-center rounded-xl bg-surface-container p-1 shadow-inner">
-          <button
-            role="tab"
-            aria-selected={initialTab === 'listings'}
-            onClick={() => setTab('listings')}
-            className={`flex items-center gap-2.5 rounded-lg px-5 py-2.5 text-label-lg transition-all ${initialTab === 'listings' ? 'bg-primary-container font-bold text-on-primary-container shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
-          >
-            <span className="material-symbols-outlined text-[18px]">inventory_2</span>
-            <span>Produce Listings</span>
-            <span className="rounded-full bg-on-primary-container/20 px-2 py-0.5 text-label-sm">{live.length}</span>
-          </button>
-          <button
-            role="tab"
-            aria-selected={initialTab === 'orders'}
-            onClick={() => setTab('orders')}
-            className={`flex items-center gap-2.5 rounded-lg px-5 py-2.5 text-label-lg transition-all ${initialTab === 'orders' ? 'bg-primary-container font-bold text-on-primary-container shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
-          >
-            <span className="material-symbols-outlined text-[18px]">shopping_basket</span>
-            <span>Orders to Pack</span>
-            <span className="rounded-full bg-surface-container-highest px-2 py-0.5 text-label-sm font-bold text-secondary">{toPack.length} Ready</span>
-          </button>
+      {/* Segmented tab switcher */}
+      {gate === null && (
+        <div className="mb-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div role="tablist" className="inline-flex rounded-lg border border-border bg-surface-container p-0.5">
+            {([
+              ['listings', 'Produce Listings', live.length],
+              ['orders', 'Orders to Pack', toPack.length],
+            ] as const).map(([key, label, n]) => (
+              <button
+                key={key}
+                role="tab"
+                aria-selected={initialTab === key}
+                onClick={() => setTab(key)}
+                className={`rounded-md px-3.5 py-1.5 text-xs font-medium transition-all ${initialTab === key ? 'bg-surface-card text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
+              >
+                {label} <span className="ml-1 opacity-70">{n}</span>
+              </button>
+            ))}
+          </div>
+          {initialTab === 'listings' && (
+            <div className="flex items-center gap-2">
+              <div className="relative w-56">
+                <span className="material-symbols-outlined absolute top-2 left-2.5 text-[15px] text-on-surface-variant">search</span>
+                <input
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  aria-label="Filter crops"
+                  className="h-8 w-full rounded-md border border-border bg-surface-container pr-3 pl-8 text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none"
+                  placeholder="Filter crops..."
+                  type="text"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setNewest((v) => !v)}
+                className="flex h-8 items-center gap-1 rounded-md border border-border bg-surface-container px-2.5 text-xs text-on-surface-variant transition-colors hover:text-on-surface"
+              >
+                <span className="material-symbols-outlined text-[15px]">sort</span>
+                <span>{newest ? 'Newest' : 'A to Z'}</span>
+              </button>
+            </div>
+          )}
         </div>
-      </div>}
+      )}
 
       {gate === null && initialTab === 'listings' && (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between px-2">
-            <span className="text-label-sm tracking-wider text-on-surface-variant uppercase">Active Inventory Catalogue ({live.filter((l) => l.status === 'ACTIVE').length} on sale)</span>
-            <span className="text-label-sm text-on-surface-variant">Live Stock Synchronization: Enabled</span>
-          </div>
-          <ul aria-label="Your farms" className="flex flex-wrap gap-x-6 gap-y-1 px-2 text-on-surface">
+        <div className="flex flex-col gap-3">
+          <ul aria-label="Your farms" className="flex flex-wrap gap-x-6 gap-y-1 px-1 text-xs text-on-surface">
             {(farms.data ?? []).map((f) => (
               <li key={f.id} className="flex flex-wrap items-center gap-x-2">
                 <span className="font-semibold">{f.name}</span>
@@ -189,28 +176,30 @@ export function FarmerHubPage({ tab: initialTab }: { tab: Tab }) {
               </li>
             ))}
           </ul>
-          {listings.isPending && <p className="text-on-surface-variant">Loading your listings…</p>}
-          {listings.isError && <p role="alert" className="font-semibold text-error">Could not load your listings. Refresh to try again.</p>}
+          {listings.isPending && <p className="text-sm text-on-surface-variant">Loading your listings…</p>}
+          {listings.isError && <p role="alert" className="text-sm font-semibold text-error">Could not load your listings. Refresh to try again.</p>}
           {listings.isSuccess && live.length === 0 && (
-            <div className="rounded-xl bg-surface-container p-6">
-              <h2 className="font-headline-sm text-headline-sm">Put your first produce up for sale</h2>
-              <p className="mt-1 text-on-surface-variant">Add the crop, how much you have, your price and a photo taken at the farm. Customers nearby see it straight away.</p>
+            <div className="rounded-lg border border-dashed border-border bg-surface-card p-6">
+              <h2 className="font-serif text-xl">Put your first produce up for sale</h2>
+              <p className="mt-1 text-sm text-on-surface-variant">Add the crop, how much you have, your price and a photo taken at the farm. Customers nearby see it straight away.</p>
             </div>
           )}
-          {live.length > 0 && <ul aria-label="Your listings" className="grid grid-cols-1 gap-3.5">
-            {live.map((l) => (
-              <li key={l.id}>
-              <ListingRow
-                listing={l}
-                tag={TAG[categoryOf(l.cropId, crops.data)] ?? 'Veg'}
-                onEdit={() => {
-                  setEditorError(undefined)
-                  setEditing(l)
-                }}
-              />
-              </li>
-            ))}
-          </ul>}
+          {shown.length > 0 && (
+            <ul aria-label="Your listings" className="divide-y divide-border overflow-hidden rounded-lg border border-border">
+              {shown.map((l) => (
+                <li key={l.id}>
+                  <ListingRow
+                    listing={l}
+                    tag={TAG[categoryOf(l.cropId, crops.data)] ?? 'Veg'}
+                    onEdit={() => {
+                      setEditorError(undefined)
+                      setEditing(l)
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
@@ -218,15 +207,15 @@ export function FarmerHubPage({ tab: initialTab }: { tab: Tab }) {
 
       {/* Add / edit listing slide-over */}
       {editing !== null && (
-        <div className="fixed inset-0 z-[1500] flex justify-end bg-surface-container-lowest/70 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[1500] flex justify-end bg-black/60 backdrop-blur-xs">
           <div className="flex-1 cursor-pointer" onClick={() => setEditing(null)}></div>
-          <div className="flex h-full w-full max-w-xl flex-col overflow-y-auto bg-surface-container p-6 shadow-2xl">
-            <div className="mb-4 flex items-center justify-between border-b border-surface-variant/40 pb-4">
+          <div className="flex h-full w-full max-w-md flex-col overflow-y-auto border-l border-border bg-surface-card p-6 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
               <div>
-                <h2 className="font-headline-sm text-headline-sm text-on-surface">{editing === 'new' ? 'New Produce Listing' : 'Edit Listing'}</h2>
+                <h2 className="text-base font-semibold text-on-surface">{editing === 'new' ? 'New Produce Listing' : 'Edit Listing'}</h2>
                 <span className="text-label-sm text-on-surface-variant">Post harvest lot for direct buyer orders</span>
               </div>
-              <button onClick={() => setEditing(null)} aria-label="Close" className="flex h-9 w-9 items-center justify-center rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface">
+              <button onClick={() => setEditing(null)} aria-label="Close" className="flex size-7 items-center justify-center rounded text-on-surface-variant hover:bg-surface-container hover:text-on-surface">
                 <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
@@ -276,68 +265,64 @@ function ListingRow({ listing: l, tag, onEdit }: { listing: Listing; tag: string
   const adjust = (delta: number) => update.mutate(Math.max(0, l.qtyAvailable + delta))
 
   return (
-    <article className="group flex flex-col items-start justify-between gap-4 rounded-xl bg-surface-container p-4 shadow-sm transition-all hover:bg-surface-container-high/80 md:flex-row md:items-center">
-      <div className="flex min-w-0 items-center gap-4">
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-surface-container-lowest">
+    <article className="flex flex-col justify-between gap-4 bg-surface-card p-4 transition-colors hover:bg-surface-container md:flex-row md:items-center">
+      <div className="flex min-w-0 items-center gap-3.5">
+        <div className="relative size-12 shrink-0 overflow-hidden rounded-md border border-border bg-surface-container">
           {photo.thumbUrl ? (
-            <img className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" alt={l.cropName} src={photo.thumbUrl} />
+            <img className="h-full w-full object-cover" alt={l.cropName} src={photo.thumbUrl} />
           ) : (
-            <span aria-hidden className="grid h-full w-full place-items-center text-3xl">{cropLook(l.cropId).emoji}</span>
+            <span aria-hidden className="grid h-full w-full place-items-center text-xl">{cropLook(l.cropId).emoji}</span>
           )}
-          <span className="absolute right-1 bottom-1 rounded bg-surface-container-lowest/80 px-1.5 py-0.5 text-label-sm text-on-surface-variant backdrop-blur">{tag}</span>
         </div>
         <div className="flex min-w-0 flex-col">
-          <div className="mb-1 flex flex-wrap items-center gap-2">
-            <h3 className="truncate font-headline-sm text-headline-sm text-on-surface">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="truncate text-sm font-medium text-on-surface">
               {l.cropName}
               {l.variety ? `, ${l.variety}` : ''}
             </h3>
-            <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-label-sm ${l.status === 'ACTIVE' ? 'bg-primary/10 text-primary' : 'bg-surface-container-highest text-on-surface-variant'}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${l.status === 'ACTIVE' ? 'bg-primary' : 'bg-outline'}`}></span>
-              {status}
-            </span>
-            {isLowStock(l) && <span className="rounded-full bg-secondary/15 px-2 py-0.5 text-label-sm text-secondary">Low stock</span>}
+            <span className={`size-1.5 rounded-full ${l.status === 'ACTIVE' ? 'bg-primary' : 'bg-outline'}`} title={status} />
+            <span className="text-[11px] text-on-surface-variant">{status}</span>
+            {isLowStock(l) && <span className="rounded-full bg-secondary/15 px-2 py-0.5 text-[11px] text-secondary">Low stock</span>}
           </div>
-          {isLowStock(l) && <p className="mb-1 text-body-sm text-secondary">Only {l.qtyAvailable} {l.unit} left. Add stock before it sells out.</p>}
-          <div className="flex items-center gap-3 text-body-sm text-on-surface-variant">
-            <span className="text-body-xl font-bold text-secondary">{rupees(l.pricePerUnit)}</span>
-            <span>/ {l.unit}</span>
+          <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-on-surface-variant">
+            <span className="font-medium text-on-surface">{rupees(l.pricePerUnit)} / {l.unit}</span>
             <span>•</span>
-            <span className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px]">event</span> {day(l.harvestDate)}
-            </span>
+            <span>Harvested {day(l.harvestDate)}</span>
+            <span>•</span>
+            <span>{tag}</span>
           </div>
+          {isLowStock(l) && <p className="mt-0.5 text-[11px] text-secondary">Only {l.qtyAvailable} {l.unit} left. Add stock before it sells out.</p>}
         </div>
       </div>
 
-      <div className="flex w-full shrink-0 items-center justify-between gap-6 border-t border-surface-variant/30 pt-3 md:w-auto md:justify-end md:border-t-0 md:pt-0">
-        <div className="flex flex-col">
-          <span className="mb-1 text-label-sm text-on-surface-variant">In stock ({l.unit})</span>
-          <div className="flex items-center rounded-lg bg-surface-container-lowest p-1">
-            <button aria-label="Decrease stock" disabled={update.isPending} onClick={() => adjust(-1)} className="flex h-7 w-7 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface">
-              <span className="material-symbols-outlined text-[16px]">remove</span>
+      <div className="flex shrink-0 items-center justify-between gap-6 border-t border-border pt-2 md:justify-end md:border-t-0 md:pt-0">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-on-surface-variant">Available:</span>
+          <div className="flex items-center rounded-md border border-border bg-surface p-0.5">
+            <button aria-label="Decrease stock" disabled={update.isPending} onClick={() => adjust(-1)} className="flex size-6 items-center justify-center rounded text-on-surface-variant transition-colors hover:text-on-surface">
+              <span className="material-symbols-outlined text-[14px]">remove</span>
             </button>
-            <span className="w-16 bg-transparent text-center text-label-lg text-on-surface">{l.qtyAvailable}</span>
-            <button aria-label="Increase stock" disabled={update.isPending} onClick={() => adjust(1)} className="flex h-7 w-7 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface">
-              <span className="material-symbols-outlined text-[16px]">add</span>
+            <span className="w-12 text-center text-xs font-medium text-on-surface">{l.qtyAvailable}</span>
+            <button aria-label="Increase stock" disabled={update.isPending} onClick={() => adjust(1)} className="flex size-6 items-center justify-center rounded text-on-surface-variant transition-colors hover:text-on-surface">
+              <span className="material-symbols-outlined text-[14px]">add</span>
             </button>
           </div>
+          <span className="text-xs text-on-surface-variant">{l.unit}</span>
         </div>
-
-        <div className="flex items-center gap-2">
-          <button onClick={onEdit} className="h-9 rounded-lg bg-surface-container-high px-3 text-label-md text-on-surface transition-colors hover:bg-surface-bright">Edit</button>
+        <div className="flex items-center gap-3 text-xs">
+          <button onClick={onEdit} className="font-medium text-on-surface-variant hover:text-on-surface hover:underline">Edit</button>
           {l.status !== 'PAUSED' ? (
-            <button onClick={() => catalogApi.updateListing(l.id, { status: 'PAUSED' }).then(() => queryClient.invalidateQueries({ queryKey: ['listings', 'mine'] }))} className="h-9 rounded-lg bg-surface-container-high px-3 text-label-md text-on-surface transition-colors hover:bg-surface-bright">Pause</button>
+            <button onClick={() => catalogApi.updateListing(l.id, { status: 'PAUSED' }).then(() => queryClient.invalidateQueries({ queryKey: ['listings', 'mine'] }))} className="font-medium text-on-surface-variant hover:text-on-surface hover:underline">Pause</button>
           ) : (
-            <button onClick={() => catalogApi.updateListing(l.id, { status: 'ACTIVE' }).then(() => queryClient.invalidateQueries({ queryKey: ['listings', 'mine'] }))} className="h-9 rounded-lg bg-surface-container-high px-3 text-label-md text-primary transition-colors hover:bg-surface-bright">Resume</button>
+            <button onClick={() => catalogApi.updateListing(l.id, { status: 'ACTIVE' }).then(() => queryClient.invalidateQueries({ queryKey: ['listings', 'mine'] }))} className="font-medium text-primary hover:underline">Resume</button>
           )}
           <button
             aria-label={confirm ? 'Confirm remove' : 'Remove listing'}
             onClick={() => (confirm ? remove.mutate() : setConfirm(true))}
             onBlur={() => setConfirm(false)}
-            className={`flex h-9 items-center justify-center rounded-lg transition-colors ${confirm ? 'bg-error-container px-3 text-error' : 'w-9 bg-surface-container-high text-on-surface-variant hover:bg-error-container hover:text-error'}`}
+            className={`flex h-7 items-center justify-center rounded-md transition-colors ${confirm ? 'bg-error-container px-2 text-error' : 'w-7 text-on-surface-variant hover:text-error'}`}
           >
-            {confirm ? <span className="text-label-md">Remove?</span> : <span className="material-symbols-outlined text-[18px]">delete</span>}
+            {confirm ? <span className="text-xs">Remove?</span> : <span className="material-symbols-outlined text-[16px]">delete</span>}
           </button>
         </div>
       </div>
