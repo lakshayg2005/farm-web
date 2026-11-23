@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { isProcessing, mediaApi, photoBadge, type Media, type OwnerType } from '@/api/media'
 
 const BADGE_TONE = {
-  verified: 'bg-primary text-white',
+  verified: 'bg-primary text-on-primary',
   unverified: 'bg-secondary text-on-secondary',
   checking: 'bg-white/90 text-ink',
   failed: 'bg-danger/10 text-danger',

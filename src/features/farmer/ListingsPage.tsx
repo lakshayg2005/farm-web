@@ -194,15 +194,15 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
           {l.mediaIds.length > 0 ? (
             <OwnerPhotos ownerType="LISTING" ownerId={l.id} only={l.mediaIds.slice(0, 3)} size="sm" />
           ) : (
-            <p className="rounded-lg bg-paper-deep px-3 py-2 text-sm text-ink-soft">{t('No photos yet. Listings with a farm photo sell faster.')}</p>
+            <p className="rounded-md bg-paper-deep px-3 py-2 text-sm text-ink-soft">{t('No photos yet. Listings with a farm photo sell faster.')}</p>
           )}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-2">
-            <h2 className="font-display text-xl leading-tight">
+            <h3 className="font-display text-lg leading-tight">
               {l.cropName}
               {l.variety && <span className="text-ink-soft">, {l.variety}</span>}
-            </h2>
+            </h3>
             <span className="flex flex-wrap gap-1.5">
               {isLowStock(l) && <StatusChip tone="warn">{t('Low stock')}</StatusChip>}
               <StatusChip tone={status.tone}>{t(status.label)}</StatusChip>

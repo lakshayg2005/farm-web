@@ -160,11 +160,11 @@ export function ShopBrowser({ cartPath }: { cartPath: string }) {
                 aria-pressed={category === id}
                 onClick={() => setCategory(id)}
                 className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border-[1.5px] px-4 text-sm font-semibold transition-colors duration-150 ${
-                  category === id ? 'border-ink bg-ink text-white' : 'border-line-strong bg-white hover:bg-paper'
+                  category === id ? 'border-ink bg-ink text-background' : 'border-line-strong bg-surface-card hover:bg-paper'
                 }`}
               >
                 {id === 'all' ? t('All') : t(CATEGORY_LABEL[id] ?? id)}
-                <span className={category === id ? 'text-white/70' : 'text-ink-soft'}>{n}</span>
+                <span className={category === id ? 'text-background/70' : 'text-ink-soft'}>{n}</span>
               </button>
             ))}
           </div>

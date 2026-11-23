@@ -4,6 +4,7 @@ import { ListSkeleton, StatusChip, type Tone } from '@/components/ui'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { ApiError } from '@/api/http'
+import { AgreementTerms } from './AgreementTerms'
 import { day, landApi, rupees, type CropUpdate, type HarvestOrder, type Reservation } from './land'
 
 const STATUS_TEXT: Record<string, { label: string; tone: Tone }> = {
@@ -113,6 +114,7 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
           Cancel this reservation
         </button>
       )}
+      {named && <AgreementTerms reservationId={r.id} />}
       {FOLLOWED.includes(r.status) && <Timeline reservationId={r.id} />}
       {r.status === 'HARVEST_READY' && <p className="mt-4 text-ink-soft">The farmer has harvested. Your harvest order is being prepared…</p>}
       {(r.status === 'FULFILLING' || r.status === 'COMPLETED') && <Harvest reservationId={r.id} onDone={refresh} />}

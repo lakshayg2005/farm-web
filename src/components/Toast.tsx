@@ -18,10 +18,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {message && (
         <div
           role="status"
-          className="fixed right-6 bottom-5 z-[2000] flex items-center gap-2.5 rounded-xl border border-border bg-surface-card px-4 py-2.5 text-xs text-on-surface shadow-xl"
+          className="fixed inset-x-4 bottom-20 z-[2000] mx-auto max-w-sm rounded-md bg-on-surface px-4 py-2.5 text-sm text-background shadow-lg sm:right-6 sm:bottom-6 sm:left-auto sm:mx-0 lg:bottom-6"
         >
-          <span className="material-symbols-outlined text-[18px] text-primary">check_circle</span>
-          <span>{message}</span>
+          {message}
         </div>
       )}
     </ToastContext.Provider>

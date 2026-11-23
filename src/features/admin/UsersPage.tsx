@@ -37,7 +37,7 @@ export function UsersPage() {
               type="button"
               aria-pressed={role === r}
               onClick={() => setRole(r)}
-              className={`min-h-11 shrink-0 rounded-full border-[1.5px] px-4 text-sm font-semibold ${role === r ? 'border-ink bg-ink text-white' : 'border-line-strong bg-white hover:bg-paper'}`}
+              className={`min-h-11 shrink-0 rounded-full border-[1.5px] px-4 text-sm font-semibold ${role === r ? 'border-ink bg-ink text-background' : 'border-line-strong bg-surface-card hover:bg-paper'}`}
             >
               {r === 'all' ? t('All') : t(r === 'admin' ? 'Admin' : r === 'farmer' ? 'Farmer' : r === 'customer' ? 'Customer' : 'Delivery')}
             </button>

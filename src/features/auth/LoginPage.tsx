@@ -42,7 +42,7 @@ export function LoginPage() {
         <Field label="Phone number" name="phone" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} error={errors.phone} />
         <Field label="Password" name="password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} />
         {errors.form && (
-          <p role="alert" className="font-semibold text-danger">
+          <p role="alert" className="text-sm font-medium text-danger">
             {t(errors.form)}
           </p>
         )}
@@ -50,12 +50,12 @@ export function LoginPage() {
           {busy ? t('Signing in…') : t('Sign in')}
         </button>
       </form>
-      <p className="mt-6 text-ink-soft">
-        {t('New here?')}{' '}
-        <Link to="/register" className="font-semibold text-primary underline">
+      <div className="mt-8 border-t border-border pt-6">
+        <p className="text-sm text-ink-soft">{t('New here?')}</p>
+        <Link to="/register" className="btn-secondary mt-2 w-full min-h-11">
           {t('Create an account')}
         </Link>
-      </p>
+      </div>
     </AuthShell>
   )
 }

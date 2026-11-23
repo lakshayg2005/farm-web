@@ -1,25 +1,22 @@
 import { Link } from 'react-router'
+import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
+import { useI18n } from '@/i18n/i18n'
 
 export function NotFoundPage() {
+  const { t } = useI18n()
   return (
-    <>
+    <div className="flex min-h-dvh flex-col">
       <SiteHeader />
-      <main className="flex min-h-[calc(100vh-4.5rem)] items-center justify-center bg-black px-6 pb-24 text-white">
-        <div className="text-center">
-          <p className="text-sm tracking-widest text-gray-500 uppercase">404</p>
-          <h1 className="mt-4 text-4xl font-bold">This page does not exist</h1>
-          <p className="mt-4 text-gray-400">The link may be old or mistyped. Start again from the home page.</p>
-          <div className="mt-8 flex justify-center gap-4">
-            <Link to="/" className="rounded-xl bg-primary px-6 py-3 font-semibold text-on-primary hover:brightness-110">
-              Home
-            </Link>
-            <Link to="/catalog" className="rounded-xl border border-gray-700 px-6 py-3 font-semibold hover:bg-gray-900">
-              Fresh produce
-            </Link>
-          </div>
-        </div>
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-20 sm:px-8">
+        <p className="text-sm text-on-surface-variant">404</p>
+        <h1 className="mt-2 font-serif text-4xl">{t('This page does not exist')}</h1>
+        <p className="mt-3 max-w-md text-on-surface-variant">{t('The link may be old or mistyped.')}</p>
+        <Link to="/" className="btn-primary mt-8">
+          {t('Go to the start page')}
+        </Link>
       </main>
-    </>
+      <SiteFooter />
+    </div>
   )
 }

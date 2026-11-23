@@ -32,7 +32,7 @@ const DEMO_USER = {
   name: 'Demo User',
   phone: '+919900000000',
   email: null,
-  roles: ['farmer', 'customer', 'inspector', 'admin'],
+  roles: ['farmer', 'customer', 'admin'],
   phoneVerified: true,
   farmerVerified: true,
   homeLat: 21.1904,

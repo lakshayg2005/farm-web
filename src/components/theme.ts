@@ -6,13 +6,13 @@ const listeners = new Set<() => void>()
 
 function read(): Theme {
   try {
-    return localStorage.getItem(KEY) === 'light' ? 'light' : 'dark'
+    return localStorage.getItem(KEY) === 'dark' ? 'dark' : 'light'
   } catch {
-    return 'dark'
+    return 'light'
   }
 }
 
-let current: Theme = typeof window === 'undefined' ? 'dark' : read()
+let current: Theme = typeof window === 'undefined' ? 'light' : read()
 
 function apply(theme: Theme) {
   document.documentElement.classList.toggle('dark', theme === 'dark')
@@ -21,7 +21,7 @@ function apply(theme: Theme) {
 
 if (typeof document !== 'undefined') apply(current)
 
-/** The light or dark theme (dark by default); the choice is remembered in this browser. */
+/** The light or dark theme (light by default); the choice is remembered in this browser. */
 export function useTheme() {
   const theme = useSyncExternalStore(
     (fn) => {
@@ -29,7 +29,7 @@ export function useTheme() {
       return () => listeners.delete(fn)
     },
     () => current,
-    () => 'dark' as Theme,
+    () => 'light' as Theme,
   )
   const setTheme = useCallback((next: Theme) => {
     current = next

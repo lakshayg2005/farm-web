@@ -35,7 +35,7 @@ export function NotificationsPage({ role }: { role: string }) {
               type="button"
               aria-pressed={unreadOnly === value}
               onClick={() => setUnreadOnly(value as boolean)}
-              className="min-h-10 rounded-md px-4 text-[0.95rem] font-semibold aria-pressed:bg-white aria-pressed:shadow-[0_1px_2px_rgba(23,26,29,.18)]"
+              className="min-h-10 rounded-md px-4 text-[0.95rem] font-semibold aria-pressed:bg-surface-card aria-pressed:shadow-[0_1px_2px_rgba(23,26,29,.18)]"
             >
               {label as string}
             </button>

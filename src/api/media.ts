@@ -1,7 +1,7 @@
 import { api } from './http'
 
 /** Photos go straight to object storage through a signed URL; the media service then checks EXIF/GPS. */
-export type OwnerType = 'FARM' | 'LISTING' | 'PLOT' | 'RESERVATION' | 'INSPECTION' | 'DELIVERY' | 'USER'
+export type OwnerType = 'FARM' | 'LISTING' | 'PLOT' | 'RESERVATION' | 'DELIVERY' | 'USER'
 export type MediaStatus = 'PENDING_UPLOAD' | 'PROCESSING' | 'READY' | 'REJECTED' | 'FAILED' | 'DELETED'
 export type GeoStatus = 'PENDING' | 'VERIFIED' | 'TOO_FAR' | 'NO_GPS' | 'NO_REFERENCE' | 'NOT_APPLICABLE'
 

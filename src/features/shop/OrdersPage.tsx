@@ -49,10 +49,10 @@ export function CustomerOrdersPage() {
             aria-selected={tab === x.id}
             onClick={() => setTab(x.id)}
             className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border-[1.5px] px-4 text-sm font-semibold ${
-              tab === x.id ? 'border-ink bg-ink text-white' : 'border-line-strong bg-white hover:bg-paper'
+              tab === x.id ? 'border-ink bg-ink text-background' : 'border-line-strong bg-surface-card hover:bg-paper'
             }`}
           >
-            {t(x.label)} <span className={tab === x.id ? 'text-white/70' : 'text-ink-soft'}>{count(x.id)}</span>
+            {t(x.label)} <span className={tab === x.id ? 'text-background/70' : 'text-ink-soft'}>{count(x.id)}</span>
           </button>
         ))}
       </div>
@@ -184,7 +184,7 @@ function OrderDetailPanel({ id }: { id: string }) {
           )}
           {track.data?.stop?.otp && (
             <p className="mt-2">
-              {t('Delivery code')}: <strong className="rounded bg-white px-2 py-0.5 font-mono text-lg tracking-widest">{track.data.stop.otp}</strong>
+              {t('Delivery code')}: <strong className="rounded bg-surface-card px-2 py-0.5 font-mono text-lg tracking-widest">{track.data.stop.otp}</strong>
               <span className="block text-sm text-ink-soft">{t('Tell the delivery partner this code when you receive the order.')}</span>
             </p>
           )}

@@ -222,7 +222,7 @@ function TimelineItem({ update: u, reservationId }: { update: CropUpdate; reserv
   const stage = STAGES.find((s) => s.id === u.stage)?.label ?? u.stage
   return (
     <li className="relative">
-      <span aria-hidden="true" className="absolute top-1.5 -left-[1.6rem] size-3 rounded-full border-2 border-white bg-[var(--color-primary)]" />
+      <span aria-hidden="true" className="absolute top-1.5 -left-[1.6rem] size-3 rounded-full border-2 border-surface-card bg-[var(--color-primary)]" />
       <p className="font-semibold">
         {stage} <span className="font-normal text-ink-soft">on {day(u.createdAt)}</span>
       </p>
@@ -309,7 +309,7 @@ function UpdateForm({
           {STAGES.map((s) => (
             <label
               key={s.id}
-              className="cursor-pointer rounded-full border border-line-strong bg-white px-4 py-1.5 min-h-10 has-checked:border-ink has-checked:bg-primary/15 has-checked:font-semibold"
+              className="cursor-pointer rounded-full border border-line-strong bg-surface-card px-4 py-1.5 min-h-10 has-checked:border-ink has-checked:bg-primary/15 has-checked:font-semibold"
             >
               <input type="radio" name={`stage-${reservationId}`} value={s.id} checked={stage === s.id} onChange={() => setStage(s.id)} className="sr-only" />
               {s.label}
@@ -341,7 +341,7 @@ function UpdateForm({
           </ul>
         )}
         {files.length < MAX_PHOTOS && (
-          <label className="mt-2 inline-block cursor-pointer rounded-lg border border-dashed border-ink-soft bg-white px-4 py-2 font-semibold hover:bg-paper-deep">
+          <label className="mt-2 inline-block cursor-pointer rounded-lg border border-dashed border-ink-soft bg-surface-card px-4 py-2 font-semibold hover:bg-paper-deep">
             Add photos
             <input
               type="file"

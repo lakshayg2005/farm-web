@@ -63,7 +63,7 @@ export function PlotMap({ plots, selectedId, onSelect, onBoundsChange, focus }: 
       {
         style: (f) => {
           const selected = f?.properties?.plotSeasonId === selectedId
-          return { color: selected ? '#ee9800' : '#2ec47a', weight: selected ? 4 : 2, fillOpacity: selected ? 0.45 : 0.25 }
+          return { color: selected ? '#b86e12' : '#2d5a3d', weight: selected ? 4 : 2, fillOpacity: selected ? 0.45 : 0.25 }
         },
         onEachFeature: (f, l) => l.on({ click: () => f.properties?.plotSeasonId && onPick.current(f.properties.plotSeasonId) }),
       },

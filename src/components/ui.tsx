@@ -6,16 +6,16 @@ export type Tone = 'neutral' | 'good' | 'info' | 'warn' | 'danger'
 
 const CHIP: Record<Tone, { box: string; dot: string }> = {
   neutral: { box: 'bg-paper-deep text-ink', dot: 'bg-ink-soft' },
-  good: { box: 'bg-primary/15 text-primary', dot: 'bg-primary' },
-  info: { box: 'bg-sky-400/15 text-sky-300', dot: 'bg-focus' },
-  warn: { box: 'bg-secondary/15 text-secondary', dot: 'bg-warn' },
-  danger: { box: 'bg-error/15 text-error', dot: 'bg-danger' },
+  good: { box: 'bg-primary-soft text-primary', dot: 'bg-primary' },
+  info: { box: 'bg-info/10 text-info', dot: 'bg-info' },
+  warn: { box: 'bg-secondary/12 text-secondary', dot: 'bg-warn' },
+  danger: { box: 'bg-error-container text-error', dot: 'bg-danger' },
 }
 
 export function StatusChip({ tone = 'neutral', children }: { tone?: Tone; children: ReactNode }) {
   const c = CHIP[tone]
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-sm font-semibold ${c.box}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${c.box}`}>
       <span aria-hidden="true" className={`size-2 rounded-full ${c.dot}`} />
       {children}
     </span>
@@ -76,7 +76,7 @@ export function Figure({ label, value, hint }: { label: string; value: ReactNode
   return (
     <div className="card p-4 sm:p-5">
       <p className="text-sm text-ink-soft">{t(label)}</p>
-      <p className="mt-1 text-2xl font-bold tabular-nums">{value}</p>
+      <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
       {hint && <p className="mt-1 text-sm text-ink-soft">{hint}</p>}
     </div>
   )

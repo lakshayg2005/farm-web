@@ -6,14 +6,15 @@ const ENGLISH = { name: 'English' }
 test('hindi: the choice sticks across pages and reloads', async ({ page, problems }) => {
   await page.goto('/')
   await page.getByRole('button', HINDI).first().click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('किसान के खेत से आपकी थाली तक')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('साइन इन करें')
   await expect(page.locator('html')).toHaveAttribute('lang', 'hi')
 
   await page.reload()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('किसान के खेत से आपकी थाली तक')
-
-  await page.goto('/login')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('साइन इन करें')
+
+  await page.goto('/register')
+  await expect(page.getByRole('heading', { level: 1 })).not.toHaveText('Create an account')
+  await page.goto('/login')
   await expect(page.getByLabel('फ़ोन नंबर')).toBeVisible()
 
   await page.getByRole('button', ENGLISH).first().click()

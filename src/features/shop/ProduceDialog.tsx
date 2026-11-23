@@ -30,12 +30,12 @@ export function ProduceDialog({ item, cartPath, onClose }: { item: Produce; cart
       onClose={onClose}
       onClick={(e) => e.target === ref.current && ref.current?.close()}
       aria-label={item.cropName}
-      className="m-auto w-[min(42rem,calc(100vw-1.5rem))] max-w-none rounded-2xl border border-line bg-white p-0 text-ink backdrop:bg-ink/50"
+      className="m-auto w-[min(42rem,calc(100vw-1.5rem))] max-w-none rounded-2xl border border-line bg-surface-card p-0 text-ink backdrop:bg-ink/50"
     >
       <div className="max-h-[90dvh] overflow-y-auto">
         <div className="relative aspect-[16/9] w-full bg-paper-deep sm:aspect-[2/1]">
           <ProducePhoto listingId={item.id} big alt={item.cropName} />
-          <button type="button" onClick={() => ref.current?.close()} aria-label={t('Close')} className="absolute top-3 right-3 grid size-11 place-items-center rounded-full bg-white/90 text-xl shadow">
+          <button type="button" onClick={() => ref.current?.close()} aria-label={t('Close')} className="absolute top-3 right-3 grid size-11 place-items-center rounded-full bg-surface-card/90 text-xl text-ink shadow">
             ×
           </button>
         </div>

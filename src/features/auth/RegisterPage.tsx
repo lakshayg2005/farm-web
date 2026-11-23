@@ -48,20 +48,20 @@ export function RegisterPage() {
   }
 
   return (
-    <AuthShell title="Create an account" intro="One account works for buying produce and for reserving land.">
+    <AuthShell title="Create an account" intro="One account can buy produce, reserve land, or sell as a farmer.">
       <form onSubmit={onSubmit} noValidate className="space-y-5">
         <Field label="Full name" name="name" autoComplete="name" value={form.name} onChange={set('name')} error={errors.name} />
         <Field label="Phone number" name="phone" type="tel" autoComplete="tel" value={form.phone} onChange={set('phone')} error={errors.phone} />
         <Field label="Email (optional)" name="email" type="email" autoComplete="email" value={form.email} onChange={set('email')} />
         <Field label="Password" name="password" type="password" autoComplete="new-password" hint="At least 8 characters." value={form.password} onChange={set('password')} error={errors.password} />
         <fieldset>
-          <legend className="font-semibold">{t('I want to')}</legend>
+          <legend className="text-sm font-medium">{t('I want to')}</legend>
           <div className="mt-2 space-y-2">
             {choices.map((c) => (
-              <label key={c.role} className="flex items-start gap-3 input">
-                <input type="checkbox" className="mt-1.5" checked={roles.includes(c.role)} onChange={() => toggle(c.role)} />
+              <label key={c.role} className="flex cursor-pointer items-start gap-3 rounded-md border border-line-strong bg-surface-card px-3 py-2.5 has-[:checked]:border-primary has-[:checked]:bg-primary-soft">
+                <input type="checkbox" className="mt-1 accent-primary" checked={roles.includes(c.role)} onChange={() => toggle(c.role)} />
                 <span>
-                  <span className="block font-semibold">{t(c.label)}</span>
+                  <span className="block text-sm font-semibold">{t(c.label)}</span>
                   <span className="text-sm text-ink-soft">{t(c.body)}</span>
                 </span>
               </label>
@@ -74,7 +74,7 @@ export function RegisterPage() {
           )}
         </fieldset>
         {errors.form && (
-          <p role="alert" className="font-semibold text-danger">
+          <p role="alert" className="text-sm font-medium text-danger">
             {t(errors.form)}
           </p>
         )}
@@ -82,9 +82,9 @@ export function RegisterPage() {
           {busy ? t('Creating account…') : t('Create account')}
         </button>
       </form>
-      <p className="mt-6 text-ink-soft">
+      <p className="mt-6 text-sm text-ink-soft">
         {t('Already registered?')}{' '}
-        <Link to="/login" className="font-semibold text-primary underline">
+        <Link to="/" className="font-semibold text-primary underline underline-offset-2">
           {t('Sign in')}
         </Link>
       </p>

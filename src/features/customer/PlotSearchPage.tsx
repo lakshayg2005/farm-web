@@ -56,7 +56,7 @@ export function PlotSearchPage() {
         {hasMap ? (
           <PlotMap plots={plots} selectedId={selectedId} onSelect={setSelectedId} onBoundsChange={setBounds} />
         ) : (
-          <p role="note" className="rounded-lg bg-white px-3 py-2.5 text-sm">
+          <p role="note" className="rounded-lg bg-surface-card px-3 py-2.5 text-sm">
             The map could not load, so these are plots within 200 km of central India. Refresh to try the map again.
           </p>
         )}

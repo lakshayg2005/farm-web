@@ -25,20 +25,21 @@ export function FarmPage() {
   const isCustomer = !!user?.roles.includes('customer')
 
   return (
-    <div className="mx-auto min-h-dvh max-w-7xl px-4 pb-16 sm:px-8">
+    <div className="flex min-h-dvh flex-col">
       <SiteHeader />
+      <main className="mx-auto w-full max-w-6xl px-4 pt-8 pb-16 sm:px-8">
       {farm.isPending ? (
         <ListSkeleton label="Loading the farm" rows={1} />
       ) : farm.isError ? (
         <ErrorState title="This farm could not be found" body="It may have been removed." />
       ) : (
         <>
-          <h1 className="font-display text-[2.4rem] leading-none sm:text-[3.2rem]">{farm.data.name}</h1>
+          <h1 className="font-serif text-[2.5rem] leading-none sm:text-5xl">{farm.data.name}</h1>
           <p className="mt-2 text-ink-soft">{[farm.data.village, farm.data.district, farm.data.state].filter(Boolean).join(', ')}</p>
           <div className="mt-2">
             <Rating value={farm.data.rating} count={farm.data.ratingCount} />
           </div>
-          <h2 className="mt-8 font-display text-2xl">{t('On sale now')}</h2>
+          <h2 className="mt-10 font-display text-lg">{t('On sale now')}</h2>
           {listings.isPending ? (
             <ListSkeleton label="Loading produce" />
           ) : listings.data && listings.data.length > 0 ? (
@@ -54,6 +55,7 @@ export function FarmPage() {
           )}
         </>
       )}
+      </main>
       {open && <ProduceDialog key={open.id} item={open} cartPath={isCustomer ? '/customer/cart' : '/login'} onClose={() => setOpenId(null)} />}
     </div>
   )

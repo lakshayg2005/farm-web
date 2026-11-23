@@ -164,10 +164,10 @@ describe('farmer listings page', () => {
     })
     renderAt('/farmer/listings')
     expect(await screen.findByRole('heading', { level: 3, name: 'Tomato, Hybrid 501' })).toBeInTheDocument()
-    expect(screen.getAllByText(/₹28 \/ kg/)).toHaveLength(2)
+    expect(screen.getAllByText('₹28 per kg')).toHaveLength(2)
     expect(screen.getByText('Paused')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Resume' })).toBeInTheDocument()
-    expect(screen.getByText('Active Listings')).toBeInTheDocument()
+    expect(screen.getByText('1 of 2 listings on sale.')).toBeInTheDocument()
   })
 
   it('lists new produce, uploads its photo and attaches it', async () => {
@@ -227,7 +227,10 @@ describe('farmer listings page', () => {
       'PATCH /catalog/listings/l1': (body) => jsonResponse({ ...LISTING, mediaIds: [], ...(body as object) }),
     })
     renderAt('/farmer/listings')
-    await userEvent.click(await screen.findByRole('button', { name: 'Increase stock' }))
+    const stock = await screen.findByLabelText(/In stock/)
+    await userEvent.clear(stock)
+    await userEvent.type(stock, '121')
+    await userEvent.click(screen.getByRole('button', { name: 'Update stock' }))
     await waitFor(() => expect(calls.some((c) => c.key === 'PATCH /catalog/listings/l1')).toBe(true))
     expect(calls.find((c) => c.key === 'PATCH /catalog/listings/l1')!.body).toEqual({ qtyAvailable: 121 })
 
@@ -242,9 +245,10 @@ describe('farmer listings page', () => {
       'DELETE /catalog/listings/l1': () => jsonResponse(null, 204),
     })
     renderAt('/farmer/listings')
-    await userEvent.click(await screen.findByRole('button', { name: 'Remove listing' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Remove' }))
     expect(calls.some((c) => c.key === 'DELETE /catalog/listings/l1')).toBe(false)
-    await userEvent.click(screen.getByRole('button', { name: 'Confirm remove' }))
+    expect(screen.getByText('Remove this listing?')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Remove' }))
     await waitFor(() => expect(calls.some((c) => c.key === 'DELETE /catalog/listings/l1')).toBe(true))
   })
 

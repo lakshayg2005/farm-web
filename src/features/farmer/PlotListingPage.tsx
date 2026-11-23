@@ -305,18 +305,17 @@ function SeasonInputs({ value: f, onChange, crops, cropsFailed }: { value: Seaso
       <fieldset className="sm:col-span-2">
         <legend className="text-sm font-semibold">Crops customers can choose</legend>
         {cropsFailed && <p className="mt-1 text-sm text-danger">The crop list could not load. Refresh the page to try again.</p>}
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {crops.map((c) => {
             const on = f.crops.includes(c.id)
             return (
               <label
                 key={c.id}
-                className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3.5 text-sm font-medium transition-colors duration-150 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-focus ${
-                  on ? 'border-primary bg-primary/15 text-primary' : 'border-line-strong bg-white hover:bg-paper'
+                className={`inline-flex min-h-9 cursor-pointer items-center rounded-md border px-3 text-sm transition-colors duration-150 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-focus ${
+                  on ? 'border-primary bg-primary text-on-primary' : 'border-line-strong bg-surface-card text-on-surface-variant hover:text-on-surface'
                 }`}
               >
                 <input type="checkbox" className="sr-only" checked={on} onChange={() => toggle(c.id)} />
-                <span aria-hidden="true">{on ? '✓' : '+'}</span>
                 {c.name}
               </label>
             )

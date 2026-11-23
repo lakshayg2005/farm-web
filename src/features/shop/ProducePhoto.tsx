@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { mediaApi } from '@/api/media'
 
-/** The first ready photo of a listing, or a quiet placeholder. */
+/** The first ready photo of a listing, or the crop's initial on a plain tile. */
 export function ProducePhoto({ listingId, big = false, alt = '' }: { listingId: string; big?: boolean; alt?: string }) {
   const photos = useQuery({
     queryKey: ['media', 'LISTING', listingId],
@@ -14,8 +14,8 @@ export function ProducePhoto({ listingId, big = false, alt = '' }: { listingId: 
   return first ? (
     <img src={first} alt={alt} loading="lazy" className="size-full object-cover" />
   ) : (
-    <span aria-hidden="true" className="grid size-full place-items-center bg-paper-deep text-3xl text-ink-soft/50">
-      {photos.isPending ? '' : '🌱'}
+    <span aria-hidden="true" className="grid size-full place-items-center bg-paper-deep font-serif text-[2em] text-ink-soft/60">
+      {photos.isPending ? '' : alt.charAt(0)}
     </span>
   )
 }

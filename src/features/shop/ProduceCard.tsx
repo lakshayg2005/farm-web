@@ -12,9 +12,9 @@ export function ProduceCard({ item, onOpen, inCart }: { item: Produce; onOpen: (
       <span className="relative block aspect-[4/3] w-full overflow-hidden bg-paper-deep">
         <ProducePhoto listingId={item.id} alt={item.cropName} />
         {item.isOrganic && (
-          <span className="absolute top-2 left-2 rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white">{t('Organic')}</span>
+          <span className="absolute top-2 left-2 rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-on-primary">{t('Organic')}</span>
         )}
-        {inCart && <span className="absolute top-2 right-2 rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-primary">{t('In your cart')}</span>}
+        {inCart && <span className="absolute top-2 right-2 rounded-full bg-surface-card px-2.5 py-0.5 text-xs font-bold text-primary">{t('In your cart')}</span>}
       </span>
       <span className="flex flex-1 flex-col gap-1.5 p-3.5">
         <span className="font-display text-xl leading-tight">

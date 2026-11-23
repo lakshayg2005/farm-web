@@ -26,7 +26,6 @@ test.describe('farmer', () => {
 
   test('orders: figures, tabs and the six-stage rail', async ({ page, problems }) => {
     await nav(page).getByRole('link', { name: 'Orders' }).click()
-    await expect(page.getByText('Paid out to you')).toBeVisible()
     await expect(page.getByRole('tab', { name: /To pack/ })).toBeVisible()
     await page.getByRole('tab', { name: /In progress/ }).click()
     await expect(page.getByRole('img', { name: /Stage \d of 6/ }).first()).toBeVisible()

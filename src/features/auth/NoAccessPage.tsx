@@ -1,4 +1,3 @@
-import { Link } from 'react-router'
 import { useAuth } from './authContext'
 import { AuthShell } from './AuthShell'
 
@@ -7,12 +6,9 @@ export function NoAccessPage() {
   const { logout } = useAuth()
   return (
     <AuthShell title="This account is for the app" intro="Delivery partners use the delivery app. The website is for farmers, customers and admins.">
-      <button type="button" onClick={() => void logout()} className="font-semibold text-primary underline">
+      <button type="button" onClick={() => void logout()} className="btn-secondary w-full min-h-11">
         Sign out
-      </button>{' '}
-      <Link to="/" className="ml-4 underline">
-        Back to start
-      </Link>
+      </button>
     </AuthShell>
   )
 }

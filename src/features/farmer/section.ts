@@ -3,7 +3,8 @@ import { notificationsPage } from '@/features/notifications/page'
 import type { Section } from '@/routes/types'
 import { CropsPage } from './CropsPage'
 import { EarningsPage } from './EarningsPage'
-import { FarmerHubPage } from './FarmerHubPage'
+import { ListingsPage } from './ListingsPage'
+import { OrdersPage } from './OrdersPage'
 import { PlotListingPage } from './PlotListingPage'
 import { RequestsPage } from './RequestsPage'
 
@@ -21,20 +22,18 @@ export const farmerSection: Section = {
         title: 'No listings yet',
         body: 'Add your first produce listing with a photo, price and how much you have in stock.',
       },
-      element: createElement(FarmerHubPage, { tab: 'listings' }),
-      bare: true,
+      element: createElement(ListingsPage),
     },
     {
       path: 'orders',
       label: 'Orders',
       icon: 'box',
-      summary: 'Orders from customers to accept and pack, and the payouts you have earned.',
+      summary: 'Orders from customers to pack, and where each one is on its way.',
       empty: {
         title: 'No orders yet',
         body: 'When a customer buys from your listings, the order shows here for you to accept and pack.',
       },
-      element: createElement(FarmerHubPage, { tab: 'orders' }),
-      bare: true,
+      element: createElement(OrdersPage),
     },
     {
       path: 'plots',

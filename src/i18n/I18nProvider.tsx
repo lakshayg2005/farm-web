@@ -30,7 +30,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 export function LanguageSwitch({ className = '' }: { className?: string }) {
   const { lang, setLang } = useI18n()
   return (
-    <div role="group" aria-label="Language" className={`inline-flex rounded-lg border border-line-strong p-0.5 ${className}`}>
+    <div role="group" aria-label="Language" className={`inline-flex rounded-md border border-line p-0.5 ${className}`}>
       {LANGS.map((l) => (
         <button
           key={l.id}
@@ -39,8 +39,8 @@ export function LanguageSwitch({ className = '' }: { className?: string }) {
           aria-pressed={lang === l.id}
           aria-label={l.name}
           onClick={() => setLang(l.id)}
-          className={`min-h-8 min-w-9 rounded-md px-2 text-sm font-semibold transition-colors duration-150 ${
-            lang === l.id ? 'bg-ink text-white' : 'text-ink-soft hover:text-ink'
+          className={`min-h-7 min-w-8 rounded px-2 text-xs font-semibold transition-colors duration-150 ${
+            lang === l.id ? 'bg-surface-container-high text-ink' : 'text-ink-soft hover:text-ink'
           }`}
         >
           {l.short}

@@ -10,10 +10,12 @@ beforeEach(() => {
 })
 
 describe('routes', () => {
-  it('offers every section the user may open on the start page', async () => {
-    renderAt('/')
+  it('sends a signed-in user from the start page to a workspace that links to every section they hold', async () => {
+    const router = renderAt('/')
+    const [workspaces] = await screen.findAllByRole('navigation', { name: 'Workspace' })
+    expect(router.state.location.pathname).toBe('/admin/dashboard')
     for (const section of sections) {
-      expect(await screen.findByRole('link', { name: `Open ${section.label}` })).toHaveAttribute('href', `/${section.role}`)
+      expect(within(workspaces!).getByRole('link', { name: section.label })).toHaveAttribute('href', `/${section.role}`)
     }
   })
 

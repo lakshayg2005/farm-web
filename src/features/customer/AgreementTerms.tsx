@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { ApiError } from '@/api/http'
-import { Icon } from '@/components/Icon'
 import { day, landApi, rupees } from './land'
 
 /** "View agreement": the price, deposit, balance and terms written when the farmer accepted. */
@@ -19,9 +18,8 @@ export function AgreementTerms({ reservationId }: { reservationId: string }) {
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 font-semibold text-indigo"
+        className="text-sm font-semibold text-primary underline underline-offset-2"
       >
-        <Icon name="clipboard" className="size-4.5" />
         {open ? 'Hide agreement' : 'View agreement'}
       </button>
       {open &&
@@ -34,7 +32,7 @@ export function AgreementTerms({ reservationId }: { reservationId: string }) {
               : 'Could not load the agreement.'}
           </p>
         ) : (
-          <section aria-label="Agreement" className="mt-3 rounded-2xl border border-line bg-paper p-4">
+          <section aria-label="Agreement" className="mt-3 rounded-lg border border-line bg-paper p-4">
             <p className="font-semibold">
               {agreement.data.plotTitle} · {agreement.data.season} season
             </p>
@@ -49,9 +47,9 @@ export function AgreementTerms({ reservationId }: { reservationId: string }) {
                   ['Balance at harvest', agreement.data.balance],
                 ] as const
               ).map(([label, value]) => (
-                <div key={label} className="rounded-xl bg-surface px-3 py-2">
+                <div key={label}>
                   <dt className="text-xs text-ink-soft">{label}</dt>
-                  <dd className="font-display text-lg">{rupees(value)}</dd>
+                  <dd className="font-semibold tabular-nums">{rupees(value)}</dd>
                 </div>
               ))}
             </dl>

@@ -3,7 +3,7 @@ import { DEMO, expect, noHorizontalScroll, signIn, test } from './helpers'
 
 /** Every page at phone and desktop width: nothing scrolls sideways, and a screenshot is kept for review. */
 const journeys = [
-  { role: 'public', phone: null, pages: ['/', '/login', '/team'] },
+  { role: 'public', phone: null, pages: ['/', '/register', '/team'] },
   { role: 'farmer', phone: DEMO.farmer, pages: ['listings', 'orders', 'plots', 'reservations', 'crops', 'earnings', 'notifications'] },
   { role: 'customer', phone: DEMO.customer, pages: ['shop', 'cart', 'orders', 'plots', 'reservations', 'notifications'] },
   { role: 'admin', phone: DEMO.admin.phone, pages: ['dashboard', 'orders', 'verification', 'users', 'pooling'] },

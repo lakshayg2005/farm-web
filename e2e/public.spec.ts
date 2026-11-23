@@ -1,21 +1,21 @@
 import { DEMO, expect, signIn, test } from './helpers'
 
 test.describe('public pages and sign-in', () => {
-  test('home says what this is and offers a way in', async ({ page, problems }) => {
+  test('the start page is sign-in, with a way to create an account', async ({ page, problems }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('farmer')
-    await expect(page.getByRole('link', { name: 'Create an account' })).toBeVisible()
-    await expect(page.getByRole('main').getByRole('link', { name: 'Sign in' })).toBeVisible()
-    await expect(page.getByRole('img', { name: /Stage 4 of 6/ })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sign in')
+    await expect(page.getByLabel('Phone number')).toBeVisible()
+    await page.getByRole('link', { name: 'Create an account' }).click()
+    await expect(page).toHaveURL(/\/register/)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create an account')
     await expect(page.getByText(/inspector/i)).toHaveCount(0)
     expect(problems).toEqual([])
   })
 
-  test('a signed-in farmer is offered their own workspace', async ({ page, problems }) => {
+  test('a signed-in farmer goes straight from the start page to their workspace', async ({ page, problems }) => {
     await signIn(page, DEMO.farmer)
     await page.goto('/')
-    await expect(page.getByRole('link', { name: 'Open Farmer' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Create an account' })).toHaveCount(0)
+    await expect(page).toHaveURL(/\/farmer\/listings/)
     expect(problems).toEqual([])
   })
 
@@ -48,16 +48,5 @@ test.describe('public pages and sign-in', () => {
   test('an unknown address gets the not-found page', async ({ page }) => {
     await page.goto('/no/such/page')
     await expect(page.getByRole('heading', { name: 'This page does not exist' })).toBeVisible()
-  })
-})
-
-test.describe('public catalog', () => {
-  test('anyone can browse produce and open a farm page without signing in', async ({ page, problems }) => {
-    await page.goto('/catalog')
-    await expect(page.getByRole('heading', { name: 'Fresh produce near you' })).toBeVisible()
-    await page.getByRole('list').getByRole('button', { name: /per (kg|quintal|piece|dozen|bunch)/ }).first().click()
-    await page.locator('dialog a[href^="/farm/"]').first().click()
-    await expect(page.getByRole('heading', { name: 'On sale now' })).toBeVisible()
-    expect(problems).toEqual([])
   })
 })

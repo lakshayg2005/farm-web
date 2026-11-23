@@ -42,7 +42,7 @@ export function AdminOrdersPage() {
               role="tab"
               aria-selected={filter === f.id}
               onClick={() => setFilter(f.id)}
-              className="min-h-10 rounded-md px-3.5 py-1.5 text-[0.95rem] font-semibold aria-selected:bg-white aria-selected:shadow-[0_1px_2px_rgba(23,26,29,.18)]"
+              className="min-h-10 rounded-md px-3.5 py-1.5 text-[0.95rem] font-semibold aria-selected:bg-surface-card aria-selected:shadow-[0_1px_2px_rgba(23,26,29,.18)]"
             >
               {f.label} ({orders.data.filter((o) => !f.statuses || f.statuses.includes(o.status)).length})
             </button>

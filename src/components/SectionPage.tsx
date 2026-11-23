@@ -9,8 +9,8 @@ export function SectionPage({ page }: { page: Page }) {
   return (
     <>
       <header className="max-w-2xl">
-        <h1 className="font-headline-xl text-headline-xl tracking-tight text-on-surface">{t(page.label)}</h1>
-        <p className="mt-2 text-body-md text-on-surface-variant">{t(page.summary)}</p>
+        <h1 className="font-serif text-[2.25rem] leading-tight sm:text-[2.6rem]">{t(page.label)}</h1>
+        <p className="mt-1 text-on-surface-variant">{t(page.summary)}</p>
       </header>
       {page.element ?? <EmptyState icon={page.icon} {...page.empty} />}
     </>

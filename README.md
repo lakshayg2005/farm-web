@@ -1,6 +1,6 @@
 # farm-web
 
-Website for the Farm Platform, built by **Team 2**. One React app with role-based sections: farmers (V1 produce listings and orders, V2 plots and reservations), customers (V2 plot search and reservation), quality inspectors and admins.
+Website for the Farm Platform, built by **Team 2**. One React app with a workspace per role: farmers (produce listings and orders, plots, reservation requests, crop updates, earnings), customers (shop, cart, orders, land search and reservations) and admins (dashboard, orders, farmer verification, people, delivery pooling). The start page is the sign-in form; delivery partners use the app.
 
 All data comes from the shared backend ([farm-backend](https://github.com/lakshayg2005/farm-backend)) through the API gateway at `/api/v1`.
 The typed API client is generated from the backend's OpenAPI specs (`pnpm gen:api`), and a mock server built from the same specs (`pnpm mock`) lets screens be built before a service is ready.
@@ -27,7 +27,7 @@ React 18 + Vite + TypeScript, React Router, TanStack Query, Tailwind CSS, React-
 ```text
 src/
   api/          generated client + query hooks
-  features/     farmer/, customer/, inspector/, admin/, auth/, team/
+  features/     farmer/, customer/, shop/, admin/, auth/, notifications/, team/
   components/   shared UI
   routes/       route definitions and role guards
 ```
@@ -123,32 +123,27 @@ To build a page, create the component in `src/features/<role>/` and set it as th
 
 ### Design tokens
 
-Colours and fonts are Tailwind theme tokens in `src/index.css`: `paper`, `paper-deep`, `ink`, `ink-soft`, `line`, and one colour per section
-(`mustard` farmer, `indigo` customer, `leaf` inspector, `soil` admin). Headings use `font-display` (Young Serif); body text uses Mukta,
-which also covers Devanagari. Inside a section the CSS variable `--role` holds the section colour.
-Animations use Motion (`motion/react`) and respect the reduced-motion setting through `MotionConfig`.
+Colours and fonts are Tailwind theme tokens in `src/index.css`: a warm paper background, one green accent (`primary`) and an
+amber for warnings (`secondary`). Light is the default; `html.dark` switches the same names to the dark set. Pages use the names
+(`surface-card`, `on-surface`, `on-surface-variant`, `border`, `primary`, …), never raw colours. Text is Instrument Sans; page
+titles (`font-serif`) use Instrument Serif; Mukta covers Devanagari. All fonts are bundled, no font CDN. Shared controls are the
+`btn-primary`, `btn-secondary`, `btn-ghost`, `btn-danger`, `input` and `card` utilities. No emoji or icon font: the few icons are
+the SVGs in `src/components/Icon.tsx`. Animations use Motion (`motion/react`) and respect reduced motion through `MotionConfig`.
 
 ## Deploying
 
 **Netlify (website).** `netlify.toml` holds the build settings: `pnpm build`, publish `dist`, and
-a catch-all redirect so routes like `/catalog` work on reload. In Netlify, set the environment
+a catch-all redirect so routes like `/farmer/listings` work on reload. In Netlify, set the environment
 variable `VITE_API_BASE_URL` to the deployed API gateway (for example
 `https://<backend>.onrender.com/api/v1`). The backend gateway must allow the Netlify origin in its
 CORS list (`farm-backend/infra/traefik/dynamic.yml`, `accessControlAllowOriginList`).
 
-Without a reachable backend the public catalog (`/catalog`) still works: it shows clearly labelled
-sample produce. Sign-in and the role sections need the backend.
-
 ## Produce catalog
 
-`/catalog` (public) and *Customer → Fresh produce* list what farmers near a chosen place are
-selling (`GET /catalog/listings/search`). Each listing shows:
+*Customer → Shop* lists what farmers near a chosen place are selling (`GET /catalog/listings/search`). Each listing shows:
 
-- **Freshness**: days since harvest against the shelf life of its category (leafy greens 4 days,
-  vegetables 7, fruit 8, grains and pulses months), as a label and a bar.
-- **Arrival**: orders are packed, inspected and pooled overnight, so nearby farms (≤ 25 km) arrive
-  the next morning; farther ones take 1–2, 2–3 or 3–5 days. Crops not yet harvested add the days
-  until harvest. The detail panel shows the whole timeline.
-- Price, stock, grade, organic, distance and the farm.
+- **Freshness**: days since harvest (today, yesterday, n days ago), green up to 3 days and amber up to 7.
+- **Low stock** when 10 units or fewer are left.
+- Price, stock, organic, distance, the farm and its rating.
 
-The logic is in `src/features/catalog/catalog.ts` (tested in `catalog.test.tsx`).
+The logic is in `src/features/shop/shop.ts` (tested in `shop.test.ts`).
