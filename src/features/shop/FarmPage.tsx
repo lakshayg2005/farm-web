@@ -1,10 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router'
-import { BrandMark } from '@/components/BrandMark'
+import { useParams } from 'react-router'
+import { SiteHeader } from '@/components/SiteHeader'
 import { ErrorState, ListSkeleton, Rating } from '@/components/ui'
 import { useAuth } from '@/features/auth/authContext'
-import { LanguageSwitch } from '@/i18n/I18nProvider'
 import { useI18n } from '@/i18n/i18n'
 import { ProduceCard } from './ProduceCard'
 import { ProduceDialog } from './ProduceDialog'
@@ -27,15 +26,7 @@ export function FarmPage() {
 
   return (
     <div className="mx-auto min-h-dvh max-w-7xl px-4 pb-16 sm:px-8">
-      <header className="flex items-center gap-4 py-5">
-        <BrandMark />
-        <nav aria-label={t('Site')} className="ml-auto flex items-center gap-4 font-medium">
-          <LanguageSwitch />
-          <Link to="/catalog" className="font-semibold text-primary underline">
-            {t('All produce')}
-          </Link>
-        </nav>
-      </header>
+      <SiteHeader />
       {farm.isPending ? (
         <ListSkeleton label="Loading the farm" rows={1} />
       ) : farm.isError ? (

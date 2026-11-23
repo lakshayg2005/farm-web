@@ -1,13 +1,15 @@
 import { Link } from 'react-router'
 
-export function BrandMark({ className = '' }: { className?: string }) {
+/** Wordmark: a leaf in a mint tile and the name in Newsreader. */
+export function BrandMark({ className = '' }: { className?: string; tone?: 'dark' | 'light' }) {
   return (
-    <Link to="/" className={`inline-flex items-center gap-2.5 text-lg leading-none font-bold ${className}`}>
-      <svg viewBox="0 0 26 26" className="size-[26px] shrink-0" aria-hidden="true">
-        <rect width="26" height="26" rx="6" fill="var(--color-ink)" />
-        <path d="M7 18V8m6 10v-6m6 6V10" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
-      </svg>
-      Farm Platform
+    <Link to="/" className={`flex shrink-0 items-center gap-3 ${className}`}>
+      <span className="grid size-8 place-items-center rounded-lg bg-primary text-on-primary">
+        <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+          eco
+        </span>
+      </span>
+      <span className="font-headline-sm text-headline-sm font-semibold tracking-tight text-on-surface">Farm Platform</span>
     </Link>
   )
 }

@@ -25,7 +25,39 @@ specs.forEach((file, i) => {
   children.push(child)
 })
 
+// Demo sign-in: Prism answers with placeholder values ("string", a token that expires at once), so
+// the auth routes get a fixed demo user holding every website role. Any phone and password work.
+const DEMO_USER = {
+  id: '6f1c2a4e-1d2b-4c3d-9e8f-0a1b2c3d4e5f',
+  name: 'Demo User',
+  phone: '+919900000000',
+  email: null,
+  roles: ['farmer', 'customer', 'inspector', 'admin'],
+  phoneVerified: true,
+  farmerVerified: true,
+  homeLat: 21.1904,
+  homeLng: 81.2849,
+  createdAt: '2026-11-01T00:00:00Z',
+}
+const tokens = () => ({ accessToken: 'demo-access', refreshToken: 'demo-refresh', tokenType: 'bearer', expiresIn: 3600, user: DEMO_USER })
+const DEMO = {
+  'POST /identity/login': tokens,
+  'POST /identity/register': tokens,
+  'POST /identity/refresh': tokens,
+  'POST /identity/otp/verify': tokens,
+  'GET /identity/me': () => DEMO_USER,
+}
+
 const server = http.createServer((req, res) => {
+  const demo = DEMO[`${req.method} ${(req.url ?? '').split('?')[0].replace(/^\/api\/v1/, '')}`]
+  if (demo) {
+    req.resume()
+    res.writeHead(req.method === 'POST' && req.url?.includes('register') ? 201 : 200, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    })
+    return res.end(JSON.stringify(demo()))
+  }
   const match = /^\/api\/v1\/([a-z]+)(\/.*)?$/.exec(req.url ?? '')
   const port = match && ports.get(match[1])
   if (req.method === 'OPTIONS') {

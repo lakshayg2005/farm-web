@@ -237,3 +237,40 @@ describe('my reservations', () => {
     await waitFor(() => expect(calls.some((c) => c.key === 'POST /land/reservations/r1/cancel')).toBe(true))
   })
 })
+
+describe('agreement', () => {
+  it('shows the agreed price, deposit, balance and terms', async () => {
+    const { AgreementTerms } = await import('./AgreementTerms')
+    const { render } = await import('@testing-library/react')
+    const { QueryClient, QueryClientProvider } = await import('@tanstack/react-query')
+    mockApi({
+      'GET /land/reservations/r-1/agreement': () =>
+        jsonResponse({
+          id: 'a-1',
+          reservationId: 'r-1',
+          plotTitle: 'Riverside plot',
+          season: 'Rabi',
+          startDate: '2026-11-01',
+          endDate: '2027-03-31',
+          cropId: 'wheat',
+          expectedQtyKg: 100,
+          pricePerKg: 30,
+          total: 3000,
+          deposit: 600,
+          balance: 2400,
+          terms: ['Price ₹3,000.', 'Deposit due now.'],
+          createdAt: '2026-11-20T10:00:00Z',
+        }),
+    })
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <AgreementTerms reservationId="r-1" />
+      </QueryClientProvider>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'View agreement' }))
+    const panel = await screen.findByRole('region', { name: 'Agreement' })
+    expect(panel).toHaveTextContent('Riverside plot · Rabi season')
+    expect(panel).toHaveTextContent('₹2,400')
+    expect(screen.getByText('Deposit due now.')).toBeInTheDocument()
+  })
+})

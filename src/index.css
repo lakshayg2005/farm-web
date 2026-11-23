@@ -1,37 +1,150 @@
 @import 'tailwindcss';
 
-@import '@fontsource/instrument-serif/400.css';
-@import '@fontsource/instrument-sans/400.css';
-@import '@fontsource/instrument-sans/500.css';
-@import '@fontsource/instrument-sans/600.css';
-@import '@fontsource/instrument-sans/700.css';
-/* Instrument has no Devanagari; Mukta covers Hindi and sits behind it in the font stack. */
-@import '@fontsource/mukta/devanagari-400.css';
-@import '@fontsource/mukta/devanagari-500.css';
-@import '@fontsource/mukta/devanagari-600.css';
-@import '@fontsource/mukta/devanagari-700.css';
-
-/* Direction C, "Ledger": a calm, dense operator workspace. Tokens match docs/android-handoff.md section 11. */
 @theme {
-  --color-paper: #f2f4f5;
-  --color-paper-deep: #e6e9eb;
-  --color-ink: #171a1d;
-  --color-ink-soft: #4b5258;
-  --color-line: #dfe3e6;
-  --color-line-strong: #c9cfd4;
-  --color-primary: #1d7a4d;
-  --color-primary-deep: #166039;
-  --color-focus: #2f5fd0;
-  --color-warn: #b7791f;
-  --color-danger: #c2412d;
+  /* Agrarian design system (from the Stitch prototype): deep forest surfaces, mint primary,
+     saffron secondary, Newsreader headings and Plus Jakarta Sans body. */
+  --color-background: #0b1510;
+  --color-surface: #0b1510;
+  --color-surface-dim: #0b1510;
+  --color-surface-bright: #313c36;
+  --color-surface-variant: #2d3731;
+  --color-surface-container-lowest: #07100b;
+  --color-surface-container-low: #141e18;
+  --color-surface-container: #18221c;
+  --color-surface-container-high: #222c27;
+  --color-surface-container-highest: #2d3731;
+  --color-on-surface: #dae5dd;
+  --color-on-surface-variant: #bccabd;
+  --color-on-background: #dae5dd;
+  --color-outline: #869488;
+  --color-outline-variant: #3d4a40;
+  --color-primary: #53e193;
+  --color-on-primary: #00391e;
+  --color-primary-container: #2ec47a;
+  --color-on-primary-container: #004b2a;
+  --color-primary-fixed: #71fcac;
+  --color-primary-fixed-dim: #51df92;
+  --color-inverse-primary: #006d3f;
+  --color-surface-tint: #51df92;
+  --color-secondary: #ffb95f;
+  --color-on-secondary: #472a00;
+  --color-secondary-container: #ee9800;
+  --color-on-secondary-container: #5b3800;
+  --color-secondary-fixed: #ffddb8;
+  --color-secondary-fixed-dim: #ffb95f;
+  --color-tertiary: #ffb6a5;
+  --color-tertiary-container: #ff8d70;
+  --color-on-tertiary: #621100;
+  --color-error: #ffb4ab;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+  --color-inverse-surface: #dae5dd;
+  --color-inverse-on-surface: #28332d;
 
-  --font-display: 'Instrument Serif', 'Mukta', Georgia, serif;
-  --font-sans: 'Instrument Sans', 'Mukta', ui-sans-serif, system-ui, sans-serif;
+  /* Names the existing pages already use, mapped onto the new palette */
+  --color-line-strong: #3d4a40;
+  --color-primary-deep: #2ec47a;
+  --color-focus: #53e193;
+  --color-warn: #ffb95f;
+  --color-danger: #ffb4ab;
+  --color-white: #18221c;
+  --color-paper: #0b1510;
+  --color-paper-deep: #141e18;
+  --color-ink: #dae5dd;
+  --color-ink-soft: #bccabd;
+  --color-line: #2d3731;
+  --color-indigo: #53e193;
+  --color-forest: #18221c;
+  --color-forest-deep: #07100b;
+  --color-lime: #53e193;
+  --color-mustard: #ffb95f;
+  --color-leaf: #53e193;
+  --color-tomato: #ffb4ab;
+  --color-soil: #869488;
+  --color-sky: #60a5fa;
+
+  /* The greys used across the pages become the forest scale */
+  --color-black: #0b1510;
+  --color-gray-100: #e8f0ea;
+  --color-gray-200: #dae5dd;
+  --color-gray-300: #cfdcd1;
+  --color-gray-400: #bccabd;
+  --color-gray-500: #869488;
+  --color-gray-600: #526056;
+  --color-gray-700: #3d4a40;
+  --color-gray-800: #2d3731;
+  --color-gray-900: #18221c;
+  --color-gray-950: #141e18;
+  --color-neutral-700: #2d3731;
+  --color-neutral-800: #222c27;
+  --color-neutral-900: #18221c;
+  --color-neutral-950: #141e18;
+
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-headline-xl: 'Newsreader', Georgia, serif;
+  --font-headline-lg: 'Newsreader', Georgia, serif;
+  --font-headline-md: 'Newsreader', Georgia, serif;
+  --font-headline-sm: 'Newsreader', Georgia, serif;
+  --font-display-lg: 'Newsreader', Georgia, serif;
+  --font-body-md: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body-xl: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-label-lg: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-label-md: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-label-sm: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  --text-display-lg: 3.75rem;
+  --text-display-lg--line-height: 1.1;
+  --text-headline-xl: 2.5rem;
+  --text-headline-xl--line-height: 1.15;
+  --text-headline-lg: 2rem;
+  --text-headline-lg--line-height: 1.2;
+  --text-headline-md: 1.5rem;
+  --text-headline-md--line-height: 1.25;
+  --text-headline-sm: 1.25rem;
+  --text-headline-sm--line-height: 1.3;
+  --text-body-xl: 1.25rem;
+  --text-body-xl--line-height: 1.6;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+  --text-body-md: 1rem;
+  --text-body-md--line-height: 1.6;
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.5;
+  --text-label-lg: 0.9375rem;
+  --text-label-lg--line-height: 1.3;
+  --text-label-md: 0.8125rem;
+  --text-label-md--line-height: 1.3;
+  --text-label-sm: 0.75rem;
+  --text-label-sm--line-height: 1.3;
+
+  --shadow-card: none;
+  --shadow-lift: none;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 @layer base {
   html {
+    font-size: 100%;
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -44,29 +157,149 @@
     text-wrap: balance;
   }
 
+  ::selection {
+    background: #53e193;
+    color: #00391e;
+  }
+
+  /* Headings: bold and tight, like AINow */
+  .font-display {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
   :focus-visible {
-    outline: 3px solid var(--color-focus);
+    outline: 2px solid #53e193;
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: 6px;
+  }
+
+  input,
+  select,
+  textarea {
+    transition:
+      border-color 150ms,
+      box-shadow 150ms;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: #53e193;
+    box-shadow: none;
+    outline: none;
+  }
+
+  button:not(:disabled),
+  [role='button'] {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
 /* Shared component classes: buttons, inputs and cards look the same on every screen. */
 @utility btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 font-semibold transition-[background-color,opacity,transform] duration-150 disabled:cursor-not-allowed disabled:opacity-60 active:enabled:translate-y-px;
-}
-@utility btn-primary {
-  @apply btn bg-primary text-white hover:enabled:bg-primary-deep;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2 font-semibold transition-[background-color,opacity,transform,filter] duration-150 disabled:cursor-not-allowed disabled:opacity-60 active:enabled:translate-y-px;
 }
 @utility btn-secondary {
-  @apply btn border border-line-strong bg-white text-ink hover:enabled:bg-paper;
+  @apply btn bg-surface-container-high text-on-surface hover:enabled:bg-surface-container-highest;
 }
 @utility btn-danger {
-  @apply btn border border-line-strong bg-white text-danger hover:enabled:bg-paper;
+  @apply btn bg-surface-container-high text-error hover:enabled:bg-surface-container-highest;
 }
 @utility input {
-  @apply min-h-11 w-full rounded-lg border-[1.5px] border-line-strong bg-white px-3 py-2 text-ink placeholder:text-ink-soft/70;
+  @apply min-h-11 w-full rounded-xl border-[1.5px] border-outline-variant bg-surface-container-low px-3 py-2 text-on-surface placeholder:text-on-surface-variant/60;
 }
+
+/* Panel: the base of most cards. */
 @utility card {
-  @apply rounded-xl border border-line bg-white;
+  background: var(--color-surface-container);
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+/* Frosted glass for floating headers and badges over imagery. */
+@utility glass {
+  background: rgb(11 21 16 / 0.7);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@utility btn-primary {
+  min-height: 2.75rem;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  background: #53e193;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  color: #00391e;
+  transition:
+    transform 150ms,
+    background 150ms,
+    box-shadow 150ms;
+  &:hover {
+    filter: brightness(1.08);
+  }
+}
+
+@utility btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  border: 0;
+  background: #222c27;
+  color: #dae5dd;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition:
+    border-color 150ms,
+    transform 150ms;
+  &:hover {
+    background: #2d3731;
+  }
+}
+
+/* Dark panels (hero, banners): plain black, as on AINow. */
+@utility mesh {
+  background: #0b1510;
+}
+
+/* Second line of a headline: grey, as on AINow ("Artificial Intelligence." in grey). */
+@utility text-gradient {
+  color: #53e193;
+  font-style: italic;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
 }

@@ -6,10 +6,10 @@ export type Tone = 'neutral' | 'good' | 'info' | 'warn' | 'danger'
 
 const CHIP: Record<Tone, { box: string; dot: string }> = {
   neutral: { box: 'bg-paper-deep text-ink', dot: 'bg-ink-soft' },
-  good: { box: 'bg-[#dff1e6] text-[#12522f]', dot: 'bg-primary' },
-  info: { box: 'bg-[#e1e9fb] text-[#1f43a0]', dot: 'bg-focus' },
-  warn: { box: 'bg-[#f7ebd0] text-[#6f4a0e]', dot: 'bg-warn' },
-  danger: { box: 'bg-[#f8e1dc] text-[#8e2c1c]', dot: 'bg-danger' },
+  good: { box: 'bg-primary/15 text-primary', dot: 'bg-primary' },
+  info: { box: 'bg-sky-400/15 text-sky-300', dot: 'bg-focus' },
+  warn: { box: 'bg-secondary/15 text-secondary', dot: 'bg-warn' },
+  danger: { box: 'bg-error/15 text-error', dot: 'bg-danger' },
 }
 
 export function StatusChip({ tone = 'neutral', children }: { tone?: Tone; children: ReactNode }) {

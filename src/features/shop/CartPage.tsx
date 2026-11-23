@@ -239,7 +239,7 @@ export function CartPage() {
         </dl>
 
         {error && (
-          <p role="alert" className="rounded-lg bg-[#f8e1dc] p-3 text-sm font-semibold text-[#8e2c1c]">
+          <p role="alert" className="rounded-lg bg-error/15 p-3 text-sm font-semibold text-error">
             {error}
           </p>
         )}

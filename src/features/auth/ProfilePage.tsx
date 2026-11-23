@@ -1,9 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router'
 import { ApiError } from '@/api/http'
-import { BrandMark } from '@/components/BrandMark'
+import { SiteHeader } from '@/components/SiteHeader'
 import { StatusChip } from '@/components/ui'
-import { LanguageSwitch } from '@/i18n/I18nProvider'
 import { useI18n } from '@/i18n/i18n'
 import { sectionByRole } from '@/routes/sections'
 import { useAuth } from './authContext'
@@ -61,16 +60,8 @@ export function ProfilePage() {
 
   return (
     <div className="mx-auto min-h-dvh max-w-2xl px-4 pb-16 sm:px-8">
-      <header className="flex items-center gap-4 py-5">
-        <BrandMark />
-        <div className="ml-auto flex items-center gap-4">
-          <LanguageSwitch />
-          <Link to="/" className="font-semibold text-primary underline">
-            {t('Back')}
-          </Link>
-        </div>
-      </header>
-      <h1 className="font-display text-[2.4rem] leading-none">{t('Profile')}</h1>
+      <SiteHeader />
+      <h1 className="mt-6 font-display text-[2.4rem] leading-none">{t('Profile')}</h1>
 
       <form onSubmit={save} noValidate className="card mt-6 space-y-4 p-4 sm:p-6">
         <label className="grid gap-1 text-sm font-semibold">

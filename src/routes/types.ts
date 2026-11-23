@@ -15,6 +15,8 @@ export interface SectionPage {
   empty: { title: string; body: string }
   /** The real page. Feature issues set this; until then a placeholder renders. */
   element?: ReactNode
+  /** The page draws its own title and header (no section page header above it) */
+  bare?: boolean
 }
 
 export interface Section {

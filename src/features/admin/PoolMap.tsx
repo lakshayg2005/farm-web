@@ -53,16 +53,16 @@ export function PoolMap({ pools, selectedId }: { pools: Pool[]; selectedId: stri
     const dim = (id?: string) => selectedId !== null && id !== selectedId
     const geo = L.geoJSON({ type: 'FeatureCollection', features }, {
       style: (f) => ({
-        color: f?.id === selectedId ? '#1c2620' : '#2e3a87',
+        color: f?.id === selectedId ? '#ffb95f' : '#53e193',
         weight: f?.id === selectedId ? 5 : 3,
         opacity: dim(f?.id) ? 0.25 : 0.9,
       }),
       pointToLayer: (f: PoolFeature, latlng: [number, number]) =>
         (L as unknown as PoolLeaflet).circleMarker(latlng, {
           radius: f.properties.kind === 'PICKUP' ? 7 : 6,
-          color: '#ffffff',
+          color: '#dae5dd',
           weight: 2,
-          fillColor: f.properties.kind === 'PICKUP' ? '#d9a404' : '#2e3a87',
+          fillColor: f.properties.kind === 'PICKUP' ? '#ffb95f' : '#53e193',
           fillOpacity: dim(f.id) ? 0.3 : 1,
         }),
     } as Parameters<typeof L.geoJSON>[1]).addTo(m)

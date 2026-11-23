@@ -5,6 +5,7 @@ import { useAuth } from '@/features/auth/authContext'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef, useState, type FormEvent } from 'react'
 import { ApiError } from '@/api/http'
+import { geoProblem } from '@/api/geo'
 import { newId } from '@/api/id'
 import { MAX_PHOTOS, photoProblem, uploadPhoto } from '@/api/media'
 import { OwnerPhotos } from '@/components/OwnerPhotos'
@@ -542,9 +543,11 @@ function FarmSetup() {
 
   function useMyLocation() {
     if (!navigator.geolocation) return setError('This browser cannot share your location. Type the coordinates instead.')
+    setError(undefined)
     navigator.geolocation.getCurrentPosition(
       (pos) => setF((cur) => ({ ...cur, lat: pos.coords.latitude.toFixed(5), lng: pos.coords.longitude.toFixed(5) })),
-      () => setError('Could not get your location. Type the coordinates instead.'),
+      (err) => setError(geoProblem(err)),
+      { timeout: 10_000, maximumAge: 600_000 },
     )
   }
 

@@ -3,7 +3,7 @@ import { isProcessing, mediaApi, photoBadge, type Media, type OwnerType } from '
 
 const BADGE_TONE = {
   verified: 'bg-primary text-white',
-  unverified: 'bg-amber-200 text-ink',
+  unverified: 'bg-secondary text-on-secondary',
   checking: 'bg-white/90 text-ink',
   failed: 'bg-danger/10 text-danger',
 } as const

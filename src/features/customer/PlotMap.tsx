@@ -7,10 +7,12 @@ interface Props {
   selectedId: string | null
   onSelect: (plotId: string) => void
   onBoundsChange: (bounds: Bounds) => void
+  /** Move the map here (a searched place); a new object moves it again */
+  focus?: { lat: number; lng: number } | null
 }
 
 /** Shows the plots found as outlines on an OpenStreetMap map; reports the visible area when it moves. */
-export function PlotMap({ plots, selectedId, onSelect, onBoundsChange }: Props) {
+export function PlotMap({ plots, selectedId, onSelect, onBoundsChange, focus }: Props) {
   const el = useRef<HTMLDivElement>(null)
   const map = useRef<LeafletMapLike | null>(null)
   const layer = useRef<LeafletLayer | null>(null)
@@ -46,6 +48,12 @@ export function PlotMap({ plots, selectedId, onSelect, onBoundsChange }: Props) 
   }, [])
 
   useEffect(() => {
+    if (!focus || !map.current) return
+    fitted.current = true
+    map.current.setView([focus.lat, focus.lng], 13)
+  }, [focus])
+
+  useEffect(() => {
     const L = getLeaflet()
     const m = map.current
     if (!L || !m) return
@@ -55,7 +63,7 @@ export function PlotMap({ plots, selectedId, onSelect, onBoundsChange }: Props) 
       {
         style: (f) => {
           const selected = f?.properties?.plotSeasonId === selectedId
-          return { color: selected ? '#d9a404' : '#2e3a87', weight: selected ? 4 : 2, fillOpacity: selected ? 0.45 : 0.25 }
+          return { color: selected ? '#ffb95f' : '#53e193', weight: selected ? 4 : 2, fillOpacity: selected ? 0.45 : 0.25 }
         },
         onEachFeature: (f, l) => l.on({ click: () => f.properties?.plotSeasonId && onPick.current(f.properties.plotSeasonId) }),
       },
@@ -68,5 +76,5 @@ export function PlotMap({ plots, selectedId, onSelect, onBoundsChange }: Props) 
     }
   }, [plots, selectedId])
 
-  return <div ref={el} className="h-80 w-full rounded-xl border border-line lg:h-[34rem]" role="region" aria-label="Map of available plots" />
+  return <div ref={el} className="h-80 w-full overflow-hidden rounded-2xl lg:h-[34rem]" role="region" aria-label="Map of available plots" />
 }

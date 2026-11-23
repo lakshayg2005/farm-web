@@ -95,7 +95,7 @@ export function PoolingPage() {
                           type="button"
                           onClick={() => setSelected(pool.id === selected ? null : pool.id)}
                           aria-pressed={selected === pool.id}
-                          className="w-full card px-4 py-3 text-left transition-colors duration-150 hover:border-primary aria-pressed:border-primary aria-pressed:bg-[#dff1e6]"
+                          className="w-full card px-4 py-3 text-left transition-colors duration-150 hover:border-primary aria-pressed:border-primary aria-pressed:bg-primary/15"
                         >
                           <span className="flex items-baseline justify-between gap-2">
                             <span className="font-semibold">Pool {i + 1}</span>

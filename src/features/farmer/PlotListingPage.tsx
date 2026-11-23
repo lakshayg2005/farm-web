@@ -53,7 +53,7 @@ export function PlotListingPage() {
   return (
     <section className="mt-8 max-w-5xl space-y-6">
       {notice && (
-        <p role="status" className="card border-primary/40 bg-[#dff1e6] p-3 text-sm font-semibold text-[#12522f]">
+        <p role="status" className="card border-primary/40 bg-primary/15 p-3 text-sm font-semibold text-primary">
           {notice}
         </p>
       )}
@@ -305,7 +305,7 @@ function SeasonInputs({ value: f, onChange, crops, cropsFailed }: { value: Seaso
               <label
                 key={c.id}
                 className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3.5 text-sm font-medium transition-colors duration-150 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-focus ${
-                  on ? 'border-primary bg-[#dff1e6] text-[#12522f]' : 'border-line-strong bg-white hover:bg-paper'
+                  on ? 'border-primary bg-primary/15 text-primary' : 'border-line-strong bg-white hover:bg-paper'
                 }`}
               >
                 <input type="checkbox" className="sr-only" checked={on} onChange={() => toggle(c.id)} />
@@ -471,7 +471,7 @@ function NewPlotForm({
           <span className="text-xs font-normal text-ink-soft">JPEG, PNG or WebP, up to 5 MB. Take it at the plot so it shows as verified.</span>
         </label>
         {message && (
-          <p role="alert" className="mt-4 rounded-lg bg-[#f8e1dc] p-3 text-sm font-semibold text-[#8e2c1c]">
+          <p role="alert" className="mt-4 rounded-lg bg-error/15 p-3 text-sm font-semibold text-error">
             {message}
           </p>
         )}

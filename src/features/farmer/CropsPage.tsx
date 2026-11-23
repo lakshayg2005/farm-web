@@ -309,7 +309,7 @@ function UpdateForm({
           {STAGES.map((s) => (
             <label
               key={s.id}
-              className="cursor-pointer rounded-full border border-line-strong bg-white px-4 py-1.5 min-h-10 has-checked:border-ink has-checked:bg-[#dff1e6] has-checked:font-semibold"
+              className="cursor-pointer rounded-full border border-line-strong bg-white px-4 py-1.5 min-h-10 has-checked:border-ink has-checked:bg-primary/15 has-checked:font-semibold"
             >
               <input type="radio" name={`stage-${reservationId}`} value={s.id} checked={stage === s.id} onChange={() => setStage(s.id)} className="sr-only" />
               {s.label}

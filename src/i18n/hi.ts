@@ -10,6 +10,11 @@ import { HI_SHOP } from './hi-shop'
 export const HI: Record<string, string> = {
   ...HI_SHOP,
   // shell and navigation
+  'Get started': 'शुरू करें',
+  Marketplace: 'बाज़ार',
+  'My workspace': 'मेरा वर्कस्पेस',
+  'Operations Hub': 'ऑपरेशंस हब',
+  'Your workspaces': 'आपके वर्कस्पेस',
   'All sections': 'सभी सेक्शन',
   'Sign in': 'साइन इन करें',
   'Sign out': 'साइन आउट',
