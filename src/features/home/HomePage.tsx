@@ -73,6 +73,7 @@ export function HomePage() {
           <div className="mt-6">
             <StatusRail
               stage={EXAMPLE_STAGE}
+              total={STAGES.length}
               label={t('Stage {n} of {total}: {name}', { n: EXAMPLE_STAGE, total: STAGES.length, name: t(STAGES[EXAMPLE_STAGE - 1] ?? '') })}
             />
           </div>

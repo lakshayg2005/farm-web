@@ -35,7 +35,7 @@ export function EarningsPage() {
 
       {rows.length === 0 ? (
         <p className="card p-5 text-ink-soft">
-          {t('No payouts yet. A payout is made for each order once it is delivered and the quality check has passed.')}
+          {t('No payouts yet. A payout is made for each order once it is delivered.')}
         </p>
       ) : (
         [...groups.entries()].map(([name, list]) => (

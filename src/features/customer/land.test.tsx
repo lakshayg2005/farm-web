@@ -163,13 +163,40 @@ describe('my reservations', () => {
     expect(await within(timeline).findByRole('list', { name: 'Photos' })).toBeInTheDocument()
   })
 
-  it('sends a buy-back choice without an address', async () => {
-    const calls = customerSession({
-      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'HARVEST_READY', deposit: 800 }]),
+  const HARVEST = {
+    id: 'o1',
+    reservationId: 'r1',
+    harvestOption: null,
+    status: 'PLACED',
+    total: 2700,
+    balanceDue: 1900,
+    items: [{ name: 'Harvest: Wheat', qty: 90, unitPrice: 30 }],
+  }
+  const harvestOrder = {
+    'GET /order/orders': () => jsonResponse({ items: [{ id: 'o1', reservationId: 'r1' }], nextCursor: null }),
+    'GET /order/orders/o1': () => jsonResponse(HARVEST),
+  }
+
+  it('while the harvest order is being made, offers no choice yet', async () => {
+    customerSession({
+      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'HARVEST_READY' }]),
       'GET /land/reservations/r1/updates': () => jsonResponse([]),
+    })
+    renderAt('/customer/reservations')
+    expect(await screen.findByText(/Your harvest order is being prepared/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Confirm my choice' })).not.toBeInTheDocument()
+  })
+
+  it('sends a buy-back choice without an address, and says what it costs', async () => {
+    const calls = customerSession({
+      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'FULFILLING', deposit: 800 }]),
+      'GET /land/reservations/r1/updates': () => jsonResponse([]),
+      ...harvestOrder,
       'POST /order/orders/harvest': () => jsonResponse({ id: 'o1' }, 201),
     })
     renderAt('/customer/reservations')
+    expect(await screen.findByText('90 kg harvested')).toBeInTheDocument()
+    expect(screen.getByText(/You pay the balance of ₹1,900 now; the farmer sells the harvest and credits you ₹2,430/)).toBeInTheDocument()
     await userEvent.click(await screen.findByLabelText(/Let the farmer buy it back/))
     await userEvent.click(screen.getByRole('button', { name: 'Confirm my choice' }))
     await waitFor(() => expect(calls.some((c) => c.key === 'POST /order/orders/harvest')).toBe(true))
@@ -178,13 +205,26 @@ describe('my reservations', () => {
 
   it('asks for a valid address before choosing delivery', async () => {
     const calls = customerSession({
-      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'HARVEST_READY' }]),
+      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'FULFILLING' }]),
       'GET /land/reservations/r1/updates': () => jsonResponse([]),
+      ...harvestOrder,
     })
     renderAt('/customer/reservations')
     await userEvent.click(await screen.findByRole('button', { name: 'Confirm my choice' }))
     expect(screen.getByText('Enter the delivery address.')).toBeInTheDocument()
     expect(calls.some((c) => c.key === 'POST /order/orders/harvest')).toBe(false)
+  })
+
+  it('once chosen, shows where the harvest is instead of the choice', async () => {
+    customerSession({
+      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'FULFILLING' }]),
+      'GET /land/reservations/r1/updates': () => jsonResponse([]),
+      'GET /order/orders': harvestOrder['GET /order/orders'],
+      'GET /order/orders/o1': () => jsonResponse({ ...HARVEST, harvestOption: 'DELIVERY', status: 'POOLED' }),
+    })
+    renderAt('/customer/reservations')
+    expect(await screen.findByText(/Your harvest is on its way/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Confirm my choice' })).not.toBeInTheDocument()
   })
 
   it('cancels a pending request', async () => {

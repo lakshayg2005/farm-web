@@ -10,8 +10,8 @@ export function makeUser(roles: UserRole[]): User {
   return { id: 'u1', name: 'Asha Verma', phone: '+919876543210', email: null, roles, phoneVerified: true, farmerVerified: false }
 }
 
-export function tokens(roles: UserRole[]) {
-  return { accessToken: 'access-1', refreshToken: 'refresh-2', expiresIn: 900, tokenType: 'bearer', user: makeUser(roles) }
+export function tokens(roles: UserRole[], extra: Partial<User> = {}) {
+  return { accessToken: 'access-1', refreshToken: 'refresh-2', expiresIn: 900, tokenType: 'bearer', user: { ...makeUser(roles), ...extra } }
 }
 
 export function jsonResponse(body: unknown, status = 200) {

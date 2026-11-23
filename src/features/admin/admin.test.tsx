@@ -3,7 +3,7 @@ import { vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { session } from '@/features/auth/session'
 import { jsonResponse, makeUser, mockApi, renderAt, tokens } from '@/test/auth'
-import { dailyStats, orderedStops, passRate, poolSummary, toPool, totalSavedKm, type Pool } from './admin'
+import { averageRating, dailyStats, orderedStops, poolSummary, toPool, totalSavedKm, type Pool } from './admin'
 
 const FARMER = { ...makeUser(['farmer']), id: 'f1', name: 'Ravi Patel', phone: '+919811111111', createdAt: '2026-11-10T08:00:00Z' }
 const adminLogin = () => jsonResponse(tokens(['admin']))
@@ -14,15 +14,9 @@ beforeEach(() => {
 })
 
 describe('numbers', () => {
-  it('passRate counts only finished inspections', () => {
-    expect(passRate([])).toBeNull()
-    expect(
-      passRate([
-        { id: '1', status: 'REPORTED', result: 'PASS', grade: 'A' },
-        { id: '2', status: 'REPORTED', result: 'FAIL', grade: 'C' },
-        { id: '3', status: 'PENDING', result: null, grade: null },
-      ]),
-    ).toBe(50)
+  it('averageRating counts only rated orders', () => {
+    expect(averageRating([])).toBeNull()
+    expect(averageRating([{ ratingScore: 5 }, { ratingScore: 4 }, { ratingScore: null }, {}])).toEqual({ average: 4.5, count: 2 })
   })
   it('totalSavedKm adds the pools up', () => {
     const pool = { id: 'p', date: 'd', partnerId: null, status: 'ASSIGNED', totalKm: 9, route: null, stops: [] }

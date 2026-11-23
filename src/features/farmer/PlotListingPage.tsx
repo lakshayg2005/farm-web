@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { api, ApiError } from '@/api/http'
 import { OwnerPhotos } from '@/components/OwnerPhotos'
 import { ErrorState, ListSkeleton, StatusChip } from '@/components/ui'
+import { useAuth } from '@/features/auth/authContext'
 import { day, landApi, rupees, type Crop } from '@/features/customer/land'
 import { farmerLandApi, loadMyPlots, type PlotWithSeasons, type Season } from './reservations'
 import { mediaUploadPayload, plotCreatePayload, seasonCreatePayload, seasonProblem, type Polygon } from './plotPayloads'
@@ -35,6 +36,7 @@ export function PlotListingPage() {
   const [adding, setAdding] = useState(false)
   const [notice, setNotice] = useState('')
   const [highlight, setHighlight] = useState<string | null>(null)
+  const verified = !!useAuth().user?.farmerVerified
   const cropName = (id: string) => crops.data?.find((c) => c.id === id)?.name ?? id
 
   if (plots.isPending) return <ListSkeleton label="Loading your plots" />
@@ -42,6 +44,9 @@ export function PlotListingPage() {
     return <ErrorState title="Could not load your plots" body="Check your connection and try again." onRetry={() => void plots.refetch()} />
 
   const list = plots.data
+  // Land only lets an admin-verified farmer offer a plot, so no form until then (the banner says why).
+  if (!verified && list.length === 0)
+    return <p className="mt-8 max-w-xl text-ink-soft">Once an admin verifies you, list your plots here with their seasons and prices.</p>
   // A farmer with no plots goes straight to the form; everyone else sees what they have first.
   const showForm = adding || list.length === 0
 
@@ -72,16 +77,18 @@ export function PlotListingPage() {
             <h2 className="font-display text-2xl">
               Your plots <span className="text-ink-soft">({list.length})</span>
             </h2>
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={() => {
-                setNotice('')
-                setAdding(true)
-              }}
-            >
-              List a new plot
-            </button>
+            {verified && (
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => {
+                  setNotice('')
+                  setAdding(true)
+                }}
+              >
+                List a new plot
+              </button>
+            )}
           </div>
           <ul className="space-y-4">
             {list.map((entry) => (

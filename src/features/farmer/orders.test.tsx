@@ -32,15 +32,15 @@ describe('farmer orders page', () => {
       'POST /identity/refresh': () => jsonResponse(tokens(['farmer'])),
       'GET /order/orders': () => jsonResponse({ items: [order('o1', status, 300)], nextCursor: null }),
       'POST /order/orders/o1/pack': () => {
-        status = 'PACKED'
-        return jsonResponse({ ...order('o1', 'PACKED', 300), items: [], events: [], deliveryDate: null })
+        status = 'READY_FOR_DISPATCH' // packing hands the order to logistics: no quality check
+        return jsonResponse({ ...order('o1', 'READY_FOR_DISPATCH', 300), items: [], events: [], deliveryDate: null })
       },
     })
     renderAt('/farmer/orders')
     await userEvent.click(await screen.findByRole('button', { name: 'Mark packed' }))
     await waitFor(() => expect(calls.some((c) => c.key === 'POST /order/orders/o1/pack')).toBe(true))
     await userEvent.click(await screen.findByRole('tab', { name: /In progress \(1\)/ }))
-    expect(await screen.findByText(/Packed: waiting for quality check/)).toBeInTheDocument()
+    expect(await screen.findByText(/Packed: waiting for a delivery partner/)).toBeInTheDocument()
     expect(calls.find((c) => c.key === 'GET /order/orders')).toBeDefined()
   })
 

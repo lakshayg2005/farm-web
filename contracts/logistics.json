@@ -418,6 +418,7 @@
                 "type": "null"
               }
             ],
+            "description": "The 4-digit delivery code of a DROP stop. Only the order's customer sees it (in GET /orders/{id}/track) and tells it to the partner at the door; it is never sent to the partner or in pool lists.",
             "title": "Otp"
           },
           "otpVerified": {
@@ -792,6 +793,7 @@
     },
     "/orders/{order_id}/track": {
       "get": {
+        "description": "Where the order is, who brings it and the delivery code. Only the customer of the order\n(and an admin) may see this; anyone else gets 404, as if the order had no route.",
         "operationId": "track_order_orders__order_id__track_get",
         "parameters": [
           {
@@ -844,12 +846,12 @@
         "operationId": "list_pools_pools_get",
         "parameters": [
           {
-            "description": "Date to list pools for",
+            "description": "Date to list pools for (default: today in India)",
             "in": "query",
             "name": "pool_date",
             "required": false,
             "schema": {
-              "description": "Date to list pools for",
+              "description": "Date to list pools for (default: today in India)",
               "format": "date",
               "title": "Pool Date",
               "type": "string"
@@ -899,12 +901,12 @@
         "operationId": "run_pools_pools_run_post",
         "parameters": [
           {
-            "description": "Date to pool orders for",
+            "description": "Date to pool orders for (default: today in India)",
             "in": "query",
             "name": "pool_date",
             "required": false,
             "schema": {
-              "description": "Date to pool orders for",
+              "description": "Date to pool orders for (default: today in India)",
               "format": "date",
               "title": "Pool Date",
               "type": "string"

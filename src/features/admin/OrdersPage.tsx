@@ -9,7 +9,7 @@ import { loadAllOrders } from './admin'
 const FILTERS: { id: string; label: string; statuses: OrderStatus[] | null }[] = [
   { id: 'all', label: 'All', statuses: null },
   { id: 'stuck', label: 'Needs a step', statuses: ['CONFIRMED', 'PACKED'] },
-  { id: 'moving', label: 'On the way', statuses: ['QC_PASSED', 'READY_FOR_DISPATCH', 'POOLED', 'IN_TRANSIT'] },
+  { id: 'moving', label: 'On the way', statuses: ['READY_FOR_DISPATCH', 'POOLED', 'IN_TRANSIT'] },
   { id: 'done', label: 'Delivered', statuses: ['DELIVERED', 'COMPLETED'] },
   { id: 'cancelled', label: 'Cancelled', statuses: ['CANCELLED'] },
 ]
@@ -82,7 +82,8 @@ function Row({ order }: { order: OrderSummary }) {
     },
     onError: (e) => setError(message(e)),
   })
-  const cancellable = ['PLACED', 'CONFIRMED', 'PACKED', 'QC_PASSED', 'READY_FOR_DISPATCH'].includes(order.status)
+  // the order service refunds and cancels until the farmer packs (packing hands it to logistics)
+  const cancellable = ['PLACED', 'CONFIRMED', 'PACKED'].includes(order.status)
   const stage = stageOf(order.status)
 
   return (
@@ -98,7 +99,7 @@ function Row({ order }: { order: OrderSummary }) {
         <StatusChip tone={tone(order.status)}>{STATUS_TEXT[order.status]}</StatusChip>
       </div>
       <div className="mt-3">
-        <StatusRail stage={stage} label={order.status === 'CANCELLED' ? 'Cancelled' : `Stage ${stage} of ${STAGES.length}: ${STAGES[stage - 1]}`} />
+        <StatusRail stage={stage} total={STAGES.length} label={order.status === 'CANCELLED' ? 'Cancelled' : `Stage ${stage} of ${STAGES.length}: ${STAGES[stage - 1]}`} />
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" aria-expanded={open} onClick={() => setOpen(!open)} className="btn-secondary min-h-10">

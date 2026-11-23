@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ListSkeleton, Rating, StatusChip } from '@/components/ui'
 import { useI18n } from '@/i18n/i18n'
+import { useAuth } from '@/features/auth/authContext'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef, useState, type FormEvent } from 'react'
 import { ApiError } from '@/api/http'
@@ -41,6 +42,8 @@ const ORDER: Record<string, number> = { ACTIVE: 0, SOLD_OUT: 1, PAUSED: 2 }
 
 export function ListingsPage() {
   const { t } = useI18n()
+  const { user } = useAuth()
+  const verified = !!user?.farmerVerified
   const farms = useQuery({ queryKey: ['farms', 'mine'], queryFn: catalogApi.myFarms })
   const listings = useQuery({ queryKey: ['listings', 'mine'], queryFn: catalogApi.myListings, enabled: !!farms.data?.length })
   const crops = useQuery({ queryKey: ['catalog-crops'], queryFn: catalogApi.crops, staleTime: 3_600_000 })
@@ -55,7 +58,9 @@ export function ListingsPage() {
         {t('Could not load your farms. Refresh to try again.')}
       </p>
     )
-  if (farms.data.length === 0) return <FarmSetup />
+  // The catalog only lets an admin-verified farmer open a farm, so no form until then (the banner says why).
+  if (farms.data.length === 0)
+    return verified ? <FarmSetup /> : <p className="mt-8 max-w-xl text-ink-soft">{t('Once an admin verifies you, set up your farm here and list what you grow.')}</p>
 
   const live = (listings.data ?? [])
     .filter((l) => l.status !== 'ARCHIVED')
@@ -70,7 +75,7 @@ export function ListingsPage() {
             (live.length === 0 ? t('Nothing listed yet.') : t('{n} of {total} listings on sale.', { n: onSale, total: live.length }))}
           {notice && <span className="ml-2 font-semibold text-primary">{notice}</span>}
         </p>
-        {editing === null && (
+        {editing === null && verified && (
           <button
             type="button"
             className={primary}
@@ -208,7 +213,6 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
             </span>
             , {t('harvested')} {day(l.harvestDate)}
             {l.isOrganic && `, ${t('organic')}`}
-            {l.grade && `, ${t('grade')} ${l.grade}`}
           </p>
 
           <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-3">

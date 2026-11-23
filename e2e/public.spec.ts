@@ -6,7 +6,7 @@ test.describe('public pages and sign-in', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('farmer')
     await expect(page.getByRole('link', { name: 'Create an account' })).toBeVisible()
     await expect(page.getByRole('main').getByRole('link', { name: 'Sign in' })).toBeVisible()
-    await expect(page.getByRole('img', { name: /Stage 4 of 8/ })).toBeVisible()
+    await expect(page.getByRole('img', { name: /Stage 4 of 6/ })).toBeVisible()
     await expect(page.getByText(/inspector/i)).toHaveCount(0)
     expect(problems).toEqual([])
   })

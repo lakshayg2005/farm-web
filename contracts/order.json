@@ -885,12 +885,11 @@
         "type": "object"
       },
       "OrderStatus": {
-        "description": "Lifecycle of a per-farm order (HLD section 11).\n\nPLACED -> CONFIRMED -> PACKED -> QC_PASSED -> READY_FOR_DISPATCH is issue #13. After that\nlogistics drives it: POOLED (pool assigned), IN_TRANSIT (picked up), DELIVERED, COMPLETED.",
+        "description": "Lifecycle of a per-farm order (HLD section 11).\n\nPLACED -> CONFIRMED -> PACKED -> READY_FOR_DISPATCH, then logistics drives it: POOLED (pool\nassigned), IN_TRANSIT (picked up), DELIVERED, COMPLETED. There is no quality gate (removed in\nNovember 2026): packing makes the order ready for dispatch, and the customer's rating after\ndelivery is the quality signal.",
         "enum": [
           "PLACED",
           "CONFIRMED",
           "PACKED",
-          "QC_PASSED",
           "READY_FOR_DISPATCH",
           "POOLED",
           "IN_TRANSIT",
@@ -953,6 +952,18 @@
           "orderType": {
             "$ref": "#/components/schemas/OrderType",
             "default": "PRODUCE"
+          },
+          "ratingScore": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The customer's score (1-5) once a completed order is rated",
+            "title": "Ratingscore"
           },
           "reservationId": {
             "anyOf": [
@@ -1302,7 +1313,7 @@
     },
     "/internal/orders/ready-for-dispatch": {
       "get": {
-        "description": "Orders in READY_FOR_DISPATCH whose delivery date is `date` or earlier.\n\nThe shape is what the logistics pooling job reads (snake_case keys, not the public camelCase):\n`order_id`, `hub_lat`/`hub_lng` (where the farm hands the produce over), `drop_lat`/`drop_lng`\n(the customer's address), `weight_kg` and `address`. Once logistics publishes `pool.assigned`\nthe order moves to POOLED and no longer shows up here.\nTODO(M1): `weight_kg` adds up the quantities of all items whatever their unit.",
+        "description": "Orders in READY_FOR_DISPATCH whose delivery date is `date` or earlier.\n\nThe shape is what the logistics pooling job reads (snake_case keys, not the public camelCase):\n`order_id`, `customer_id`, `hub_lat`/`hub_lng` (where the farm hands the produce over),\n`drop_lat`/`drop_lng` (the customer's address), `weight_kg`, `address` and `contact_phone`\n(so the partner can call the customer). Once logistics publishes `pool.assigned` the order\nmoves to POOLED and no longer shows up here.",
         "operationId": "ready_for_dispatch_internal_orders_ready_for_dispatch_get",
         "parameters": [
           {
@@ -1594,7 +1605,7 @@
     },
     "/orders/harvest": {
       "post": {
-        "description": "The harvest order is created when the quality check passes (status PLACED, no option). DELIVERY needs `deliveryAddress` (and optionally `deliveryDate`): the order becomes READY_FOR_DISPATCH and is pooled like any order; the balance (total minus deposit) is charged when it is delivered. BUYBACK: the farmer buys the harvest, the customer is credited and the order is COMPLETED. Repeating the same choice returns the order.",
+        "description": "The harvest order is created when the farmer marks the harvest ready (status PLACED, no option). DELIVERY needs `deliveryAddress` (and optionally `deliveryDate`): the order becomes READY_FOR_DISPATCH and is pooled like any order; the balance (total minus deposit) is charged when it is delivered. BUYBACK: the balance is charged now, the farmer sells the harvest and credits the customer, and the order is COMPLETED. Repeating the same choice returns the order.",
         "operationId": "choose_harvest_option_orders_harvest_post",
         "requestBody": {
           "content": {
@@ -1655,7 +1666,7 @@
                 }
               }
             },
-            "description": "HARVEST_NOT_READY, HARVEST_OPTION_CHOSEN or HARVEST_ORDER_CLOSED"
+            "description": "HARVEST_NOT_READY, HARVEST_OPTION_CHOSEN, HARVEST_ORDER_CLOSED or BALANCE_PAYMENT_FAILED"
           },
           "422": {
             "content": {
@@ -1673,7 +1684,7 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Customer: choose delivery or buy-back for a graded harvest",
+        "summary": "Customer: choose delivery or buy-back for a harvest",
         "tags": [
           "orders"
         ]

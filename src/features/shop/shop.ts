@@ -25,7 +25,6 @@ export interface Produce {
   unit: Unit
   pricePerUnit: number
   harvestDate: string
-  grade: 'A' | 'B' | 'C' | null
   isOrganic: boolean
   mediaIds: string[]
   createdAt: string
@@ -310,9 +309,8 @@ export interface Tracking {
 export const ORDER_TEXT: Record<OrderStatus, { label: string; tone: Tone; next: string }> = {
   PLACED: { label: 'Placed', tone: 'info', next: 'Waiting for payment to settle.' },
   CONFIRMED: { label: 'Confirmed', tone: 'info', next: 'The farmer has your order and will pack it.' },
-  PACKED: { label: 'Packed', tone: 'info', next: 'Packed by the farmer. A quality check comes next.' },
-  QC_PASSED: { label: 'Quality checked', tone: 'good', next: 'It passed the quality check and waits for a delivery slot.' },
-  READY_FOR_DISPATCH: { label: 'Ready to ship', tone: 'good', next: 'It will join a delivery route shortly.' },
+  PACKED: { label: 'Packed', tone: 'info', next: 'Packed by the farmer. It waits for a delivery partner.' },
+  READY_FOR_DISPATCH: { label: 'Packed', tone: 'good', next: 'Packed by the farmer. It joins a delivery route on the delivery day.' },
   POOLED: { label: 'On a route', tone: 'good', next: 'A delivery partner is assigned and will collect it.' },
   IN_TRANSIT: { label: 'On the way', tone: 'good', next: 'Your order is on its way. Keep the delivery code ready.' },
   DELIVERED: { label: 'Delivered', tone: 'good', next: 'Delivered. It becomes complete once the payout is settled.' },
@@ -321,12 +319,12 @@ export const ORDER_TEXT: Record<OrderStatus, { label: string; tone: Tone; next: 
 }
 
 /** Position on the journey for the status bar; cancelled is shown apart. */
-export const JOURNEY: OrderStatus[] = ['CONFIRMED', 'PACKED', 'QC_PASSED', 'POOLED', 'IN_TRANSIT', 'DELIVERED', 'COMPLETED']
+export const JOURNEY: OrderStatus[] = ['CONFIRMED', 'PACKED', 'POOLED', 'IN_TRANSIT', 'DELIVERED', 'COMPLETED']
 export function journeyStep(status: OrderStatus): number {
   if (status === 'PLACED') return 0
-  if (status === 'READY_FOR_DISPATCH') return JOURNEY.indexOf('QC_PASSED') + 1
+  if (status === 'READY_FOR_DISPATCH') return JOURNEY.indexOf('PACKED') + 1
   return JOURNEY.indexOf(status) + 1
 }
 
-/** A customer may cancel until the order is handed to logistics. */
-export const canCancel = (s: OrderStatus) => ['PLACED', 'CONFIRMED', 'PACKED', 'QC_PASSED'].includes(s)
+/** A customer may cancel until the farmer packs the order (packing hands it to logistics). */
+export const canCancel = (s: OrderStatus) => ['PLACED', 'CONFIRMED', 'PACKED'].includes(s)

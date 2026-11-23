@@ -33,10 +33,10 @@ export interface paths {
          * @description Orders in READY_FOR_DISPATCH whose delivery date is `date` or earlier.
          *
          *     The shape is what the logistics pooling job reads (snake_case keys, not the public camelCase):
-         *     `order_id`, `hub_lat`/`hub_lng` (where the farm hands the produce over), `drop_lat`/`drop_lng`
-         *     (the customer's address), `weight_kg` and `address`. Once logistics publishes `pool.assigned`
-         *     the order moves to POOLED and no longer shows up here.
-         *     TODO(M1): `weight_kg` adds up the quantities of all items whatever their unit.
+         *     `order_id`, `customer_id`, `hub_lat`/`hub_lng` (where the farm hands the produce over),
+         *     `drop_lat`/`drop_lng` (the customer's address), `weight_kg`, `address` and `contact_phone`
+         *     (so the partner can call the customer). Once logistics publishes `pool.assigned` the order
+         *     moves to POOLED and no longer shows up here.
          */
         get: operations["ready_for_dispatch_internal_orders_ready_for_dispatch_get"];
         put?: never;
@@ -81,8 +81,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Customer: choose delivery or buy-back for a graded harvest
-         * @description The harvest order is created when the quality check passes (status PLACED, no option). DELIVERY needs `deliveryAddress` (and optionally `deliveryDate`): the order becomes READY_FOR_DISPATCH and is pooled like any order; the balance (total minus deposit) is charged when it is delivered. BUYBACK: the farmer buys the harvest, the customer is credited and the order is COMPLETED. Repeating the same choice returns the order.
+         * Customer: choose delivery or buy-back for a harvest
+         * @description The harvest order is created when the farmer marks the harvest ready (status PLACED, no option). DELIVERY needs `deliveryAddress` (and optionally `deliveryDate`): the order becomes READY_FOR_DISPATCH and is pooled like any order; the balance (total minus deposit) is charged when it is delivered. BUYBACK: the balance is charged now, the farmer sells the harvest and credits the customer, and the order is COMPLETED. Repeating the same choice returns the order.
          */
         post: operations["choose_harvest_option_orders_harvest_post"];
         delete?: never;
@@ -635,11 +635,13 @@ export interface components {
          * OrderStatus
          * @description Lifecycle of a per-farm order (HLD section 11).
          *
-         *     PLACED -> CONFIRMED -> PACKED -> QC_PASSED -> READY_FOR_DISPATCH is issue #13. After that
-         *     logistics drives it: POOLED (pool assigned), IN_TRANSIT (picked up), DELIVERED, COMPLETED.
+         *     PLACED -> CONFIRMED -> PACKED -> READY_FOR_DISPATCH, then logistics drives it: POOLED (pool
+         *     assigned), IN_TRANSIT (picked up), DELIVERED, COMPLETED. There is no quality gate (removed in
+         *     November 2026): packing makes the order ready for dispatch, and the customer's rating after
+         *     delivery is the quality signal.
          * @enum {string}
          */
-        OrderStatus: "PLACED" | "CONFIRMED" | "PACKED" | "QC_PASSED" | "READY_FOR_DISPATCH" | "POOLED" | "IN_TRANSIT" | "DELIVERED" | "COMPLETED" | "CANCELLED";
+        OrderStatus: "PLACED" | "CONFIRMED" | "PACKED" | "READY_FOR_DISPATCH" | "POOLED" | "IN_TRANSIT" | "DELIVERED" | "COMPLETED" | "CANCELLED";
         /**
          * OrderSummary
          * @description A row of GET /orders.
@@ -672,6 +674,11 @@ export interface components {
             itemCount: number;
             /** @default PRODUCE */
             orderType: components["schemas"]["OrderType"];
+            /**
+             * Ratingscore
+             * @description The customer's score (1-5) once a completed order is rated
+             */
+            ratingScore?: number | null;
             /** Reservationid */
             reservationId?: string | null;
             status: components["schemas"]["OrderStatus"];
@@ -1083,7 +1090,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description HARVEST_NOT_READY, HARVEST_OPTION_CHOSEN or HARVEST_ORDER_CLOSED */
+            /** @description HARVEST_NOT_READY, HARVEST_OPTION_CHOSEN, HARVEST_ORDER_CLOSED or BALANCE_PAYMENT_FAILED */
             409: {
                 headers: {
                     [name: string]: unknown;

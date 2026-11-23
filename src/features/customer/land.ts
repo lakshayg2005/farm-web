@@ -39,6 +39,7 @@ export type ReservationStatus =
   | 'ACTIVE'
   | 'HARVEST_READY'
   | 'FULFILLING'
+  | 'COMPLETED'
   | 'REJECTED'
   | 'CANCELLED'
   | 'EXPIRED'
@@ -80,6 +81,17 @@ export interface PaymentIntent {
   id: string
   amount: number
   status: 'PENDING' | 'SUCCEEDED' | 'FAILED'
+}
+
+/** The harvest order of a reservation: made when the farmer marks the harvest ready. */
+export interface HarvestOrder {
+  id: string
+  reservationId: string | null
+  harvestOption: 'DELIVERY' | 'BUYBACK' | null
+  status: string
+  total: number
+  balanceDue: number
+  items: { name: string; qty: number; unitPrice: number }[]
 }
 
 export interface DeliveryAddress {
@@ -124,6 +136,12 @@ export const landApi = {
       method: 'POST',
       body: { amount, kind: 'DEPOSIT', referenceId: reservationId },
     }),
+  /** The harvest order made for this reservation, or null while it is being made. */
+  harvestOrder: async (reservationId: string): Promise<HarvestOrder | null> => {
+    const page = await api<{ items: { id: string; reservationId?: string | null }[] }>('/order/orders?role=customer&limit=100')
+    const row = page.items.find((o) => o.reservationId === reservationId)
+    return row ? api<HarvestOrder>(`/order/orders/${row.id}`) : null
+  },
   chooseHarvest: (reservationId: string, option: 'DELIVERY' | 'BUYBACK', deliveryAddress?: DeliveryAddress) =>
     api('/order/orders/harvest', {
       method: 'POST',

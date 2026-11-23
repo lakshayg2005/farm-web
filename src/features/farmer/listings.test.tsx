@@ -33,7 +33,6 @@ const LISTING: Listing = {
   unit: 'kg',
   pricePerUnit: 28,
   harvestDate: '2026-11-14',
-  grade: null,
   isOrganic: false,
   status: 'ACTIVE',
   mediaIds: ['m1', 'm2'],
@@ -58,7 +57,7 @@ const MEDIA = (id: string, extra: Partial<Media>): Media => ({
 function farmer(handlers: Record<string, (body: unknown) => Response>) {
   session.refreshToken = 'refresh-1'
   return mockApi({
-    'POST /identity/refresh': () => jsonResponse(tokens(['farmer'])),
+    'POST /identity/refresh': () => jsonResponse(tokens(['farmer'], { farmerVerified: true })),
     'GET /catalog/crops': () => jsonResponse(CROPS),
     'GET /catalog/farms/mine': () => jsonResponse({ items: [FARM], nextCursor: null }),
     ...handlers,
@@ -125,6 +124,18 @@ describe('photo badges', () => {
 })
 
 describe('farmer listings page', () => {
+  it('before an admin verifies them, a farmer is told to wait instead of getting a form', async () => {
+    session.refreshToken = 'refresh-1'
+    mockApi({
+      'POST /identity/refresh': () => jsonResponse(tokens(['farmer'])),
+      'GET /catalog/farms/mine': () => jsonResponse({ items: [], nextCursor: null }),
+    })
+    renderAt('/farmer/listings')
+    expect(await screen.findByText(/Once an admin verifies you, set up your farm here/)).toBeInTheDocument()
+    expect(screen.getByRole('note')).toHaveTextContent('Waiting for verification')
+    expect(screen.queryByRole('button', { name: /Save|Create|Add a listing/ })).not.toBeInTheDocument()
+  })
+
   it('asks for the farm first when the farmer has none', async () => {
     const calls = farmer({
       'GET /catalog/farms/mine': () => jsonResponse({ items: [], nextCursor: null }),

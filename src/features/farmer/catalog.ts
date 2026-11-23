@@ -44,7 +44,6 @@ export interface Listing {
   unit: Unit
   pricePerUnit: number
   harvestDate: string
-  grade: 'A' | 'B' | 'C' | null
   isOrganic: boolean
   status: ListingStatus
   mediaIds: string[]

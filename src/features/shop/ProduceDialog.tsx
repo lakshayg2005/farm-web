@@ -52,7 +52,6 @@ export function ProduceDialog({ item, cartPath, onClose }: { item: Produce; cart
           <div className="flex flex-wrap gap-2">
             <StatusChip tone={fresh.tone}>{t(fresh.days > 1 ? 'Harvested {n} days ago' : fresh.label, { n: fresh.days })}</StatusChip>
             {item.isOrganic && <StatusChip tone="good">{t('Organic')}</StatusChip>}
-            {item.grade && <StatusChip tone="info">{t('Grade {g}', { g: item.grade })}</StatusChip>}
             <StatusChip tone={item.qtyAvailable <= 10 ? 'warn' : 'neutral'}>{t('{n} {unit} in stock', { n: item.qtyAvailable, unit: item.unit })}</StatusChip>
           </div>
           {item.description && <p className="text-ink-soft">{item.description}</p>}

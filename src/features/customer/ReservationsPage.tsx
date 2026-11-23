@@ -4,20 +4,21 @@ import { ListSkeleton, StatusChip, type Tone } from '@/components/ui'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { ApiError } from '@/api/http'
-import { day, landApi, rupees, type CropUpdate, type Reservation } from './land'
+import { day, landApi, rupees, type CropUpdate, type HarvestOrder, type Reservation } from './land'
 
 const STATUS_TEXT: Record<string, { label: string; tone: Tone }> = {
   PENDING: { label: 'Waiting for the farmer', tone: 'warn' },
   ACCEPTED: { label: 'Accepted: deposit due', tone: 'info' },
   ACTIVE: { label: 'Growing', tone: 'good' },
-  HARVEST_READY: { label: 'Harvest ready', tone: 'good' },
-  FULFILLING: { label: 'Harvest on its way', tone: 'good' },
+  HARVEST_READY: { label: 'Harvested', tone: 'good' },
+  FULFILLING: { label: 'Harvest ready', tone: 'good' },
+  COMPLETED: { label: 'Completed', tone: 'good' },
   REJECTED: { label: 'Declined', tone: 'neutral' },
   CANCELLED: { label: 'Cancelled', tone: 'neutral' },
   EXPIRED: { label: 'Expired', tone: 'neutral' },
 }
 const STAGE_TEXT = { SOWN: 'Sown', GROWING: 'Growing', FLOWERING: 'Flowering' } as const
-const FOLLOWED = ['ACTIVE', 'HARVEST_READY', 'FULFILLING']
+const FOLLOWED = ['ACTIVE', 'HARVEST_READY', 'FULFILLING', 'COMPLETED']
 
 const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not reach the server. Try again.')
 
@@ -43,7 +44,7 @@ export function ReservationsPage() {
       </p>
     )
   // What needs the customer first: pay a deposit, choose a harvest option, then the rest.
-  const order = ['ACCEPTED', 'HARVEST_READY', 'ACTIVE', 'FULFILLING', 'PENDING']
+  const order = ['ACCEPTED', 'FULFILLING', 'HARVEST_READY', 'ACTIVE', 'PENDING']
   const rank = (r: Reservation) => (order.includes(r.status) ? order.indexOf(r.status) : order.length)
   const sorted = [...list.data].sort((a, b) => rank(a) - rank(b))
   return (
@@ -63,7 +64,7 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['reservations'] })
   const status = STATUS_TEXT[r.status] ?? { label: r.status, tone: 'neutral' }
   // Only an accepted reservation has an agreement that names the plot.
-  const named = ['ACCEPTED', 'ACTIVE', 'HARVEST_READY', 'FULFILLING'].includes(r.status)
+  const named = ['ACCEPTED', 'ACTIVE', 'HARVEST_READY', 'FULFILLING', 'COMPLETED'].includes(r.status)
   const agreement = useQuery({ queryKey: ['agreement', r.id], queryFn: () => landApi.agreement(r.id), enabled: named, staleTime: 300_000, retry: false })
 
   const cancel = useMutation({ mutationFn: () => landApi.cancel(r.id), onSuccess: refresh, onError: (e) => setError(message(e)) })
@@ -113,16 +114,8 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
         </button>
       )}
       {FOLLOWED.includes(r.status) && <Timeline reservationId={r.id} />}
-      {r.status === 'HARVEST_READY' && <HarvestChoice reservationId={r.id} onDone={refresh} />}
-      {r.status === 'FULFILLING' && (
-        <p className="mt-4">
-          Your harvest order is in progress.{' '}
-          <Link to="/customer/orders" className="font-semibold text-primary underline">
-            Track it under your orders
-          </Link>
-          .
-        </p>
-      )}
+      {r.status === 'HARVEST_READY' && <p className="mt-4 text-ink-soft">The farmer has harvested. Your harvest order is being prepared…</p>}
+      {(r.status === 'FULFILLING' || r.status === 'COMPLETED') && <Harvest reservationId={r.id} onDone={refresh} />}
       {error && (
         <p role="alert" className="mt-3 font-semibold text-danger">
           {error}
@@ -156,7 +149,52 @@ function Timeline({ reservationId }: { reservationId: string }) {
   )
 }
 
-function HarvestChoice({ reservationId, onDone }: { reservationId: string; onDone: () => void }) {
+/** The harvest order: the choice while it waits for one, then where it stands. */
+function Harvest({ reservationId, onDone }: { reservationId: string; onDone: () => void }) {
+  const queryClient = useQueryClient()
+  const harvest = useQuery({ queryKey: ['harvest-order', reservationId], queryFn: () => landApi.harvestOrder(reservationId) })
+  if (harvest.isPending) return <p className="mt-4 text-ink-soft">Loading your harvest order…</p>
+  if (harvest.isError || !harvest.data) return <p className="mt-4 text-ink-soft">Your harvest order is being prepared. Refresh in a moment.</p>
+  const h = harvest.data
+  const item = h.items[0]
+  const summary = item && (
+    <p className="mt-4">
+      <strong>{item.qty} kg harvested</strong>, worth {rupees(item.qty * item.unitPrice)} at {rupees(item.unitPrice)} a kg.
+    </p>
+  )
+  if (h.harvestOption === null && h.status === 'PLACED')
+    return (
+      <>
+        {summary}
+        <HarvestChoice
+          reservationId={reservationId}
+          order={h}
+          onDone={() => {
+            void queryClient.invalidateQueries({ queryKey: ['harvest-order', reservationId] })
+            onDone()
+          }}
+        />
+      </>
+    )
+  const done = h.status === 'COMPLETED'
+  return (
+    <>
+      {summary}
+      <p className="mt-1">
+        {h.harvestOption === 'BUYBACK'
+          ? 'You chose buy-back: the farmer sold the harvest and you were credited.'
+          : done
+            ? 'Your harvest was delivered.'
+            : 'Your harvest is on its way.'}{' '}
+        <Link to="/customer/orders" className="font-semibold text-primary underline">
+          {done ? 'See the order and rate it' : 'Track it under your orders'}
+        </Link>
+      </p>
+    </>
+  )
+}
+
+function HarvestChoice({ reservationId, order, onDone }: { reservationId: string; order: HarvestOrder; onDone: () => void }) {
   const [option, setOption] = useState<'DELIVERY' | 'BUYBACK'>('DELIVERY')
   const [f, setF] = useState({ line1: '', city: '', pincode: '', phone: '', lat: '', lng: '' })
   const [error, setError] = useState<string>()
@@ -207,14 +245,16 @@ function HarvestChoice({ reservationId, onDone }: { reservationId: string; onDon
           <input type="radio" name={`opt-${reservationId}`} checked={option === 'DELIVERY'} onChange={() => setOption('DELIVERY')} className="mt-1.5" />
           <span>
             <span className="block font-semibold">Deliver it to me</span>
-            <span className="text-sm text-ink-soft">Pooled delivery; the balance is paid when it arrives.</span>
+            <span className="text-sm text-ink-soft">Pooled delivery; the balance of {rupees(order.balanceDue)} plus delivery is paid when it arrives.</span>
           </span>
         </label>
         <label className="mt-2 flex items-start gap-3">
           <input type="radio" name={`opt-${reservationId}`} checked={option === 'BUYBACK'} onChange={() => setOption('BUYBACK')} className="mt-1.5" />
           <span>
             <span className="block font-semibold">Let the farmer buy it back</span>
-            <span className="text-sm text-ink-soft">The farmer buys the harvest and you are credited.</span>
+            <span className="text-sm text-ink-soft">
+              You pay the balance of {rupees(order.balanceDue)} now; the farmer sells the harvest and credits you {rupees(Math.round(order.total * 90) / 100)} (90%).
+            </span>
           </span>
         </label>
       </fieldset>
