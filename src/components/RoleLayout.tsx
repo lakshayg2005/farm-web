@@ -121,7 +121,7 @@ export function RoleLayout({ section }: { section: Section }) {
       <main className={`min-w-0 px-4 py-6 sm:px-8 lg:px-10 lg:py-10 ${hasTabs ? 'pb-28 lg:pb-10' : ''}`}>
         {section.role === 'farmer' && user && !user.farmerVerified && (
           <p role="note" className="mx-auto mb-5 max-w-6xl rounded-lg border border-warn/40 bg-[#f7ebd0] p-3 text-[#6f4a0e]">
-            <strong>{t('Waiting for verification')}.</strong> {t('You can set up your farm and listings now. An admin checks new farmers before customers can buy from them.')}
+            <strong>{t('Waiting for verification')}.</strong> {t('An admin checks every new farmer before they can list produce or offer land. You will get a notification once you are verified.')}
           </p>
         )}
         <motion.div

@@ -2,24 +2,23 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router'
 import { Figure } from '@/components/ui'
 import { rupees } from '@/features/customer/land'
-import { adminApi, dailyStats, loadAllOrders, passRate, todayISO, totalSavedKm } from './admin'
+import { adminApi, averageRating, dailyStats, loadAllOrders, todayISO, totalSavedKm } from './admin'
 
 /** Each number comes from the service that owns it; one that is down shows a dash instead of breaking the page. */
 export function DashboardPage() {
   const waiting = useQuery({ queryKey: ['farmers', 'waiting'], queryFn: () => adminApi.farmers(false), retry: false })
   const verified = useQuery({ queryKey: ['farmers', 'verified'], queryFn: () => adminApi.farmers(true), retry: false })
-  const inspections = useQuery({ queryKey: ['inspections', 'all'], queryFn: adminApi.inspections, retry: false })
   const pools = useQuery({ queryKey: ['pools', todayISO()], queryFn: () => adminApi.pools(todayISO()), retry: false })
   const orders = useQuery({ queryKey: ['admin-orders'], queryFn: () => loadAllOrders(), retry: false })
 
   const count = (q: typeof waiting) => (q.data ? String(q.data.items.length) : '–')
-  const rate = inspections.data ? passRate(inspections.data) : null
+  const rating = orders.data ? averageRating(orders.data) : undefined
   const days = orders.data ? dailyStats(orders.data) : null
   const today = days?.at(-1)
   const sales = days?.reduce((t, d) => t + d.sales, 0)
   const placed = days?.reduce((t, d) => t + d.orders, 0)
   const toPack = orders.data?.filter((o) => o.status === 'CONFIRMED').length
-  const toGrade = orders.data?.filter((o) => o.status === 'PACKED').length
+  const toRoute = orders.data?.filter((o) => o.status === 'PACKED' || o.status === 'READY_FOR_DISPATCH').length
 
   return (
     <div className="mt-8 max-w-5xl space-y-6">
@@ -27,9 +26,9 @@ export function DashboardPage() {
         <Figure label="Orders today" value={today ? String(today.orders) : '–'} hint={today ? `${rupees(today.sales)} in sales` : undefined} />
         <Figure label="Sales, last 14 days" value={sales === undefined ? '–' : rupees(sales)} hint={placed === undefined ? undefined : `${placed} orders`} />
         <Figure
-          label="Inspection pass rate"
-          value={rate === null ? '–' : `${rate}%`}
-          hint={inspections.data ? `${inspections.data.length} inspections` : undefined}
+          label="Customer rating"
+          value={rating ? `${rating.average} / 5` : rating === null ? 'None yet' : '–'}
+          hint={rating ? `${rating.count} rated ${rating.count === 1 ? 'order' : 'orders'}` : rating === null ? 'Customers rate delivered orders' : undefined}
         />
         <Figure
           label="Kilometres saved today"
@@ -50,11 +49,11 @@ export function DashboardPage() {
         <Figure label="Verified farmers" value={count(verified)} />
         <Figure
           label="Orders needing a step"
-          value={toPack === undefined ? '–' : String((toPack ?? 0) + (toGrade ?? 0))}
+          value={toPack === undefined ? '–' : String((toPack ?? 0) + (toRoute ?? 0))}
           hint={
             toPack === undefined ? undefined : (
               <>
-                {toPack} to pack, {toGrade} to grade ·{' '}
+                {toPack} to pack, {toRoute} waiting for a route ·{' '}
                 <Link to="/admin/orders" className="font-semibold text-primary underline">
                   See orders
                 </Link>

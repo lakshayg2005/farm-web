@@ -25,7 +25,7 @@ const quiet = 'btn-secondary hover:border-ink-soft disabled:opacity-60'
 const input = 'mt-1 w-full input font-normal'
 
 /** Crops being grown for a customer: deposit paid (ACTIVE), harvest ready, or on its way. */
-const GROWING = ['ACTIVE', 'HARVEST_READY', 'FULFILLING']
+const GROWING = ['ACTIVE', 'HARVEST_READY', 'FULFILLING', 'COMPLETED']
 
 export function CropsPage() {
   const reservations = useQuery({ queryKey: ['farmer-reservations'], queryFn: farmerLandApi.reservations })
@@ -84,14 +84,30 @@ function StageTrack({ reached }: { reached: number }) {
   )
 }
 
+/** What happens to the harvest, from the harvest order: the customer's choice decides who acts next. */
+function HarvestNote({ reservationId }: { reservationId: string }) {
+  const order = useQuery({ queryKey: ['harvest-order', reservationId], queryFn: () => farmerLandApi.harvestOrder(reservationId) })
+  const option = order.data?.harvestOption
+  return (
+    <p className="mt-4 rounded-lg bg-paper p-3">
+      {option === 'DELIVERY'
+        ? 'Harvested. The customer chose home delivery: a delivery partner collects it from this plot.'
+        : option === 'BUYBACK'
+          ? 'Harvested. The customer chose buy-back: sell the produce; they were credited 90% of its value.'
+          : 'Harvested. Waiting for the customer to choose home delivery or buy-back.'}
+    </p>
+  )
+}
+
 function CropCard({ reservation: r, info, cropName }: { reservation: Reservation; info: SeasonInfo | undefined; cropName: string }) {
   const queryClient = useQueryClient()
   const updates = useQuery({ queryKey: ['crop-updates', r.id], queryFn: () => farmerLandApi.updates(r.id) })
   const [posting, setPosting] = useState(false)
   const [confirmReady, setConfirmReady] = useState(false)
+  const [harvestedKg, setHarvestedKg] = useState(String(r.expectedQtyKg))
   const [error, setError] = useState<string>()
   const ready = useMutation({
-    mutationFn: () => farmerLandApi.harvestReady(r.id),
+    mutationFn: () => farmerLandApi.harvestReady(r.id, Number(harvestedKg)),
     onSuccess: (fresh) => {
       setConfirmReady(false)
       queryClient.setQueryData<Reservation[]>(['farmer-reservations'], (old) => old?.map((x) => (x.id === fresh.id ? fresh : x)))
@@ -111,12 +127,9 @@ function CropCard({ reservation: r, info, cropName }: { reservation: Reservation
       </p>
       <StageTrack reached={stageReached(r.status, list)} />
 
-      {r.status === 'HARVEST_READY' && (
-        <p className="mt-4 rounded-lg bg-paper p-3">
-          Marked ready to harvest. The harvest is graded next, then the customer chooses delivery or buy-back.
-        </p>
-      )}
-      {r.status === 'FULFILLING' && <p className="mt-4 rounded-lg bg-paper p-3">The harvest order is on its way to the customer.</p>}
+      {r.status === 'HARVEST_READY' && <p className="mt-4 rounded-lg bg-paper p-3">Harvested. The customer's harvest order is being made.</p>}
+      {r.status === 'FULFILLING' && <HarvestNote reservationId={r.id} />}
+      {r.status === 'COMPLETED' && <p className="mt-4 rounded-lg bg-paper p-3">Done: the harvest was delivered or bought back.</p>}
 
       <section className="mt-5" aria-label="Crop updates">
         {updates.isPending ? (
@@ -160,9 +173,30 @@ function CropCard({ reservation: r, info, cropName }: { reservation: Reservation
           {r.status === 'ACTIVE' &&
             (confirmReady ? (
               <span className="flex flex-wrap items-center gap-3">
-                <span>Ready to harvest? The customer is told and an inspection is booked.</span>
-                <button type="button" disabled={ready.isPending} onClick={() => ready.mutate()} className={quiet}>
-                  {ready.isPending ? 'Saving…' : 'Yes, it is ready'}
+                <label className="flex items-center gap-2">
+                  <span>Harvested</span>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min={1}
+                    step="any"
+                    value={harvestedKg}
+                    onChange={(e) => setHarvestedKg(e.target.value)}
+                    className="input w-28"
+                    aria-describedby={`harvest-help-${r.id}`}
+                  />
+                  <span>kg</span>
+                </label>
+                <span id={`harvest-help-${r.id}`} className="text-sm text-ink-soft">
+                  The customer pays for this weight and chooses delivery or buy-back.
+                </span>
+                <button
+                  type="button"
+                  disabled={ready.isPending || !(Number(harvestedKg) > 0)}
+                  onClick={() => ready.mutate()}
+                  className={quiet}
+                >
+                  {ready.isPending ? 'Saving…' : 'Yes, it is harvested'}
                 </button>
                 <button type="button" onClick={() => setConfirmReady(false)} className="underline">
                   Not yet

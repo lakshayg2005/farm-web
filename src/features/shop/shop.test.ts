@@ -4,7 +4,7 @@ import { addressPayload, cartStore, cartTotals, freshness, journeyStep, refine, 
 const produce = (over: Partial<Produce>): Produce => ({
   id: 'l1', farmId: 'f1', farmName: 'Sahu Farm', farmRating: null, farmRatingCount: 0, district: 'Durg', village: 'Patan',
   cropId: 'tomato', cropName: 'Tomato', variety: 'Hybrid', description: null, qtyAvailable: 20, unit: 'kg', pricePerUnit: 30,
-  harvestDate: '2026-11-20', grade: null, isOrganic: false, mediaIds: [], createdAt: '', distanceM: 1000, ...over,
+  harvestDate: '2026-11-20', isOrganic: false, mediaIds: [], createdAt: '', distanceM: 1000, ...over,
 })
 
 describe('cart', () => {
@@ -60,7 +60,8 @@ describe('freshness and steps', () => {
   })
   it('places statuses on the journey', () => {
     expect(journeyStep('CONFIRMED')).toBe(1)
-    expect(journeyStep('COMPLETED')).toBe(7)
+    expect(journeyStep('READY_FOR_DISPATCH')).toBe(journeyStep('PACKED'))  // packing = ready, no quality step
+    expect(journeyStep('COMPLETED')).toBe(6)
   })
 })
 

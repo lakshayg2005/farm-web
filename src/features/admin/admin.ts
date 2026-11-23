@@ -12,13 +12,6 @@ export interface UserPage {
   nextCursor: string | null
 }
 
-export interface InspectionSummary {
-  id: string
-  status: string
-  result: string | null
-  grade: string | null
-}
-
 /** One delivery pool: nearby drop points grouped into a single vehicle route (HLD section 14).
  * The page's own shape; `toPool` builds it from the logistics contract (PoolOut). */
 export interface PoolStop {
@@ -72,7 +65,6 @@ export const adminApi = {
   farmers: (verified: boolean) =>
     api<UserPage>(`/identity/users?role=farmer&farmerVerified=${verified}&limit=200`),
   verifyFarmer: (userId: string) => api<UserRow>(`/identity/users/${userId}/verify-farmer`, { method: 'POST' }),
-  inspections: () => api<InspectionSummary[]>('/quality/inspections'),
   /** GET /logistics/pools?pool_date (admin): the pools saved for that date. */
   pools: (date: string) => api<PoolOut[]>(`/logistics/pools?pool_date=${date}`).then((rows) => rows.map(toPool)),
   /** POST /logistics/pools/run?pool_date (admin) answers { poolsCreated, pools } for that date. */
@@ -80,11 +72,14 @@ export const adminApi = {
     api<PoolRunResponse>(`/logistics/pools/run?pool_date=${date}`, { method: 'POST' }).then((r) => r.pools.map(toPool)),
 }
 
-/** Share of finished inspections that passed, as a whole percent; null until one is finished. */
-export function passRate(inspections: InspectionSummary[]): number | null {
-  const done = inspections.filter((i) => i.result === 'PASS' || i.result === 'FAIL')
-  if (done.length === 0) return null
-  return Math.round((done.filter((i) => i.result === 'PASS').length / done.length) * 100)
+/**
+ * Customers rate an order after it is delivered; that rating is the platform's quality signal
+ * (there is no inspection step). Average of the rated orders to one decimal, null until one is rated.
+ */
+export function averageRating(orders: { ratingScore?: number | null }[]): { average: number; count: number } | null {
+  const scores = orders.map((o) => o.ratingScore).filter((r): r is number => typeof r === 'number')
+  if (scores.length === 0) return null
+  return { average: Math.round((scores.reduce((t, r) => t + r, 0) / scores.length) * 10) / 10, count: scores.length }
 }
 
 export function totalSavedKm(pools: Pool[]): number {

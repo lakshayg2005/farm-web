@@ -93,7 +93,8 @@ function OrderRow({ order }: { order: OrderSummary }) {
   }
   const pack = useMutation({ mutationFn: () => ordersApi.pack(order.id), onSuccess: refresh, onError: (e) => setError(message(e)) })
   const cancel = useMutation({ mutationFn: () => ordersApi.cancel(order.id), onSuccess: refresh, onError: (e) => setError(message(e)) })
-  const cancellable = ['PLACED', 'CONFIRMED', 'PACKED', 'QC_PASSED', 'READY_FOR_DISPATCH'].includes(order.status)
+  // the order service allows a cancel until the order is packed
+  const cancellable = ['PLACED', 'CONFIRMED', 'PACKED'].includes(order.status)
 
   return (
     <div className="card p-4">
@@ -142,6 +143,7 @@ function OrderRow({ order }: { order: OrderSummary }) {
       <div className="mt-3">
         <StatusRail
           stage={stageOf(order.status)}
+          total={STAGES.length}
           label={
             order.status === 'CANCELLED'
               ? t('Cancelled')

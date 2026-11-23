@@ -26,7 +26,7 @@ export function StatusChip({ tone = 'neutral', children }: { tone?: Tone; childr
  * The signature element: an 8-segment bar. Completed stages are green, the rest grey,
  * with the current stage written underneath by the caller.
  */
-export function StatusRail({ stage, total = 8, label }: { stage: number; total?: number; label: string }) {
+export function StatusRail({ stage, total, label }: { stage: number; total: number; label: string }) {
   return (
     <div role="img" aria-label={label} className="flex gap-[3px]">
       {Array.from({ length: total }, (_, i) => (
