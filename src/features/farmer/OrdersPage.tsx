@@ -46,7 +46,7 @@ export function OrdersPage() {
               role="tab"
               aria-selected={tab === t.id}
               onClick={() => setTab(t.id)}
-              className="rounded-full border border-line bg-transparent px-4 py-1.5 font-semibold aria-selected:border-indigo aria-selected:bg-white aria-selected:text-black"
+              className="rounded-full border border-line bg-transparent px-4 py-1.5 font-semibold aria-selected:border-indigo aria-selected:bg-primary aria-selected:text-on-primary"
             >
               {t.label} ({count})
             </button>
@@ -103,7 +103,7 @@ function OrderRow({ order }: { order: OrderSummary }) {
                 setError(undefined)
                 pack.mutate()
               }}
-              className="rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 disabled:opacity-60"
+              className="rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 disabled:opacity-60"
             >
               {pack.isPending ? 'Marking…' : 'Mark packed'}
             </button>

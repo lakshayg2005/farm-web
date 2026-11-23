@@ -7,90 +7,93 @@ import { BrandMark } from './BrandMark'
 const links = [
   { to: '/', label: 'Home' },
   { to: '/catalog', label: 'Fresh produce' },
-  { to: '/customer/plots', label: 'Reserve farmland' },
-  { to: '/#how', label: 'How it works' },
+  { to: '/reserve-farmland', label: 'Reserve farmland' },
+  { to: '/how-it-works', label: 'How it works' },
   { to: '/team', label: 'Our team' },
 ]
 
-/** Top navigation for the public pages (home, catalog, team). */
-/** Always the black bar, as on AINow. */
+/** Top navigation for the public pages: a fixed, blurred bar over the page. */
 export function SiteHeader() {
   const { user, logout } = useAuth()
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
-  const linkClass = ({ isActive }: { isActive: boolean }) => (isActive ? 'text-white' : 'text-gray-400 hover:text-white')
+  const hub = user ? homePathFor(user) : '/login'
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    `transition-colors ${isActive ? 'font-bold text-primary' : 'text-label-lg text-on-surface-variant hover:text-on-surface'}`
 
   return (
-    <nav className="border-b border-gray-800 bg-black py-4 text-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6">
+    <>
+    <header className="fixed inset-x-0 top-0 z-50 bg-surface/85 shadow-[0_1px_8px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+      <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between gap-6 px-6 lg:px-12">
         <BrandMark />
 
-        <div className="hidden items-center gap-8 md:flex">
-          {links.map((l) =>
-            l.to.includes('#') ? (
-              // a hash link is never "active": NavLink would light it up on the home page
-              <Link key={l.to} to={l.to} className="text-gray-400 hover:text-white">
-                {l.label}
-              </Link>
-            ) : (
-              <NavLink key={l.to} to={l.to} className={linkClass} end>
-                {l.label}
-              </NavLink>
-            ),
-          )}
-        </div>
+        <nav aria-label="Main" className="hidden items-center gap-8 lg:flex">
+          {links.map((l) => (
+            <NavLink key={l.to} to={l.to} className={linkClass} end={l.to === '/'}>
+              {l.label}
+            </NavLink>
+          ))}
+        </nav>
 
-        <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-3">
+          <Link
+            to={hub}
+            className="hidden items-center gap-2 rounded-full bg-surface-container-high px-3 py-1.5 text-label-md text-on-surface-variant transition-colors hover:bg-surface-container-highest hover:text-on-surface sm:inline-flex"
+          >
+            <span className="size-2 animate-pulse rounded-full bg-primary" />
+            <span>{user ? 'My workspace' : 'Get started'}</span>
+          </Link>
           {user ? (
-            <>
-              <Link to={homePathFor(user)} className="hidden max-w-[10rem] truncate text-sm text-gray-400 hover:text-white sm:inline">
-                {user.name}
-              </Link>
-              <button
-                type="button"
-                onClick={() => {
-                  close()
-                  void logout()
-                }}
-                className="rounded-lg border border-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-900"
-              >
-                Logout
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={() => {
+                close()
+                void logout()
+              }}
+              className="rounded-xl bg-surface-container-high px-4 py-2 text-label-lg text-on-surface transition-colors hover:bg-surface-container-highest"
+            >
+              Logout
+            </button>
           ) : (
-            <Link to="/login" onClick={close} className="rounded-lg bg-white px-5 py-2 font-medium text-black hover:bg-gray-200">
+            <Link
+              to="/login"
+              onClick={close}
+              className="rounded-xl bg-surface-container-high px-4 py-2 text-label-lg text-on-surface transition-colors hover:bg-surface-container-highest"
+            >
               Login
             </Link>
           )}
-
+          <Link to={hub} aria-label="Account" className="grid size-8 shrink-0 place-items-center rounded-full bg-primary font-bold text-on-primary">
+            {user ? user.name.charAt(0) : <span className="material-symbols-outlined text-[18px]">person</span>}
+          </Link>
           <button
             type="button"
-            onClick={() => setOpen((value) => !value)}
+            onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label={open ? 'Close menu' : 'Open menu'}
-            className="rounded-lg border border-gray-800 p-2 text-gray-300 hover:text-white md:hidden"
+            className="grid size-9 place-items-center rounded-lg bg-surface-container-high text-on-surface lg:hidden"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
-              {open ? <path d="M5 5l10 10M15 5L5 15" /> : <path d="M3 6h14M3 10h14M3 14h14" />}
-            </svg>
+            <span className="material-symbols-outlined text-[22px]">{open ? 'close' : 'menu'}</span>
           </button>
         </div>
       </div>
 
       {open && (
-        <div aria-label="Main mobile" role="navigation" className="mx-auto mt-4 flex max-w-7xl flex-col gap-1 border-t border-gray-800 px-6 pt-3 md:hidden">
+        <nav aria-label="Main mobile" className="mx-auto flex max-w-[1440px] flex-col gap-1 px-6 pb-4 lg:hidden">
           {links.map((l) => (
-            <Link key={l.to} to={l.to} onClick={close} className="py-2 text-gray-400 hover:text-white">
+            <Link key={l.to} to={l.to} onClick={close} className="rounded-lg px-3 py-2.5 text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
               {l.label}
             </Link>
           ))}
           {!user && (
-            <Link to="/register" onClick={close} className="py-2 text-gray-400 hover:text-white">
+            <Link to="/register" onClick={close} className="rounded-lg px-3 py-2.5 text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
               Register
             </Link>
           )}
-        </div>
+        </nav>
       )}
-    </nav>
+    </header>
+    <div className="h-20" aria-hidden />
+    </>
   )
 }

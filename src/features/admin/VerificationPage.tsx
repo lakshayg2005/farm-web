@@ -58,7 +58,7 @@ function FarmerRow({ farmer }: { farmer: UserRow }) {
           setError(undefined)
           verify.mutate()
         }}
-        className="rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 disabled:opacity-60"
+        className="rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 disabled:opacity-60"
       >
         {verify.isPending ? 'Verifying…' : `Verify ${farmer.name}`}
       </button>

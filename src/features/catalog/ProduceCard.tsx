@@ -1,5 +1,4 @@
 import { motion } from 'motion/react'
-import { Icon } from '@/components/Icon'
 import { type Delivery, type Freshness, type Produce, cropLook, formatKm, rupees } from './catalog'
 import { FreshMeter } from './FreshMeter'
 import { useProducePhoto } from './useProducePhoto'
@@ -30,64 +29,73 @@ export function ProduceCard({
         type="button"
         onClick={onOpen}
         aria-label={`${item.cropName} from ${item.farmName}`}
-        className="card group flex h-full w-full flex-col overflow-hidden text-left transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]"
+        className="group flex h-full w-full flex-col overflow-hidden rounded-2xl bg-surface-container text-left shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-surface-container-high hover:shadow-2xl"
       >
-        <div className="relative grid h-40 place-items-center overflow-hidden bg-neutral-900">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-container-high">
           {photo.thumbUrl && (
             <img
               src={photo.thumbUrl}
               alt={`${item.cropName} from ${item.farmName}`}
               loading="lazy"
-              className="absolute inset-0 size-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           )}
-          <span
-            aria-hidden
-            className={`${photo.thumbUrl ? 'hidden ' : ''}text-[4.5rem] drop-shadow-[0_8px_12px_rgb(0_0_0/0.15)] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6`}
-          >
-            {look.emoji}
-          </span>
-          <div className="absolute inset-x-3 top-3 flex flex-wrap gap-1.5">
+          {!photo.thumbUrl && (
+            <span aria-hidden className="grid size-full place-items-center text-[4.5rem] transition-transform duration-300 group-hover:scale-110">
+              {look.emoji}
+            </span>
+          )}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-black/30" />
+          <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
             {item.isOrganic && (
-              <span className="glass inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold text-green-400">
-                <Icon name="leaf" className="size-3.5" /> Organic
+              <span className="flex items-center gap-1 rounded-full bg-primary/20 px-2.5 py-1 text-label-sm font-bold tracking-wide text-primary uppercase backdrop-blur-md">
+                <span className="material-symbols-outlined text-[14px]">eco</span> Organic
               </span>
             )}
             {item.grade && (
-              <span className="glass inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold">
-                <Icon name="star" className="size-3.5 text-mustard" /> Grade {item.grade}
+              <span className="rounded-full bg-secondary/20 px-2.5 py-1 text-label-sm font-bold tracking-wide text-secondary uppercase backdrop-blur-md">
+                Grade {item.grade}
               </span>
             )}
           </div>
-          <span className="glass absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold">
-            <Icon name="pin" className="size-3.5" /> {formatKm(item.distanceM)}
+          <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-surface-container-lowest/80 px-2.5 py-1 text-label-sm text-on-surface backdrop-blur-md">
+            <span className="material-symbols-outlined text-[14px] text-primary">near_me</span> {formatKm(item.distanceM)}
           </span>
         </div>
 
-        <div className="flex flex-1 flex-col gap-3 p-4">
-          <div>
-            <p className="text-lg leading-tight font-semibold">{item.cropName}</p>
-            <p className="truncate text-sm text-ink-soft">
-              {item.variety ? `${item.variety} · ` : ''}
-              {item.farmName}, {item.village ?? item.district}
+        <div className="flex flex-1 flex-col justify-between gap-4 p-5">
+          <div className="space-y-3">
+            <div>
+              <h3 className="font-headline-sm text-headline-sm font-semibold tracking-tight text-on-surface">{item.cropName}</h3>
+              <p className="truncate text-body-sm text-on-surface-variant">
+                {item.variety ? `${item.variety} · ` : ''}
+                {item.farmName}, {item.village ?? item.district}
+              </p>
+            </div>
+            <div className="rounded-xl bg-surface-container-low p-3">
+              <FreshMeter fresh={fresh} compact />
+            </div>
+            <p className="flex items-center gap-2 text-body-sm text-on-surface-variant">
+              <span className="material-symbols-outlined text-[18px] text-primary">local_shipping</span>
+              <span>
+                <span className="font-semibold text-on-surface">{delivery.label}</span>
+                <span> · {delivery.by.replace('Arrives ', '')}</span>
+              </span>
             </p>
           </div>
-          <FreshMeter fresh={fresh} compact />
-          <p className="flex items-center gap-2 rounded-xl bg-paper px-3 py-2 text-sm">
-            <Icon name="truck" className="size-4.5 shrink-0 text-indigo" />
-            <span>
-              <span className="font-semibold">{delivery.label}</span>
-              <span className="text-ink-soft"> · {delivery.by.replace('Arrives ', '')}</span>
+          <div className="flex items-end justify-between gap-2 border-t border-outline-variant/40 pt-4">
+            <div>
+              <p>
+                <span className="font-headline-sm text-headline-sm font-bold text-secondary">{rupees(item.pricePerUnit)}</span>
+                <span className="text-body-sm text-on-surface-variant"> / {item.unit}</span>
+              </p>
+              <p className="text-label-sm text-outline">
+                {item.qtyAvailable} {item.unit} remaining
+              </p>
+            </div>
+            <span className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-label-md font-bold text-on-primary">
+              View <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </span>
-          </p>
-          <div className="mt-auto flex items-end justify-between gap-2 pt-1">
-            <p>
-              <span className="font-display text-2xl">{rupees(item.pricePerUnit)}</span>
-              <span className="text-sm text-ink-soft"> / {item.unit}</span>
-            </p>
-            <p className="text-right text-xs text-ink-soft">
-              {item.qtyAvailable} {item.unit} left
-            </p>
           </div>
         </div>
       </button>

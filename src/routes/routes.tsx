@@ -11,6 +11,9 @@ import { VerifyPage } from '@/features/auth/VerifyPage'
 import { HomePage } from '@/features/home/HomePage'
 import { NotFoundPage } from '@/features/home/NotFoundPage'
 import { TeamPage } from '@/features/team/TeamPage'
+import { FarmlandPage } from '@/features/customer/FarmlandPage'
+import { HowItWorksPage } from '@/features/home/HowItWorksPage'
+import { ToastProvider } from '@/components/Toast'
 import { sections } from './sections'
 
 /**
@@ -21,7 +24,9 @@ export const routes: RouteObject[] = [
   {
     element: (
       <AuthProvider>
-        <Outlet />
+        <ToastProvider>
+          <Outlet />
+        </ToastProvider>
       </AuthProvider>
     ),
     children: [
@@ -35,6 +40,8 @@ export const routes: RouteObject[] = [
       },
       { path: '/team', element: <TeamPage /> },
       { path: '/catalog', element: <CatalogPage /> },
+      { path: '/reserve-farmland', element: <FarmlandPage /> },
+      { path: '/how-it-works', element: <HowItWorksPage /> },
       { path: '/verify', element: <VerifyPage /> },
       { path: '/no-access', element: <NoAccessPage /> },
       ...sections.map(

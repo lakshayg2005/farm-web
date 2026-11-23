@@ -11,7 +11,7 @@ export function NotFoundPage() {
           <h1 className="mt-4 text-4xl font-bold">This page does not exist</h1>
           <p className="mt-4 text-gray-400">The link may be old or mistyped. Start again from the home page.</p>
           <div className="mt-8 flex justify-center gap-4">
-            <Link to="/" className="rounded-xl bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200">
+            <Link to="/" className="rounded-xl bg-primary px-6 py-3 font-semibold text-on-primary hover:brightness-110">
               Home
             </Link>
             <Link to="/catalog" className="rounded-xl border border-gray-700 px-6 py-3 font-semibold hover:bg-gray-900">

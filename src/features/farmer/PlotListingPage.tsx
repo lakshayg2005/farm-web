@@ -207,7 +207,7 @@ export function PlotListingPage() {
         </div>
         {message && <p role="status" className="mt-4 rounded-lg bg-paper-deep p-3 text-sm">{message}</p>}
         {savedPlot && <p className="mt-2 text-xs text-ink-soft">Plot ID: {savedPlot.id}</p>}
-        <button disabled={saving} type="submit" className="mt-5 rounded-lg bg-ink px-5 py-3 font-semibold text-white disabled:opacity-50">
+        <button disabled={saving} type="submit" className="mt-5 rounded-lg bg-primary px-5 py-3 font-semibold text-on-primary disabled:opacity-50">
           {saving ? 'Saving plot and season…' : 'Save plot and season'}
         </button>
       </form>

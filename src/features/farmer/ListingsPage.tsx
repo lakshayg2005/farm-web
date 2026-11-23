@@ -29,7 +29,7 @@ const message = (e: unknown) =>
 
 const input =
   'mt-1 w-full rounded-xl border border-line bg-transparent px-3 py-2 font-normal disabled:bg-paper disabled:text-ink-soft'
-const primary = 'rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 hover:bg-white/90 disabled:opacity-60'
+const primary = 'rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 hover:bg-primary/90 disabled:opacity-60'
 const quiet = 'rounded-xl border border-line bg-transparent px-3 py-1.5 font-semibold hover:border-ink-soft disabled:opacity-60'
 const panel = { initial: { opacity: 0, y: -8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: 0.2 } }
 

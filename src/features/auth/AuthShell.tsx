@@ -35,7 +35,7 @@ export function Field({
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        className="mt-2 w-full rounded-xl border border-gray-800 bg-transparent px-5 py-4 outline-none focus:border-white"
+        className="mt-2 w-full rounded-xl border border-gray-800 bg-transparent px-5 py-4 outline-none focus:border-primary"
         {...input}
       />
       {hint && !error && (
@@ -53,4 +53,4 @@ export function Field({
 }
 
 export const primaryButton =
-  'w-full rounded-xl bg-white py-4 font-semibold text-black hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
+  'w-full rounded-xl bg-primary py-4 font-semibold text-on-primary hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50'

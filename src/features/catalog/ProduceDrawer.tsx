@@ -179,7 +179,7 @@ export function ProduceDrawer({
             <p className="mt-1 text-sm text-white/75">
               Add it to your basket in the Farm customer app: pay once, track the delivery live and confirm it with an OTP.
             </p>
-            <Link to="/register" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-black hover:bg-neutral-800">
+            <Link to="/register" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-on-primary hover:bg-neutral-800">
               Create a customer account <Icon name="arrow" className="size-4" />
             </Link>
           </div>

@@ -104,7 +104,7 @@ export function CatalogBrowser() {
   return (
     <div>
       {/* Search and filters */}
-      <div className="card p-3 sm:p-4">
+      <div className="space-y-1 rounded-2xl bg-surface-container-low p-3 shadow-md sm:p-4">
         <div className="mb-3">
           <PlaceSearch
             placeholder="Find produce near any village, town or address…"
@@ -120,7 +120,7 @@ export function CatalogBrowser() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Search tomatoes, mangoes, a farm…"
-              className="h-11 w-full rounded-full border border-line bg-paper pr-4 pl-11"
+              className="h-12 w-full rounded-xl bg-surface-container pr-4 pl-12 text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary"
             />
           </label>
           <div className="flex flex-wrap items-center gap-2">
@@ -174,7 +174,7 @@ export function CatalogBrowser() {
               aria-pressed={organic}
               onClick={() => setOrganic((v) => !v)}
               className={`inline-flex h-11 items-center gap-1.5 rounded-full border px-4 font-medium transition-colors ${
-                organic ? 'border-white bg-white text-black' : 'border-line bg-surface hover:border-ink-soft'
+                organic ? 'border-primary bg-primary text-on-primary' : 'border-transparent bg-surface-container hover:bg-surface-container-high'
               }`}
             >
               <Icon name="leaf" className="size-4.5" /> Organic
@@ -196,8 +196,8 @@ export function CatalogBrowser() {
                   onClick={() => setCategory(c.id)}
                   className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 whitespace-nowrap transition-all ${
                     active
-                      ? 'border-white bg-white text-black'
-                      : 'border-line bg-surface hover:-translate-y-0.5 hover:border-ink-soft'
+                      ? 'border-primary bg-primary text-on-primary'
+                      : 'border-transparent bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
                   }`}
                 >
                   <span aria-hidden>{c.emoji}</span>
@@ -228,13 +228,13 @@ export function CatalogBrowser() {
           ['Arrive tomorrow', String(tomorrow), 'truck'],
           ['Peak fresh', String(peak), 'leaf'],
         ].map(([label, value, icon]) => (
-          <div key={label} className="card flex items-center gap-3 px-4 py-3">
-            <span className="grid size-10 place-items-center rounded-xl bg-neutral-900 text-black">
+          <div key={label} className="flex items-center gap-3 rounded-xl bg-surface-container px-4 py-3 shadow-sm">
+            <span className="grid size-10 place-items-center rounded-lg bg-surface-container-high text-primary">
               <Icon name={icon as 'basket'} className="size-5" />
             </span>
             <div>
-              <dt className="text-sm text-ink-soft">{label}</dt>
-              <dd className="font-display text-xl leading-tight">{value}</dd>
+              <dt className="text-label-sm tracking-wider text-on-surface-variant uppercase">{label}</dt>
+              <dd className="font-headline-md text-headline-md font-semibold leading-tight">{value}</dd>
             </div>
           </div>
         ))}
@@ -275,7 +275,7 @@ export function CatalogBrowser() {
             {view.length} listing{view.length === 1 ? '' : 's'} near <strong className="text-ink">{place.name}</strong>
             {nearest !== null && <> · nearest farm {formatKm(nearest)} away</>}
           </p>
-          <ul className="mt-3 grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <ul className="mt-4 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {view.map((v, i) => (
               <ProduceCard key={v.item.id} {...v} index={i} onOpen={() => setOpenId(v.item.id)} />
             ))}

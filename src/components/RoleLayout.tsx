@@ -25,16 +25,16 @@ export function RoleLayout({ section }: { section: Section }) {
   return (
     <div
       style={{ '--role': section.accent } as CSSProperties}
-      className="min-h-dvh bg-black text-white lg:grid lg:grid-cols-[17rem_1fr]"
+      className="min-h-dvh bg-background text-on-surface lg:grid lg:grid-cols-[18rem_1fr]"
     >
       {/* Desktop rail */}
-      <aside className="relative hidden border-r border-gray-800 bg-black text-white lg:block">
+      <aside className="relative hidden bg-surface-container-low text-on-surface lg:block">
         <div className="sticky top-0 flex h-dvh flex-col">
           <div className="px-6 pt-6">
             <BrandMark />
           </div>
-          <p className="px-6 pt-10 text-sm tracking-widest text-gray-500 uppercase">Workspace</p>
-          <p className="px-6 pt-2 text-3xl font-bold">{section.label}</p>
+          <p className="px-6 pt-10 text-label-sm tracking-widest text-primary uppercase">{section.label} workspace</p>
+          <p className="px-6 pt-2 font-headline-lg text-headline-lg font-semibold">{section.label}</p>
           <nav aria-label={`${section.label} pages`} className="mt-6 flex-1 px-3">
             <ul className="space-y-1">
               {section.pages.map((page) => (
@@ -42,8 +42,8 @@ export function RoleLayout({ section }: { section: Section }) {
                   <NavLink
                     to={page.path}
                     className={({ isActive }) =>
-                      `relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors duration-200 ${
-                        isActive ? 'font-semibold text-white' : 'text-gray-400 hover:text-white'
+                      `relative flex items-center gap-3 rounded-xl px-3 py-3 transition-colors duration-200 ${
+                        isActive ? 'font-bold text-on-primary' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
                       }`
                     }
                   >
@@ -53,7 +53,7 @@ export function RoleLayout({ section }: { section: Section }) {
                           <motion.span
                             layoutId="rail-active"
                             transition={quick}
-                            className="absolute inset-0 rounded-lg bg-neutral-900"
+                            className="absolute inset-0 rounded-xl bg-primary-container"
                           />
                         )}
                         <Icon name={page.icon} className="relative size-5" />
@@ -65,10 +65,10 @@ export function RoleLayout({ section }: { section: Section }) {
               ))}
             </ul>
           </nav>
-          <div className="mx-3 mb-4 rounded-2xl border border-gray-800 p-3">
+          <div className="mx-3 mb-4 rounded-2xl bg-surface-container p-3">
             {user && (
               <div className="flex items-center gap-3 px-1 pb-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white font-bold text-black">
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary font-bold text-on-primary">
                   {user.name.charAt(0)}
                 </span>
                 <span className="min-w-0">
@@ -88,16 +88,16 @@ export function RoleLayout({ section }: { section: Section }) {
       </aside>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-20 border-b border-gray-800 bg-black lg:hidden">
+      <header className="sticky top-0 z-20 bg-surface/90 backdrop-blur-xl lg:hidden">
         <div className="flex h-14 items-center justify-between px-4">
           <BrandMark className="text-base" />
-          <span className="rounded-full border border-gray-700 px-3 py-0.5 text-sm text-gray-300">
+          <span className="rounded-full bg-surface-container-high px-3 py-0.5 text-sm text-on-surface-variant">
             {section.label}
           </span>
         </div>
               </header>
 
-      <main className={`bg-black px-6 py-12 sm:px-8 lg:px-14 lg:py-16 ${hasTabs ? 'pb-28 lg:pb-14' : ''}`}>
+      <main className={`bg-background px-6 py-12 sm:px-8 lg:px-14 lg:py-16 ${hasTabs ? 'pb-28 lg:pb-14' : ''}`}>
         <motion.div
           key={pathname}
           initial={{ opacity: 0, y: 8 }}
@@ -112,7 +112,7 @@ export function RoleLayout({ section }: { section: Section }) {
       {hasTabs && (
         <nav
           aria-label={`${section.label} pages`}
-          className="fixed inset-x-0 bottom-0 z-20 border-t border-gray-800 bg-black pb-[env(safe-area-inset-bottom)] lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-20 bg-surface-container-low pb-[env(safe-area-inset-bottom)] lg:hidden"
         >
           <ul className="grid" style={{ gridTemplateColumns: `repeat(${section.pages.length}, minmax(0, 1fr))` }}>
             {section.pages.map((page) => (
@@ -121,7 +121,7 @@ export function RoleLayout({ section }: { section: Section }) {
                   to={page.path}
                   className={({ isActive }) =>
                     `flex flex-col items-center gap-0.5 px-1 pt-2 pb-2 text-xs leading-tight ${
-                      isActive ? 'font-semibold text-ink' : 'text-ink-soft'
+                      isActive ? 'font-semibold text-primary' : 'text-on-surface-variant'
                     }`
                   }
                 >
@@ -132,7 +132,7 @@ export function RoleLayout({ section }: { section: Section }) {
                           <motion.span
                             layoutId="tab-active"
                             transition={quick}
-                            className="absolute inset-0 rounded-full bg-neutral-800"
+                            className="absolute inset-0 rounded-full bg-primary-container/40"
                           />
                         )}
                         <Icon name={page.icon} className="relative size-5" />

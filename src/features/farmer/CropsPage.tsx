@@ -19,7 +19,7 @@ import {
 
 const message = (e: unknown) =>
   e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not reach the server. Try again.'
-const primary = 'rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 hover:bg-white/90 disabled:opacity-60'
+const primary = 'rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 hover:bg-primary/90 disabled:opacity-60'
 const quiet = 'rounded-xl border border-line bg-transparent px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
 const input = 'mt-1 w-full rounded-xl border border-line bg-transparent px-3 py-2 font-normal'
 
@@ -187,7 +187,7 @@ function TimelineItem({ update: u, reservationId }: { update: CropUpdate; reserv
   const stage = STAGES.find((s) => s.id === u.stage)?.label ?? u.stage
   return (
     <li className="relative">
-      <span aria-hidden="true" className="absolute top-1.5 -left-[1.6rem] size-3 rounded-full border-2 border-white bg-[var(--role)]" />
+      <span aria-hidden="true" className="absolute top-1.5 -left-[1.6rem] size-3 rounded-full border-2 border-primary bg-[var(--role)]" />
       <p className="font-semibold">
         {stage} <span className="font-normal text-ink-soft">on {day(u.createdAt)}</span>
       </p>
@@ -306,7 +306,7 @@ function UpdateForm({
           </ul>
         )}
         {files.length < MAX_PHOTOS && (
-          <label className="mt-2 inline-block cursor-pointer rounded-lg border border-dashed border-ink-soft bg-white px-4 py-2 font-semibold hover:bg-paper-deep">
+          <label className="mt-2 inline-block cursor-pointer rounded-lg border border-dashed border-ink-soft bg-primary px-4 py-2 font-semibold hover:bg-paper-deep">
             Add photos
             <input
               type="file"

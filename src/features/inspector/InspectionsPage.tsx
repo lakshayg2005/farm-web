@@ -127,7 +127,7 @@ function ClaimRow({ inspection: i, onDone }: { inspection: Inspection; onDone: (
           </p>
         )}
       </div>
-      <button type="button" disabled={claim.isPending} onClick={() => claim.mutate()} className="rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 disabled:opacity-60">
+      <button type="button" disabled={claim.isPending} onClick={() => claim.mutate()} className="rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 disabled:opacity-60">
         Claim
       </button>
     </div>
@@ -245,7 +245,7 @@ function ReportCard({ inspection: i, onDone }: { inspection: Inspection; onDone:
           {error}
         </p>
       )}
-      <button type="submit" disabled={submit.isPending} className="rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 disabled:opacity-60">
+      <button type="submit" disabled={submit.isPending} className="rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 disabled:opacity-60">
         {submit.isPending ? 'Submitting…' : 'Submit report'}
       </button>
     </form>

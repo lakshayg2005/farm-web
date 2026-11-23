@@ -116,9 +116,9 @@ export function searchQuery(bounds: Bounds | null, filters: { season?: string; c
 }
 
 export const landApi = {
-  crops: () => api<Crop[]>('/catalog/crops'),
+  crops: () => api<Crop[]>('/catalog/crops', { anonymous: true }),
   searchPlots: (bounds: Bounds | null, filters: { season?: string; crop?: string }) =>
-    api<{ features: PlotFeature[] }>(`/land/plots/search?${searchQuery(bounds, filters)}`).then((r) => r.features),
+    api<{ features: PlotFeature[] }>(`/land/plots/search?${searchQuery(bounds, filters)}`, { anonymous: true }).then((r) => r.features),
   reserve: (plotSeasonId: string, cropId: string, expectedQtyKg: number) =>
     api<Reservation>('/land/reservations', { method: 'POST', body: { plotSeasonId, cropId, expectedQtyKg } }),
   myReservations: () => api<Reservation[]>('/land/reservations/mine'),

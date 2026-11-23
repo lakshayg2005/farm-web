@@ -16,7 +16,7 @@ import {
 } from './reservations'
 
 const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not reach the server. Try again.')
-const primary = 'rounded-xl bg-white px-5 py-2 font-semibold text-black transition-colors hover:bg-gray-200 hover:bg-white/90 disabled:opacity-60'
+const primary = 'rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 hover:bg-primary/90 disabled:opacity-60'
 const quiet = 'rounded-xl border border-line bg-transparent px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
 
 /** Re-renders every `ms` so countdowns stay current. */
