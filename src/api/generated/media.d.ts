@@ -30,7 +30,7 @@ export interface paths {
         };
         /**
          * Get Media Internal
-         * @description Full details incl. where the photo was taken, e.g. for quality or logistics.
+         * @description Full details incl. where the photo was taken, e.g. for logistics.
          */
         get: operations["get_media_internal_internal_media__media_id__get"];
         put?: never;
@@ -311,7 +311,7 @@ export interface components {
          * @description What the photo belongs to; decides which location it is checked against.
          * @enum {string}
          */
-        OwnerType: "FARM" | "LISTING" | "PLOT" | "RESERVATION" | "INSPECTION" | "DELIVERY" | "USER";
+        OwnerType: "FARM" | "LISTING" | "PLOT" | "RESERVATION" | "DELIVERY" | "USER";
         /** UploadUrlIn */
         UploadUrlIn: {
             /**

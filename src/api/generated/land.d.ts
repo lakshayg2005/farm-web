@@ -258,7 +258,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Harvest Ready */
+        /**
+         * Harvest Ready
+         * @description The farmer harvested. The order service turns it into a harvest order at once (there is no
+         *     quality gate); the reservation moves to FULFILLING when that order exists and the customer
+         *     picks delivery or buy-back.
+         */
         post: operations["harvest_ready_reservations__reservation_id__harvest_ready_post"];
         delete?: never;
         options?: never;
@@ -383,6 +388,17 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /**
+         * HarvestReadyIn
+         * @description Body of POST /reservations/{id}/harvest-ready (optional): how much was really harvested.
+         */
+        HarvestReadyIn: {
+            /**
+             * Harvestedqtykg
+             * @description Weight harvested; the harvest order is priced on it (default: the expected kg)
+             */
+            harvestedQtyKg?: number | null;
         };
         /** PlotCreate */
         PlotCreate: {
@@ -519,7 +535,10 @@ export interface components {
              * Format: uuid
              */
             plotSeasonId: string;
-            /** Status */
+            /**
+             * Status
+             * @description PENDING (waiting for the farmer, expires after 48 h), ACCEPTED (waiting for the deposit), ACTIVE (growing), HARVEST_READY (harvested; the order is being made), FULFILLING (the customer chooses delivery or buy-back, then it is delivered), COMPLETED, REJECTED, CANCELLED or EXPIRED
+             */
             status: string;
             /** Total */
             total: number | null;
@@ -1154,7 +1173,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["HarvestReadyIn"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

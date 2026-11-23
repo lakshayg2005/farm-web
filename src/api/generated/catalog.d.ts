@@ -412,12 +412,6 @@ export interface components {
             } | null;
             point: components["schemas"]["GeoPoint"];
         };
-        /**
-         * Grade
-         * @description Set by the quality service (quality.graded); A is best.
-         * @enum {string}
-         */
-        Grade: "A" | "B" | "C";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -539,8 +533,6 @@ export interface components {
              * Format: uuid
              */
             farmerId: string;
-            /** @description Null until the quality service grades a batch */
-            grade: components["schemas"]["Grade"] | null;
             /**
              * Harvestdate
              * Format: date
@@ -621,8 +613,6 @@ export interface components {
              * Format: uuid
              */
             farmerId: string;
-            /** @description Null until the quality service grades a batch */
-            grade: components["schemas"]["Grade"] | null;
             /**
              * Harvestdate
              * Format: date
@@ -713,7 +703,6 @@ export interface components {
              * Format: uuid
              */
             farmerId: string;
-            grade: components["schemas"]["Grade"] | null;
             /**
              * Listingid
              * Format: uuid
@@ -1199,8 +1188,6 @@ export interface operations {
                 crop?: string | null;
                 min_price?: number | null;
                 max_price?: number | null;
-                /** @description Minimum grade: B returns A and B (ungraded listings excluded) */
-                grade?: components["schemas"]["Grade"] | null;
                 organic?: boolean | null;
                 sort?: components["schemas"]["SearchSort"];
                 limit?: number;

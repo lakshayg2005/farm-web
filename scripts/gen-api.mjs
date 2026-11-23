@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const SERVICES = ['identity', 'catalog', 'land', 'media', 'quality', 'order', 'logistics', 'notification']
+const SERVICES = ['identity', 'catalog', 'land', 'media', 'order', 'logistics', 'notification']
 const REPO = 'lakshayg2005/farm-backend'
 const args = process.argv.slice(2)
 const localAt = args.indexOf('--local')

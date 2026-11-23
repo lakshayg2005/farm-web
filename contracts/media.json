@@ -464,7 +464,6 @@
           "LISTING",
           "PLOT",
           "RESERVATION",
-          "INSPECTION",
           "DELIVERY",
           "USER"
         ],
@@ -642,7 +641,7 @@
     },
     "/internal/media/{media_id}": {
       "get": {
-        "description": "Full details incl. where the photo was taken, e.g. for quality or logistics.",
+        "description": "Full details incl. where the photo was taken, e.g. for logistics.",
         "operationId": "get_media_internal_internal_media__media_id__get",
         "parameters": [
           {
