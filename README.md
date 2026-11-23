@@ -9,8 +9,8 @@ The typed API client is generated from the backend's OpenAPI specs (`pnpm gen:ap
 
 | What | URL |
 | --- | --- |
-| Website, team VM | <http://10.1.75.79:3501> (college network or VPN) |
-| API gateway, team VM | <http://10.1.75.79:4501/api/v1> |
+| Website, team VM | <https://10.1.75.79:3501> (college network or VPN; self-signed certificate, accept the browser warning) |
+| API gateway, team VM | <http://10.1.75.79:4501/api/v1> (the website itself calls it same-origin at `https://10.1.75.79:3501/api/v1`) |
 | Website, local | <http://localhost:5173> (`pnpm dev`) |
 | API gateway, local | <http://localhost/api/v1> (`docker compose up -d` in farm-backend) |
 | Demo logins for every role | [farm-backend/docs/DEMO.md](https://github.com/lakshayg2005/farm-backend/blob/main/docs/DEMO.md) |
@@ -37,10 +37,32 @@ src/
 `pnpm e2e` runs Playwright journeys for every role against a real stack with the curated demo data
 (`scripts/reset-demo.sh` in farm-backend; logins in its `docs/DEMO.md`). It builds the app and serves it on
 `http://localhost:4173` (an origin the gateway allows), API from `VITE_API_BASE_URL`. Against a deployed site:
-`E2E_BASE_URL=http://10.1.75.79:3501 pnpm e2e`. First time: `pnpm exec playwright install chromium`.
+`E2E_BASE_URL=https://10.1.75.79:3501 pnpm e2e`. First time: `pnpm exec playwright install chromium`.
 Every test fails on a console error, an uncaught exception or a 5xx answer; `responsive.spec.ts` visits every page at
 390 px and 1440 px, checks nothing scrolls sideways and leaves screenshots in `e2e/screenshots/`.
 `pnpm test` is unit tests only.
+
+## Deploying to the team VM
+
+The site is a static build served by nginx on the VM (no Docker, no systemd there). Needs the college network or VPN;
+SSH uses key auth as `student` on port 2501 with passwordless sudo.
+
+| What | Value |
+| --- | --- |
+| SSH | `ssh -p 2501 student@10.1.75.79` |
+| nginx | `/etc/nginx/sites-enabled/farm-web`: HTTPS on port 3000 (self-signed cert in `/etc/nginx/certs/`), exposed as `:3501` |
+| Web root | `/var/www/farm-web` |
+| Staging dir | `~/farm-web-dist` |
+| API | nginx proxies `/api/` to `127.0.0.1:4000`, so the build calls the same origin |
+
+```bash
+VITE_API_BASE_URL=/api/v1 pnpm build        # same-origin API: an https page cannot call the http gateway
+rsync -az --delete -e "ssh -p 2501" dist/ student@10.1.75.79:farm-web-dist/
+ssh -p 2501 student@10.1.75.79 'sudo rsync -a --delete ~/farm-web-dist/ /var/www/farm-web/'
+```
+
+nginx serves new files without a restart. Reload (`sudo nginx -s reload`) only after changing its config, and check
+`sudo nginx -t` first: a reload also applies any pending config edit. Check the result with `E2E_BASE_URL=https://10.1.75.79:3501 pnpm e2e`.
 
 ## Workflow (all repos)
 

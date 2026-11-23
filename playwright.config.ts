@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test'
 /**
  * Journeys against a real stack with the demo data (backend: scripts/reset-demo.sh, logins in docs/DEMO.md).
  *   pnpm e2e                                  builds and serves the app on :4173, API from VITE_API_BASE_URL (.env)
- *   E2E_BASE_URL=http://10.1.75.79:3501 pnpm e2e   against an already deployed site (no local server)
+ *   E2E_BASE_URL=https://10.1.75.79:3501 pnpm e2e  against an already deployed site (no local server)
  * The gateway only allows the origins in infra/traefik/dynamic.yml, which includes http://localhost:4173.
  */
 const external = process.env.E2E_BASE_URL
@@ -18,6 +18,7 @@ export default defineConfig({
   use: {
     baseURL: external ?? 'http://localhost:4173',
     trace: 'retain-on-failure',
+    ignoreHTTPSErrors: true, // the team VM uses a self-signed certificate
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: external
