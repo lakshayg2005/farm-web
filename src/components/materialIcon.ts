@@ -11,6 +11,11 @@ const MAP: Record<string, string> = {
   shield: 'verified_user',
   grid: 'dashboard',
   route: 'route',
+  cart: 'shopping_cart',
+  bell: 'notifications',
+  rupee: 'currency_rupee',
+  user: 'person',
+  back: 'arrow_back',
 }
 
 export const materialIcon = (name: string) => MAP[name] ?? 'circle'
