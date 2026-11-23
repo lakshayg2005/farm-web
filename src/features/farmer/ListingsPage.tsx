@@ -1,14 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { FarmLocationPicker } from '@/components/FarmLocationPicker'
+import { ListSkeleton, Rating, StatusChip } from '@/components/ui'
+import { useI18n } from '@/i18n/i18n'
+import { useAuth } from '@/features/auth/authContext'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef, useState, type FormEvent } from 'react'
 import { ApiError } from '@/api/http'
+import { newId } from '@/api/id'
 import { MAX_PHOTOS, photoProblem, uploadPhoto } from '@/api/media'
 import { OwnerPhotos } from '@/components/OwnerPhotos'
 import {
   catalogApi,
   day,
   farmPayload,
+  isLowStock,
   listingChanges,
   listingPayload,
   rupees,
@@ -28,15 +32,18 @@ const message = (e: unknown) =>
   e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not reach the server. Try again.'
 
 const input =
-  'mt-1 w-full rounded-xl border border-line bg-transparent px-3 py-2 font-normal disabled:bg-paper disabled:text-ink-soft'
-const primary = 'rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 hover:bg-primary/90 disabled:opacity-60'
-const quiet = 'rounded-xl border border-line bg-transparent px-3 py-1.5 font-semibold hover:border-ink-soft disabled:opacity-60'
+  'mt-1 w-full input font-normal disabled:bg-paper disabled:text-ink-soft'
+const primary = 'btn-primary'
+const quiet = 'btn-secondary min-h-9 px-3 py-1.5'
 const panel = { initial: { opacity: 0, y: -8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: 0.2 } }
 
 /** Order: on sale first, then sold out, then paused; newest change first within each. */
 const ORDER: Record<string, number> = { ACTIVE: 0, SOLD_OUT: 1, PAUSED: 2 }
 
 export function ListingsPage() {
+  const { t } = useI18n()
+  const { user } = useAuth()
+  const verified = !!user?.farmerVerified
   const farms = useQuery({ queryKey: ['farms', 'mine'], queryFn: catalogApi.myFarms })
   const listings = useQuery({ queryKey: ['listings', 'mine'], queryFn: catalogApi.myListings, enabled: !!farms.data?.length })
   const crops = useQuery({ queryKey: ['catalog-crops'], queryFn: catalogApi.crops, staleTime: 3_600_000 })
@@ -44,14 +51,16 @@ export function ListingsPage() {
   const [notice, setNotice] = useState<string>()
   const [editorError, setEditorError] = useState<string>()
 
-  if (farms.isPending) return <p className="mt-8 text-ink-soft">Loading your farms…</p>
+  if (farms.isPending) return <ListSkeleton label="Loading your farms" />
   if (farms.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-400">
-        Could not load your farms. Refresh to try again.
+      <p role="alert" className="mt-8 font-semibold text-danger">
+        {t('Could not load your farms. Refresh to try again.')}
       </p>
     )
-  if (farms.data.length === 0) return <FarmSetup />
+  // The catalog only lets an admin-verified farmer open a farm, so no form until then (the banner says why).
+  if (farms.data.length === 0)
+    return verified ? <FarmSetup /> : <p className="mt-8 max-w-xl text-ink-soft">{t('Once an admin verifies you, set up your farm here and list what you grow.')}</p>
 
   const live = (listings.data ?? [])
     .filter((l) => l.status !== 'ARCHIVED')
@@ -62,10 +71,11 @@ export function ListingsPage() {
     <div className="mt-8 max-w-4xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-ink-soft" role="status">
-          {listings.isSuccess && (live.length === 0 ? 'Nothing listed yet.' : `${onSale} of ${live.length} listings on sale.`)}
-          {notice && <span className="ml-2 font-semibold text-leaf">{notice}</span>}
+          {listings.isSuccess &&
+            (live.length === 0 ? t('Nothing listed yet.') : t('{n} of {total} listings on sale.', { n: onSale, total: live.length }))}
+          {notice && <span className="ml-2 font-semibold text-primary">{notice}</span>}
         </p>
-        {editing === null && (
+        {editing === null && verified && (
           <button
             type="button"
             className={primary}
@@ -75,10 +85,19 @@ export function ListingsPage() {
               setEditing('new')
             }}
           >
-            Add a listing
+            {t('Add a listing')}
           </button>
         )}
       </div>
+
+      <ul aria-label={t('Your farms')} className="flex flex-wrap gap-x-6 gap-y-1">
+        {farms.data.map((f) => (
+          <li key={f.id} className="flex flex-wrap items-center gap-x-2">
+            <span className="font-semibold">{f.name}</span>
+            <Rating value={f.rating} count={f.ratingCount ?? 0} />
+          </li>
+        ))}
+      </ul>
 
       <AnimatePresence initial={false}>
         {editing !== null && (
@@ -107,22 +126,22 @@ export function ListingsPage() {
       </AnimatePresence>
 
       {listings.isPending ? (
-        <p className="text-ink-soft">Loading your listings…</p>
+        <p className="text-ink-soft">{t('Loading your listings…')}</p>
       ) : listings.isError ? (
-        <p role="alert" className="font-semibold text-red-400">
-          Could not load your listings. Refresh to try again.
+        <p role="alert" className="font-semibold text-danger">
+          {t('Could not load your listings. Refresh to try again.')}
         </p>
       ) : live.length === 0 ? (
         editing === null && (
-          <div className="rounded-xl border border-dashed border-line bg-transparent p-6">
-            <h2 className="text-lg font-semibold">Put your first produce up for sale</h2>
+          <div className="card border-dashed p-6">
+            <h2 className="text-lg font-semibold">{t('Put your first produce up for sale')}</h2>
             <p className="mt-1 text-ink-soft">
-              Add the crop, how much you have, your price and a photo taken at the farm. Customers nearby see it straight away.
+              {t('Add the crop, how much you have, your price and a photo taken at the farm. Customers nearby see it straight away.')}
             </p>
           </div>
         )
       ) : (
-        <ul className="space-y-3" aria-label="Your listings">
+        <ul className="space-y-3" aria-label={t('Your listings')}>
           {live.map((l) => (
             <li key={l.id}>
               <ListingRow
@@ -141,6 +160,7 @@ export function ListingsPage() {
 }
 
 function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => void }) {
+  const { t } = useI18n()
   const queryClient = useQueryClient()
   const [stock, setStock] = useState(String(l.qtyAvailable))
   const [confirmRemove, setConfirmRemove] = useState(false)
@@ -173,7 +193,7 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
           {l.mediaIds.length > 0 ? (
             <OwnerPhotos ownerType="LISTING" ownerId={l.id} only={l.mediaIds.slice(0, 3)} size="sm" />
           ) : (
-            <p className="rounded-lg bg-paper-deep px-3 py-2 text-sm text-ink-soft">No photos yet. Listings with a farm photo sell faster.</p>
+            <p className="rounded-lg bg-paper-deep px-3 py-2 text-sm text-ink-soft">{t('No photos yet. Listings with a farm photo sell faster.')}</p>
           )}
         </div>
         <div className="min-w-0 flex-1">
@@ -182,21 +202,23 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
               {l.cropName}
               {l.variety && <span className="text-ink-soft">, {l.variety}</span>}
             </h2>
-            <span className={`rounded-full px-3 py-0.5 text-sm font-semibold ${status.tone}`}>{status.label}</span>
+            <span className="flex flex-wrap gap-1.5">
+              {isLowStock(l) && <StatusChip tone="warn">{t('Low stock')}</StatusChip>}
+              <StatusChip tone={status.tone}>{t(status.label)}</StatusChip>
+            </span>
           </div>
           <p className="mt-1 text-ink-soft">
             <span className="font-semibold text-ink">
-              {rupees(l.pricePerUnit)} per {l.unit}
+              {rupees(l.pricePerUnit)} {t('per')} {t(l.unit)}
             </span>
-            , harvested {day(l.harvestDate)}
-            {l.isOrganic && ', organic'}
-            {l.grade && `, grade ${l.grade}`}
+            , {t('harvested')} {day(l.harvestDate)}
+            {l.isOrganic && `, ${t('organic')}`}
           </p>
 
           <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-3">
             <form onSubmit={saveStock} className="flex items-end gap-2">
               <label className="text-sm font-semibold">
-                In stock ({l.unit})
+                {t('In stock')} ({t(l.unit)})
                 <input
                   type="number"
                   min="0"
@@ -204,51 +226,56 @@ function ListingRow({ listing: l, onEdit }: { listing: Listing; onEdit: () => vo
                   inputMode="decimal"
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
-                  className="mt-1 block w-28 rounded-lg border border-line px-3 py-1.5 font-normal"
+                  className="mt-1 block w-28 input font-normal"
                 />
               </label>
               {stockChanged && (
                 <button type="submit" disabled={update.isPending} className={quiet}>
-                  {update.isPending ? 'Saving…' : 'Update stock'}
+                  {update.isPending ? t('Saving…') : t('Update stock')}
                 </button>
               )}
             </form>
             <div className="flex flex-wrap gap-2">
               <button type="button" onClick={onEdit} className={quiet}>
-                Edit
+                {t('Edit')}
               </button>
               {(l.status === 'ACTIVE' || l.status === 'SOLD_OUT') && (
                 <button type="button" disabled={update.isPending} onClick={() => update.mutate({ status: 'PAUSED' })} className={quiet}>
-                  Pause
+                  {t('Pause')}
                 </button>
               )}
               {l.status === 'PAUSED' && (
                 <button type="button" disabled={update.isPending} onClick={() => update.mutate({ status: 'ACTIVE' })} className={quiet}>
-                  Resume
+                  {t('Resume')}
                 </button>
               )}
               {confirmRemove ? (
                 <span className="flex items-center gap-2">
-                  <span className="text-sm">Remove this listing?</span>
-                  <button type="button" disabled={remove.isPending} onClick={() => remove.mutate()} className={`${quiet} text-red-400`}>
-                    {remove.isPending ? 'Removing…' : 'Remove'}
+                  <span className="text-sm">{t('Remove this listing?')}</span>
+                  <button type="button" disabled={remove.isPending} onClick={() => remove.mutate()} className={`${quiet} text-danger`}>
+                    {remove.isPending ? t('Removing…') : t('Remove')}
                   </button>
                   <button type="button" onClick={() => setConfirmRemove(false)} className="text-sm underline">
-                    Keep it
+                    {t('Keep it')}
                   </button>
                 </span>
               ) : (
                 <button type="button" onClick={() => setConfirmRemove(true)} className="px-2 text-sm text-ink-soft underline">
-                  Remove
+                  {t('Remove')}
                 </button>
               )}
             </div>
           </div>
+          {isLowStock(l) && (
+            <p className="mt-2 text-sm font-semibold text-warn" role="status">
+              {t('Only {n} {unit} left. Add stock before it sells out.', { n: l.qtyAvailable, unit: t(l.unit) })}
+            </p>
+          )}
           {l.qtyAvailable === 0 && l.status !== 'PAUSED' && (
-            <p className="mt-2 text-sm text-ink-soft">Sold out. Add stock to put it back on sale.</p>
+            <p className="mt-2 text-sm text-ink-soft">{t('Sold out. Add stock to put it back on sale.')}</p>
           )}
           {error && (
-            <p role="alert" className="mt-2 font-semibold text-red-400">
+            <p role="alert" className="mt-2 font-semibold text-danger">
               {error}
             </p>
           )}
@@ -307,7 +334,7 @@ export function ListingEditor({
   const [files, setFiles] = useState<File[]>([])
   const [error, setError] = useState<string | undefined>(initialError)
   // One key per "Add a listing" form, so a retried request never lists the produce twice.
-  const idempotencyKey = useRef(crypto.randomUUID())
+  const idempotencyKey = useRef(newId())
   // Set as soon as a new listing exists, so a failed photo upload can continue as an edit.
   const created = useRef<Listing | null>(null)
 
@@ -436,7 +463,7 @@ export function ListingEditor({
           <input type="date" value={f.harvestDate} onChange={set('harvestDate')} className={input} />
         </label>
         <label className="flex items-center gap-3 self-end pb-2 font-semibold">
-          <input type="checkbox" checked={f.isOrganic} onChange={(e) => setF({ ...f, isOrganic: e.target.checked })} className="size-5 accent-leaf" />
+          <input type="checkbox" checked={f.isOrganic} onChange={(e) => setF({ ...f, isOrganic: e.target.checked })} className="size-5 accent-primary" />
           Grown organically
         </label>
         <label className="font-semibold sm:col-span-2">
@@ -486,7 +513,7 @@ export function ListingEditor({
       </div>
 
       {error && (
-        <p role="alert" className="mt-4 font-semibold text-red-400">
+        <p role="alert" className="mt-4 font-semibold text-danger">
           {error}
         </p>
       )}
@@ -562,27 +589,13 @@ export function FarmSetup() {
             Longitude
             <input value={f.lng} onChange={set('lng')} inputMode="decimal" placeholder="81.63" className={input} />
           </label>
-          <FarmLocationPicker
-            lat={f.lat.trim() === '' ? null : Number(f.lat)}
-            lng={f.lng.trim() === '' ? null : Number(f.lng)}
-            onChange={(la, ln, place) =>
-              setF((cur) => ({
-                ...cur,
-                lat: String(la),
-                lng: String(ln),
-                village: place?.village && !cur.village ? place.village : cur.village,
-                district: place?.district && !cur.district ? place.district : cur.district,
-                state: place?.state && !cur.state ? place.state : cur.state,
-              }))
-            }
-          />
-          <button type="button" onClick={useMyLocation} className="justify-self-start font-semibold text-indigo underline sm:col-span-2">
+          <button type="button" onClick={useMyLocation} className="justify-self-start font-semibold text-primary underline sm:col-span-2">
             Use my location
           </button>
         </fieldset>
       </div>
       {error && (
-        <p role="alert" className="mt-4 font-semibold text-red-400">
+        <p role="alert" className="mt-4 font-semibold text-danger">
           {error}
         </p>
       )}

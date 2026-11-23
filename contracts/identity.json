@@ -226,7 +226,6 @@
           "farmer",
           "customer",
           "delivery",
-          "inspector",
           "admin"
         ],
         "title": "Role",
@@ -1150,7 +1149,7 @@
     },
     "/users/{user_id}/roles": {
       "put": {
-        "description": "Replace a user's roles (the only way to grant inspector or admin). Ends their sessions.",
+        "description": "Replace a user's roles (the only way to grant admin). Ends their sessions.",
         "operationId": "set_roles_users__user_id__roles_put",
         "parameters": [
           {

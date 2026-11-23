@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ListSkeleton } from '@/components/ui'
 import { AnimatePresence, motion } from 'motion/react'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
@@ -19,12 +20,12 @@ import {
 
 const message = (e: unknown) =>
   e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Could not reach the server. Try again.'
-const primary = 'rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 hover:bg-primary/90 disabled:opacity-60'
-const quiet = 'rounded-xl border border-line bg-transparent px-4 py-2 font-semibold hover:border-ink-soft disabled:opacity-60'
-const input = 'mt-1 w-full rounded-xl border border-line bg-transparent px-3 py-2 font-normal'
+const primary = 'btn-primary'
+const quiet = 'btn-secondary hover:border-ink-soft disabled:opacity-60'
+const input = 'mt-1 w-full input font-normal'
 
 /** Crops being grown for a customer: deposit paid (ACTIVE), harvest ready, or on its way. */
-const GROWING = ['ACTIVE', 'HARVEST_READY', 'FULFILLING']
+const GROWING = ['ACTIVE', 'HARVEST_READY', 'FULFILLING', 'COMPLETED']
 
 export function CropsPage() {
   const reservations = useQuery({ queryKey: ['farmer-reservations'], queryFn: farmerLandApi.reservations })
@@ -32,22 +33,22 @@ export function CropsPage() {
   const crops = useQuery({ queryKey: ['crops'], queryFn: landApi.crops, staleTime: 3_600_000 })
   const cropName = (id: string) => crops.data?.find((c) => c.id === id)?.name ?? id
 
-  if (reservations.isPending) return <p className="mt-8 text-ink-soft">Loading your crops…</p>
+  if (reservations.isPending) return <ListSkeleton label="Loading your crops" />
   if (reservations.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-400">
+      <p role="alert" className="mt-8 font-semibold text-danger">
         Could not load your crops. Refresh to try again.
       </p>
     )
   const growing = reservations.data.filter((r) => GROWING.includes(r.status))
   if (growing.length === 0)
     return (
-      <div className="mt-8 max-w-xl rounded-xl border border-dashed border-line bg-transparent p-6">
+      <div className="mt-8 max-w-xl card border-dashed p-6">
         <h2 className="text-lg font-semibold">No crops growing for customers yet</h2>
         <p className="mt-1 text-ink-soft">
           A crop shows up here once you accept a reservation and the customer pays the deposit.
         </p>
-        <Link to="/farmer/reservations" className="mt-3 inline-block font-semibold text-indigo underline">
+        <Link to="/farmer/reservations" className="mt-3 inline-block font-semibold text-primary underline">
           See reservation requests
         </Link>
       </div>
@@ -83,14 +84,30 @@ function StageTrack({ reached }: { reached: number }) {
   )
 }
 
+/** What happens to the harvest, from the harvest order: the customer's choice decides who acts next. */
+function HarvestNote({ reservationId }: { reservationId: string }) {
+  const order = useQuery({ queryKey: ['harvest-order', reservationId], queryFn: () => farmerLandApi.harvestOrder(reservationId) })
+  const option = order.data?.harvestOption
+  return (
+    <p className="mt-4 rounded-lg bg-paper p-3">
+      {option === 'DELIVERY'
+        ? 'Harvested. The customer chose home delivery: a delivery partner collects it from this plot.'
+        : option === 'BUYBACK'
+          ? 'Harvested. The customer chose buy-back: sell the produce; they were credited 90% of its value.'
+          : 'Harvested. Waiting for the customer to choose home delivery or buy-back.'}
+    </p>
+  )
+}
+
 function CropCard({ reservation: r, info, cropName }: { reservation: Reservation; info: SeasonInfo | undefined; cropName: string }) {
   const queryClient = useQueryClient()
   const updates = useQuery({ queryKey: ['crop-updates', r.id], queryFn: () => farmerLandApi.updates(r.id) })
   const [posting, setPosting] = useState(false)
   const [confirmReady, setConfirmReady] = useState(false)
+  const [harvestedKg, setHarvestedKg] = useState(String(r.expectedQtyKg))
   const [error, setError] = useState<string>()
   const ready = useMutation({
-    mutationFn: () => farmerLandApi.harvestReady(r.id),
+    mutationFn: () => farmerLandApi.harvestReady(r.id, Number(harvestedKg)),
     onSuccess: (fresh) => {
       setConfirmReady(false)
       queryClient.setQueryData<Reservation[]>(['farmer-reservations'], (old) => old?.map((x) => (x.id === fresh.id ? fresh : x)))
@@ -110,18 +127,15 @@ function CropCard({ reservation: r, info, cropName }: { reservation: Reservation
       </p>
       <StageTrack reached={stageReached(r.status, list)} />
 
-      {r.status === 'HARVEST_READY' && (
-        <p className="mt-4 rounded-lg bg-paper p-3">
-          Marked ready to harvest. An inspector grades the harvest next, then the customer chooses delivery or buy-back.
-        </p>
-      )}
-      {r.status === 'FULFILLING' && <p className="mt-4 rounded-lg bg-paper p-3">The harvest order is on its way to the customer.</p>}
+      {r.status === 'HARVEST_READY' && <p className="mt-4 rounded-lg bg-paper p-3">Harvested. The customer's harvest order is being made.</p>}
+      {r.status === 'FULFILLING' && <HarvestNote reservationId={r.id} />}
+      {r.status === 'COMPLETED' && <p className="mt-4 rounded-lg bg-paper p-3">Done: the harvest was delivered or bought back.</p>}
 
       <section className="mt-5" aria-label="Crop updates">
         {updates.isPending ? (
           <p className="text-ink-soft">Loading updates…</p>
         ) : updates.isError ? (
-          <p className="text-red-400">Could not load the updates.</p>
+          <p className="text-danger">Could not load the updates.</p>
         ) : list.length === 0 ? (
           <p className="text-ink-soft">No updates yet. The customer sees each update you post, so start with a photo of the sowing.</p>
         ) : (
@@ -159,9 +173,30 @@ function CropCard({ reservation: r, info, cropName }: { reservation: Reservation
           {r.status === 'ACTIVE' &&
             (confirmReady ? (
               <span className="flex flex-wrap items-center gap-3">
-                <span>Ready to harvest? The customer is told and an inspection is booked.</span>
-                <button type="button" disabled={ready.isPending} onClick={() => ready.mutate()} className={quiet}>
-                  {ready.isPending ? 'Saving…' : 'Yes, it is ready'}
+                <label className="flex items-center gap-2">
+                  <span>Harvested</span>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min={1}
+                    step="any"
+                    value={harvestedKg}
+                    onChange={(e) => setHarvestedKg(e.target.value)}
+                    className="input w-28"
+                    aria-describedby={`harvest-help-${r.id}`}
+                  />
+                  <span>kg</span>
+                </label>
+                <span id={`harvest-help-${r.id}`} className="text-sm text-ink-soft">
+                  The customer pays for this weight and chooses delivery or buy-back.
+                </span>
+                <button
+                  type="button"
+                  disabled={ready.isPending || !(Number(harvestedKg) > 0)}
+                  onClick={() => ready.mutate()}
+                  className={quiet}
+                >
+                  {ready.isPending ? 'Saving…' : 'Yes, it is harvested'}
                 </button>
                 <button type="button" onClick={() => setConfirmReady(false)} className="underline">
                   Not yet
@@ -175,7 +210,7 @@ function CropCard({ reservation: r, info, cropName }: { reservation: Reservation
         </div>
       )}
       {error && (
-        <p role="alert" className="mt-3 font-semibold text-red-400">
+        <p role="alert" className="mt-3 font-semibold text-danger">
           {error}
         </p>
       )}
@@ -187,7 +222,7 @@ function TimelineItem({ update: u, reservationId }: { update: CropUpdate; reserv
   const stage = STAGES.find((s) => s.id === u.stage)?.label ?? u.stage
   return (
     <li className="relative">
-      <span aria-hidden="true" className="absolute top-1.5 -left-[1.6rem] size-3 rounded-full border-2 border-primary bg-[var(--role)]" />
+      <span aria-hidden="true" className="absolute top-1.5 -left-[1.6rem] size-3 rounded-full border-2 border-white bg-[var(--color-primary)]" />
       <p className="font-semibold">
         {stage} <span className="font-normal text-ink-soft">on {day(u.createdAt)}</span>
       </p>
@@ -274,7 +309,7 @@ function UpdateForm({
           {STAGES.map((s) => (
             <label
               key={s.id}
-              className="cursor-pointer rounded-full border border-line bg-transparent px-4 py-1.5 has-checked:border-ink has-checked:bg-[color-mix(in_oklab,var(--role)_25%,white)] has-checked:font-semibold"
+              className="cursor-pointer rounded-full border border-line-strong bg-white px-4 py-1.5 min-h-10 has-checked:border-ink has-checked:bg-[#dff1e6] has-checked:font-semibold"
             >
               <input type="radio" name={`stage-${reservationId}`} value={s.id} checked={stage === s.id} onChange={() => setStage(s.id)} className="sr-only" />
               {s.label}
@@ -306,7 +341,7 @@ function UpdateForm({
           </ul>
         )}
         {files.length < MAX_PHOTOS && (
-          <label className="mt-2 inline-block cursor-pointer rounded-lg border border-dashed border-ink-soft bg-primary px-4 py-2 font-semibold hover:bg-paper-deep">
+          <label className="mt-2 inline-block cursor-pointer rounded-lg border border-dashed border-ink-soft bg-white px-4 py-2 font-semibold hover:bg-paper-deep">
             Add photos
             <input
               type="file"
@@ -330,13 +365,13 @@ function UpdateForm({
             </button>
           </>
         ) : (
-          <button type="button" className="font-semibold text-indigo underline" onClick={useMyLocation}>
+          <button type="button" className="font-semibold text-primary underline" onClick={useMyLocation}>
             Attach my location
           </button>
         )}
       </p>
       {error && (
-        <p role="alert" className="font-semibold text-red-400">
+        <p role="alert" className="font-semibold text-danger">
           {error}
         </p>
       )}

@@ -389,8 +389,8 @@ export function HomePage() {
             From cultivation and quality audits to consumer baskets and cold-pool management.
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Link to="/farmer" className="group relative bg-surface-container rounded-2xl p-7 flex flex-col justify-between shadow-md hover:bg-surface-container-high transition-all">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Link to="/farmer" aria-label="Open Farmer" className="group relative bg-surface-container rounded-2xl p-7 flex flex-col justify-between shadow-md hover:bg-surface-container-high transition-all">
             <div>
               <div className="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary mb-6">
                 <span className="material-symbols-outlined text-[28px]">agriculture</span>
@@ -407,7 +407,7 @@ export function HomePage() {
             </div>
           </Link>
 
-          <Link to="/customer" className="group relative bg-surface-container rounded-2xl p-7 flex flex-col justify-between shadow-md hover:bg-surface-container-high transition-all">
+          <Link to="/customer" aria-label="Open Customer" className="group relative bg-surface-container rounded-2xl p-7 flex flex-col justify-between shadow-md hover:bg-surface-container-high transition-all">
             <div>
               <div className="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center text-secondary mb-6">
                 <span className="material-symbols-outlined text-[28px]">shopping_basket</span>
@@ -424,29 +424,12 @@ export function HomePage() {
             </div>
           </Link>
 
-          <Link to="/inspector" className="group relative bg-surface-container rounded-2xl p-7 flex flex-col justify-between shadow-md hover:bg-surface-container-high transition-all cursor-pointer">
-            <div>
-              <div className="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center text-tertiary mb-6">
-                <span className="material-symbols-outlined text-[28px]">biotech</span>
-              </div>
-              <div className="font-label-sm text-label-sm text-outline mb-1">03 / AUDITOR</div>
-              <h3 className="font-headline-md text-headline-md text-on-surface mb-3 group-hover:text-tertiary transition-colors">Inspector</h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-6">
-                Conduct on-site soil and produce checks. Log refractometer readings, pesticide strip scans, and issue unforgeable digital batch seals.
-              </p>
-            </div>
-            <div className="pt-4 flex items-center justify-between font-label-md text-label-md text-tertiary font-bold">
-              <span>Audit Console</span>
-              <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-            </div>
-          </Link>
-
-          <Link to="/admin" className="group relative bg-surface-container rounded-2xl p-7 flex flex-col justify-between shadow-md hover:bg-surface-container-high transition-all cursor-pointer">
+          <Link to="/admin" aria-label="Open Admin" className="group relative bg-surface-container rounded-2xl p-7 flex flex-col justify-between shadow-md hover:bg-surface-container-high transition-all cursor-pointer">
             <div>
               <div className="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary-fixed mb-6">
                 <span className="material-symbols-outlined text-[28px]">query_stats</span>
               </div>
-              <div className="font-label-sm text-label-sm text-outline mb-1">04 / OPERATIONS</div>
+              <div className="font-label-sm text-label-sm text-outline mb-1">03 / OPERATIONS</div>
               <h3 className="font-headline-md text-headline-md text-on-surface mb-3 group-hover:text-primary-fixed transition-colors">Admin</h3>
               <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-6">
                 Approve farmer credentials, calculate cold-route pooling density, analyze cluster demand surges, and manage dispute resolutions.

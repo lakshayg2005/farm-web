@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router'
+import { cartStore, type Produce as CartProduce } from '@/features/shop/shop'
 import { searchPlaces } from '@/api/geocode'
 import { useToast } from '@/components/Toast'
 import {
@@ -57,6 +59,16 @@ function Segments({ score }: { score: number }) {
 
 export function FreshProduceView() {
   const notify = useToast()
+  const navigate = useNavigate()
+  const addToCart = (item: Produce, qty: number, goToCart: boolean) => {
+    if (offline) return notify('Showing sample produce. Real listings can be added to the cart once the server is reachable.')
+    cartStore.add(
+      { ...item, farmRating: null, farmRatingCount: 0, mediaIds: item.mediaIds ?? [], createdAt: item.updatedAt, unit: item.unit as CartProduce['unit'] },
+      qty,
+    )
+    if (goToCart) navigate('/customer/cart')
+    else notify(`${item.cropName} added to your cart.`)
+  }
   const [category, setCategory] = useState('all')
   const [organicOnly, setOrganicOnly] = useState(false)
   const [drawerQty, setDrawerQty] = useState(5)
@@ -360,7 +372,7 @@ export function FreshProduceView() {
                         onClick={(e) => {
                           e.stopPropagation()
                           setSelectedId(item.id)
-                          notify(`${item.cropName} selected. Orders are placed in the Farm customer app.`)
+                          addToCart(item, 1, false)
                         }}
                         className="flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-label-md text-on-primary shadow-sm transition-transform hover:opacity-90 active:scale-95"
                       >
@@ -463,7 +475,7 @@ export function FreshProduceView() {
                     </div>
                   </div>
                   <button
-                    onClick={() => notify(`${drawerQty} ${sel.unit} of ${sel.cropName} for ₹${drawerQty * sel.pricePerUnit}. Orders are placed in the Farm customer app.`)}
+                    onClick={() => addToCart(sel, drawerQty, true)}
                     className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-label-lg text-on-primary transition-opacity hover:opacity-95"
                   >
                     <span className="material-symbols-outlined text-xl">shopping_bag</span>

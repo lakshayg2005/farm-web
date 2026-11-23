@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { IconName } from '@/components/Icon'
 
-export type Role = 'farmer' | 'customer' | 'inspector' | 'admin'
+export type Role = 'farmer' | 'customer' | 'admin'
 
 export interface SectionPage {
   /** Path segment under the section, e.g. "listings" → /farmer/listings */
@@ -25,7 +25,5 @@ export interface Section {
   label: string
   /** Who the section is for, shown on the start page */
   audience: string
-  /** CSS colour used for the section's crop rows and active states */
-  accent: string
   pages: [SectionPage, ...SectionPage[]]
 }

@@ -10,6 +10,8 @@ import { RegisterPage } from '@/features/auth/RegisterPage'
 import { VerifyPage } from '@/features/auth/VerifyPage'
 import { HomePage } from '@/features/home/HomePage'
 import { NotFoundPage } from '@/features/home/NotFoundPage'
+import { FarmPage } from '@/features/shop/FarmPage'
+import { ProfilePage } from '@/features/auth/ProfilePage'
 import { TeamPage } from '@/features/team/TeamPage'
 import { FarmlandPage } from '@/features/customer/FarmlandPage'
 import { HowItWorksPage } from '@/features/home/HowItWorksPage'
@@ -38,8 +40,10 @@ export const routes: RouteObject[] = [
           { path: '/register', element: <RegisterPage /> },
         ],
       },
-      { path: '/team', element: <TeamPage /> },
       { path: '/catalog', element: <CatalogPage /> },
+      { path: '/farm/:id', element: <FarmPage /> },
+      { path: '/profile', element: <ProfilePage /> },
+      { path: '/team', element: <TeamPage /> },
       { path: '/reserve-farmland', element: <FarmlandPage /> },
       { path: '/how-it-works', element: <HowItWorksPage /> },
       { path: '/verify', element: <VerifyPage /> },

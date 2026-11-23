@@ -16,12 +16,17 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "gen:api": "node scripts/gen-api.mjs",
-    "mock": "node scripts/mock.mjs"
+    "mock": "node scripts/mock.mjs",
+    "e2e": "playwright test"
   },
   "dependencies": {
+    "@fontsource/instrument-sans": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
     "@fontsource/mukta": "^5.3.0",
     "@fontsource/young-serif": "^5.3.0",
     "@tanstack/react-query": "^5.107.1",
+    "leaflet": "1.9.4",
+    "leaflet-draw": "1.0.4",
     "motion": "^14.14.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -29,6 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.1",
     "@stoplight/prism-cli": "^5.16.0",
     "@tailwindcss/vite": "^4.3.5",
     "@testing-library/dom": "^10.4.2",

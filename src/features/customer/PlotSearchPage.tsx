@@ -2,16 +2,13 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useMemo, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { ApiError } from '@/api/http'
-import { PlaceSearch } from '@/components/PlaceSearch'
-import { useAuth } from '@/features/auth/authContext'
 import { day, landApi, rupees, type Bounds, type PlotFeature } from './land'
 import { getLeaflet } from './leaflet'
 import { PlotMap } from './PlotMap'
 
 const SEASONS = ['Kharif', 'Rabi', 'Zaid']
 
-export function PlotSearchPage({ publicView = false }: { publicView?: boolean }) {
-  const [focus, setFocus] = useState<{ lat: number; lng: number } | null>(null)
+export function PlotSearchPage() {
   const hasMap = getLeaflet() !== null
   const [bounds, setBounds] = useState<Bounds | null>(null)
   const [season, setSeason] = useState('')
@@ -29,16 +26,15 @@ export function PlotSearchPage({ publicView = false }: { publicView?: boolean })
     placeholderData: (previous) => previous,
   })
   const plots = search.data ?? []
-  const selected = plots.find((p) => p.id === selectedId) ?? null
+  const selected = plots.find((p) => p.properties.plotSeasonId === selectedId) ?? null
 
   return (
-    <div className={`${publicView ? '' : 'mt-8 '}grid items-start gap-6 lg:grid-cols-12`}>
-      <div className="space-y-4 lg:sticky lg:top-24 lg:col-span-7">
-        <PlaceSearch placeholder="Search a village, town or address to find land nearby…" onPick={(r) => setFocus({ lat: r.lat, lng: r.lng })} />
+    <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="space-y-4">
         <div className="flex flex-wrap gap-3">
           <label className="block">
             <span className="block text-sm font-semibold">Season</span>
-            <select value={season} onChange={(e) => setSeason(e.target.value)} className="mt-1 h-12 rounded-xl bg-surface-container px-4 text-label-lg">
+            <select value={season} onChange={(e) => setSeason(e.target.value)} className="mt-1 input">
               <option value="">Any season</option>
               {SEASONS.map((s) => (
                 <option key={s}>{s}</option>
@@ -47,7 +43,7 @@ export function PlotSearchPage({ publicView = false }: { publicView?: boolean })
           </label>
           <label className="block">
             <span className="block text-sm font-semibold">Crop</span>
-            <select value={crop} onChange={(e) => setCrop(e.target.value)} className="mt-1 h-12 rounded-xl bg-surface-container px-4 text-label-lg">
+            <select value={crop} onChange={(e) => setCrop(e.target.value)} className="mt-1 input">
               <option value="">Any crop</option>
               {(crops.data ?? []).map((c) => (
                 <option key={c.id} value={c.id}>
@@ -58,15 +54,15 @@ export function PlotSearchPage({ publicView = false }: { publicView?: boolean })
           </label>
         </div>
         {hasMap ? (
-          <PlotMap plots={plots} selectedId={selectedId} onSelect={setSelectedId} onBoundsChange={setBounds} focus={focus} />
+          <PlotMap plots={plots} selectedId={selectedId} onSelect={setSelectedId} onBoundsChange={setBounds} />
         ) : (
-          <p role="note" className="rounded-xl border border-gray-800 bg-neutral-950 px-4 py-3 text-sm text-gray-300">
+          <p role="note" className="rounded-lg bg-white px-3 py-2.5 text-sm">
             The map could not load, so these are plots within 200 km of central India. Refresh to try the map again.
           </p>
         )}
       </div>
 
-      <div className="space-y-4 lg:col-span-5">
+      <div className="space-y-4">
         {selected ? (
           <ReservePanel plot={selected} cropName={cropName} onClose={() => setSelectedId(null)} />
         ) : (
@@ -75,30 +71,27 @@ export function PlotSearchPage({ publicView = false }: { publicView?: boolean })
               {search.isPending && ready ? 'Searching…' : `${plots.length} ${plots.length === 1 ? 'plot' : 'plots'} open in this area`}
             </p>
             {search.isError && (
-              <p role="alert" className="font-semibold text-red-400">
+              <p role="alert" className="font-semibold text-danger">
                 Could not load plots. Move the map or refresh to try again.
               </p>
             )}
-            <ul className="space-y-3 lg:max-h-[620px] lg:overflow-y-auto lg:pr-1">
+            <ul className="space-y-2 lg:max-h-[34rem] lg:overflow-y-auto lg:pr-1">
               {plots.map((p) => (
-                <li key={p.id}>
+                <li key={p.properties.plotSeasonId}>
                   <button
                     type="button"
-                    onClick={() => setSelectedId(p.id)}
-                    className="w-full rounded-2xl bg-surface-container p-5 text-left shadow-md transition-all hover:bg-surface-container-high"
+                    onClick={() => setSelectedId(p.properties.plotSeasonId)}
+                    className="min-h-11 w-full card px-4 py-3 text-left hover:border-primary"
                   >
-                    <span className="flex items-start justify-between gap-3">
-                      <span className="font-headline-sm text-headline-sm text-on-surface">{p.properties.title}</span>
-                      <span className="shrink-0 rounded-full bg-primary/15 px-2.5 py-0.5 text-label-sm font-bold tracking-wider text-primary uppercase">
-                        {p.properties.season}
-                      </span>
+                    <span className="block font-display text-lg">{p.properties.title}</span>
+                    <span className="block text-sm text-ink-soft">
+                      {Number(p.properties.areaAcres).toFixed(2)} acres · {p.properties.season}, {day(p.properties.startDate)} to {day(p.properties.endDate)}
                     </span>
-                    <span className="mt-1 block text-body-sm text-on-surface-variant">
-                      {p.properties.areaAcres} acres · {day(p.properties.startDate)} to {day(p.properties.endDate)}
-                    </span>
-                    <span className="mt-3 flex items-baseline gap-1">
-                      <span className="font-headline-sm text-headline-sm font-bold text-secondary">{rupees(p.properties.price)}</span>
-                      <span className="text-body-sm text-outline">per kg of harvest</span>
+                    <span className="mt-0.5 block text-sm">
+                      <strong>{rupees(p.properties.price)}</strong> per kg of harvest
+                      {p.properties.allowedCrops.length > 0 && (
+                        <span className="text-ink-soft"> · {p.properties.allowedCrops.map((c) => cropName.get(c) ?? c).join(', ')}</span>
+                      )}
                     </span>
                   </button>
                 </li>
@@ -123,7 +116,6 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
     mutationFn: () => landApi.reserve(p.plotSeasonId, crop, Number(qty)),
     onError: (e) => setError(e instanceof ApiError ? e.message : 'Could not reach the server. Try again.'),
   })
-  const { user } = useAuth()
   const quantity = Number(qty)
   const total = quantity > 0 ? quantity * p.price : null
 
@@ -159,7 +151,7 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
       </div>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
         <dt className="text-ink-soft">Size</dt>
-        <dd>{p.areaAcres} acres</dd>
+        <dd>{Number(p.areaAcres).toFixed(2)} acres</dd>
         <dt className="text-ink-soft">Season</dt>
         <dd>
           {p.season}, {day(p.startDate)} to {day(p.endDate)}
@@ -169,7 +161,7 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
       </dl>
       <label className="block">
         <span className="block font-semibold">Crop to grow</span>
-        <select value={crop} onChange={(e) => setCrop(e.target.value)} className="mt-1 h-12 w-full rounded-xl bg-surface-container-high px-4">
+        <select value={crop} onChange={(e) => setCrop(e.target.value)} className="input mt-1">
           {p.allowedCrops.length === 0 && <option value="">No crops listed</option>}
           {p.allowedCrops.map((c) => (
             <option key={c} value={c}>
@@ -180,7 +172,7 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
       </label>
       <label className="block">
         <span className="block font-semibold">Expected harvest (kg)</span>
-        <input type="number" min="1" step="any" inputMode="decimal" value={qty} onChange={(e) => setQty(e.target.value)} className="mt-1 h-12 w-full rounded-xl bg-surface-container-high px-4" />
+        <input type="number" min="1" step="any" inputMode="decimal" value={qty} onChange={(e) => setQty(e.target.value)} className="input mt-1" />
       </label>
       {total !== null && (
         <p>
@@ -188,16 +180,11 @@ function ReservePanel({ plot, cropName, onClose }: { plot: PlotFeature; cropName
         </p>
       )}
       {error && (
-        <p role="alert" className="font-semibold text-red-400">
+        <p role="alert" className="font-semibold text-danger">
           {error}
         </p>
       )}
-      {!user && (
-        <p className="rounded-lg bg-surface-container-high px-3 py-2 text-body-sm text-on-surface-variant">
-          <Link to="/login" className="font-semibold text-primary underline">Sign in</Link> as a customer to request this plot.
-        </p>
-      )}
-      <button type="submit" disabled={reserve.isPending || !user} className="w-full rounded-xl bg-primary px-5 py-2.5 font-semibold text-on-primary transition-colors hover:brightness-110 disabled:opacity-60">
+      <button type="submit" disabled={reserve.isPending} className="w-full btn-primary">
         {reserve.isPending ? 'Sending…' : 'Request this plot'}
       </button>
     </form>

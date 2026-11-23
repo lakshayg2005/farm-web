@@ -165,6 +165,23 @@
             "title": "Name",
             "type": "string"
           },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Average score, 1 to 5; null until rated",
+            "title": "Rating"
+          },
+          "ratingCount": {
+            "default": 0,
+            "title": "Ratingcount",
+            "type": "integer"
+          },
           "state": {
             "anyOf": [
               {
@@ -405,16 +422,6 @@
         "title": "GeoRef",
         "type": "object"
       },
-      "Grade": {
-        "description": "Set by the quality service (quality.graded); A is best.",
-        "enum": [
-          "A",
-          "B",
-          "C"
-        ],
-        "title": "Grade",
-        "type": "string"
-      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -630,21 +637,27 @@
             "title": "Farmname",
             "type": "string"
           },
-          "farmerId": {
-            "format": "uuid",
-            "title": "Farmerid",
-            "type": "string"
-          },
-          "grade": {
+          "farmRating": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Grade"
+                "type": "number"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Null until the quality service grades a batch"
+            "description": "The farm's average score, 1 to 5; null until it has been rated",
+            "title": "Farmrating"
+          },
+          "farmRatingCount": {
+            "default": 0,
+            "title": "Farmratingcount",
+            "type": "integer"
+          },
+          "farmerId": {
+            "format": "uuid",
+            "title": "Farmerid",
+            "type": "string"
           },
           "harvestDate": {
             "format": "date",
@@ -728,7 +741,6 @@
           "unit",
           "pricePerUnit",
           "harvestDate",
-          "grade",
           "isOrganic",
           "status",
           "mediaIds",
@@ -811,21 +823,27 @@
             "title": "Farmname",
             "type": "string"
           },
-          "farmerId": {
-            "format": "uuid",
-            "title": "Farmerid",
-            "type": "string"
-          },
-          "grade": {
+          "farmRating": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Grade"
+                "type": "number"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Null until the quality service grades a batch"
+            "description": "The farm's average score, 1 to 5; null until it has been rated",
+            "title": "Farmrating"
+          },
+          "farmRatingCount": {
+            "default": 0,
+            "title": "Farmratingcount",
+            "type": "integer"
+          },
+          "farmerId": {
+            "format": "uuid",
+            "title": "Farmerid",
+            "type": "string"
           },
           "harvestDate": {
             "format": "date",
@@ -906,7 +924,6 @@
           "unit",
           "pricePerUnit",
           "harvestDate",
-          "grade",
           "isOrganic",
           "status",
           "mediaIds",
@@ -1091,16 +1108,6 @@
             "title": "Farmerid",
             "type": "string"
           },
-          "grade": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Grade"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
           "listingId": {
             "format": "uuid",
             "title": "Listingid",
@@ -1142,7 +1149,6 @@
           "unit",
           "qty",
           "unitPrice",
-          "grade",
           "pickupLocation"
         ],
         "title": "ReservedItem",
@@ -2084,24 +2090,6 @@
                 }
               ],
               "title": "Max Price"
-            }
-          },
-          {
-            "description": "Minimum grade: B returns A and B (ungraded listings excluded)",
-            "in": "query",
-            "name": "grade",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/Grade"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Minimum grade: B returns A and B (ungraded listings excluded)",
-              "title": "Grade"
             }
           },
           {

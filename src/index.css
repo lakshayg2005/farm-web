@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+/* Instrument has no Devanagari; Mukta covers Hindi and sits behind the main fonts. */
+@import '@fontsource/mukta/devanagari-400.css';
+@import '@fontsource/mukta/devanagari-500.css';
+@import '@fontsource/mukta/devanagari-600.css';
+@import '@fontsource/mukta/devanagari-700.css';
+
 @theme {
   /* Agrarian design system (from the Stitch prototype): deep forest surfaces, mint primary,
      saffron secondary, Newsreader headings and Plus Jakarta Sans body. */
@@ -42,6 +48,12 @@
   --color-inverse-on-surface: #28332d;
 
   /* Names the existing pages already use, mapped onto the new palette */
+  --color-white: #18221c;
+  --color-line-strong: #3d4a40;
+  --color-primary-deep: #2ec47a;
+  --color-focus: #53e193;
+  --color-warn: #ffb95f;
+  --color-danger: #ffb4ab;
   --color-paper: #0b1510;
   --color-paper-deep: #141e18;
   --color-ink: #dae5dd;
@@ -74,8 +86,8 @@
   --color-neutral-900: #18221c;
   --color-neutral-950: #141e18;
 
-  --font-display: 'Newsreader', Georgia, serif;
-  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: 'Newsreader', 'Mukta', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', 'Mukta', system-ui, sans-serif;
   --font-headline-xl: 'Newsreader', Georgia, serif;
   --font-headline-lg: 'Newsreader', Georgia, serif;
   --font-headline-md: 'Newsreader', Georgia, serif;
@@ -143,7 +155,12 @@
 
   body {
     @apply bg-paper font-sans text-ink antialiased;
-    line-height: 1.55;
+    line-height: 1.5;
+  }
+
+  h1,
+  h2 {
+    text-wrap: balance;
   }
 
   ::selection {
@@ -195,18 +212,19 @@
   }
 }
 
-/* Signature detail: furrowed field rows, seen from above, in the section's colour. */
-@utility crop-rows {
-  background-color: color-mix(in oklab, var(--role) 22%, var(--color-paper));
-  background-image: repeating-linear-gradient(
-    var(--rows-angle, -58deg),
-    var(--role) 0 5px,
-    transparent 5px 9px,
-    color-mix(in oklab, var(--role) 55%, var(--color-paper)) 9px 11px,
-    transparent 11px 16px
-  );
+/* Shared component classes: buttons, inputs and cards look the same on every screen. */
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 font-semibold transition-[background-color,opacity,transform] duration-150 disabled:cursor-not-allowed disabled:opacity-60 active:enabled:translate-y-px;
 }
-
+@utility btn-secondary {
+  @apply btn border border-line-strong bg-surface-container-high text-ink hover:enabled:bg-surface-container-highest;
+}
+@utility btn-danger {
+  @apply btn border border-line-strong bg-surface-container-high text-danger hover:enabled:bg-surface-container-highest;
+}
+@utility input {
+  @apply min-h-11 w-full rounded-lg border-[1.5px] border-line-strong bg-surface-container-high px-3 py-2 text-ink placeholder:text-ink-soft/70;
+}
 /* White card with a soft shadow: the base of most panels. */
 @utility card {
   background: var(--color-surface-container);

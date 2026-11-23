@@ -5,6 +5,19 @@ Website for the Farm Platform, built by **Team 2**. One React app with role-base
 All data comes from the shared backend ([farm-backend](https://github.com/lakshayg2005/farm-backend)) through the API gateway at `/api/v1`.
 The typed API client is generated from the backend's OpenAPI specs (`pnpm gen:api`), and a mock server built from the same specs (`pnpm mock`) lets screens be built before a service is ready.
 
+## Links
+
+| What | URL |
+| --- | --- |
+| Website, team VM | <http://10.1.75.79:3501> (college network or VPN) |
+| API gateway, team VM | <http://10.1.75.79:4501/api/v1> |
+| Website, local | <http://localhost:5173> (`pnpm dev`) |
+| API gateway, local | <http://localhost/api/v1> (`docker compose up -d` in farm-backend) |
+| Demo logins for every role | [farm-backend/docs/DEMO.md](https://github.com/lakshayg2005/farm-backend/blob/main/docs/DEMO.md) |
+| Demo walkthrough | [farm-backend/docs/DEMO-SCRIPT.md](https://github.com/lakshayg2005/farm-backend/blob/main/docs/DEMO-SCRIPT.md) |
+| Backend repo | <https://github.com/lakshayg2005/farm-backend> |
+| Apps repo (Kotlin in `android/`) | <https://github.com/lakshayg2005/farm-mobile> |
+
 ## Stack
 
 React 18 + Vite + TypeScript, React Router, TanStack Query, Tailwind CSS, React-Leaflet (+ leaflet-draw), Vitest + Playwright, pnpm.
@@ -18,6 +31,16 @@ src/
   components/   shared UI
   routes/       route definitions and role guards
 ```
+
+## End-to-end tests
+
+`pnpm e2e` runs Playwright journeys for every role against a real stack with the curated demo data
+(`scripts/reset-demo.sh` in farm-backend; logins in its `docs/DEMO.md`). It builds the app and serves it on
+`http://localhost:4173` (an origin the gateway allows), API from `VITE_API_BASE_URL`. Against a deployed site:
+`E2E_BASE_URL=http://10.1.75.79:3501 pnpm e2e`. First time: `pnpm exec playwright install chromium`.
+Every test fails on a console error, an uncaught exception or a 5xx answer; `responsive.spec.ts` visits every page at
+390 px and 1440 px, checks nothing scrolls sideways and leaves screenshots in `e2e/screenshots/`.
+`pnpm test` is unit tests only.
 
 ## Workflow (all repos)
 

@@ -1,25 +1,18 @@
 import { Link } from 'react-router'
-import { SiteHeader } from '@/components/SiteHeader'
+import { BrandMark } from '@/components/BrandMark'
 
 export function NotFoundPage() {
   return (
-    <>
-      <SiteHeader />
-      <main className="flex min-h-[calc(100vh-4.5rem)] items-center justify-center bg-black px-6 pb-24 text-white">
-        <div className="text-center">
-          <p className="text-sm tracking-widest text-gray-500 uppercase">404</p>
-          <h1 className="mt-4 text-4xl font-bold">This page does not exist</h1>
-          <p className="mt-4 text-gray-400">The link may be old or mistyped. Start again from the home page.</p>
-          <div className="mt-8 flex justify-center gap-4">
-            <Link to="/" className="rounded-xl bg-primary px-6 py-3 font-semibold text-on-primary hover:brightness-110">
-              Home
-            </Link>
-            <Link to="/catalog" className="rounded-xl border border-gray-700 px-6 py-3 font-semibold hover:bg-gray-900">
-              Fresh produce
-            </Link>
-          </div>
-        </div>
-      </main>
-    </>
+    <div className="mx-auto min-h-dvh max-w-6xl px-4 pt-6 sm:px-8 lg:pt-10">
+      <BrandMark />
+      <h1 className="mt-16 font-display text-[2.8rem] leading-none">This page does not exist</h1>
+      <p className="mt-3 max-w-md text-lg text-ink-soft">The link may be old or mistyped. Start again from the section list.</p>
+      <Link
+        to="/"
+        className="btn-primary mt-8"
+      >
+        Go to sections
+      </Link>
+    </div>
   )
 }

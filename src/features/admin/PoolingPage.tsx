@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { ApiError } from '@/api/http'
-import { adminApi, orderedStops, POOL_STATUS, poolSummary, tomorrowISO, type Pool } from './admin'
+import { adminApi, orderedStops, POOL_STATUS, poolSummary, todayISO, type Pool } from './admin'
 import { PoolMap } from './PoolMap'
 
 /** The gateway answers 404 for a route the logistics service does not have yet, 502/503 when it is down. */
@@ -11,7 +11,7 @@ const time = (iso: string | null) =>
 
 export function PoolingPage() {
   const queryClient = useQueryClient()
-  const [date, setDate] = useState(tomorrowISO())
+  const [date, setDate] = useState(todayISO())
   const [selected, setSelected] = useState<string | null>(null)
   const pools = useQuery({ queryKey: ['pools', date], queryFn: () => adminApi.pools(date), retry: false })
   const run = useMutation({
@@ -40,14 +40,14 @@ export function PoolingPage() {
               setSelected(null)
               run.reset()
             }}
-            className="mt-1 rounded-xl border border-line bg-transparent px-3 py-2 font-normal"
+            className="mt-1 input font-normal"
           />
         </label>
         <button
           type="button"
           onClick={() => run.mutate()}
           disabled={run.isPending || !date}
-          className="rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 disabled:opacity-60"
+          className="btn-primary"
         >
           {run.isPending ? 'Running…' : list.length ? 'Run pooling again' : 'Run pooling'}
         </button>
@@ -57,7 +57,7 @@ export function PoolingPage() {
       </div>
 
       {error && (
-        <p role="alert" className="font-semibold text-red-400">
+        <p role="alert" className="font-semibold text-danger">
           {isUnavailable(error)
             ? 'Pooling is not available yet: the logistics service is not running. Try again once it is deployed.'
             : error instanceof ApiError
@@ -95,15 +95,15 @@ export function PoolingPage() {
                           type="button"
                           onClick={() => setSelected(pool.id === selected ? null : pool.id)}
                           aria-pressed={selected === pool.id}
-                          className="w-full card px-4 py-3 text-left transition-colors duration-150 hover:border-indigo aria-pressed:border-indigo aria-pressed:bg-[color-mix(in_oklab,var(--role)_10%,white)]"
+                          className="w-full card px-4 py-3 text-left transition-colors duration-150 hover:border-primary aria-pressed:border-primary aria-pressed:bg-[#dff1e6]"
                         >
                           <span className="flex items-baseline justify-between gap-2">
                             <span className="font-semibold">Pool {i + 1}</span>
                             <span className="text-sm text-ink-soft">{POOL_STATUS[pool.status] ?? pool.status}</span>
                           </span>
                           <span className="block text-sm text-ink-soft">
-                            {pool.stops.filter((s) => s.kind === 'DROP').length} deliveries, {pool.totalKm} km route,{' '}
-                            <span className="font-semibold text-leaf">{pool.savedKm} km saved</span>
+                            {pool.stops.filter((s) => s.kind === 'DROP').length === 1 ? '1 delivery' : `${pool.stops.filter((s) => s.kind === 'DROP').length} deliveries`}, {pool.totalKm} km route,{' '}
+                            <span className="font-semibold text-primary">{pool.savedKm} km saved</span>
                           </span>
                         </button>
                         {selected === pool.id && <StopList pool={pool} />}
@@ -125,7 +125,7 @@ function Stat({ label, value, note, strong }: { label: string; value: string; no
   return (
     <div className="card px-4 py-3">
       <dt className="text-sm text-ink-soft">{label}</dt>
-      <dd className={`font-display text-2xl ${strong ? 'text-leaf' : ''}`}>{value}</dd>
+      <dd className={`text-xl font-bold tabular-nums ${strong ? 'text-primary' : ''}`}>{value}</dd>
       {note && <dd className="text-sm text-ink-soft">{note}</dd>}
     </div>
   )
@@ -138,7 +138,7 @@ function StopList({ pool }: { pool: Pool }) {
         <li key={`${stop.orderId}-${stop.kind}-${stop.sequence}`} className="flex items-baseline gap-2">
           <span
             aria-hidden="true"
-            className={`inline-block size-2.5 shrink-0 rounded-full ${stop.kind === 'PICKUP' ? 'bg-mustard' : 'bg-indigo'}`}
+            className={`inline-block size-2.5 shrink-0 rounded-full ${stop.kind === 'PICKUP' ? 'bg-warn' : 'bg-primary'}`}
           />
           <span>
             <span className="font-semibold">

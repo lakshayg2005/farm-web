@@ -1,22 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { OwnerPhotos } from '@/components/OwnerPhotos'
+import { ListSkeleton, StatusChip, type Tone } from '@/components/ui'
 import { useState, type FormEvent } from 'react'
-import { AgreementTerms } from './AgreementTerms'
 import { Link } from 'react-router'
 import { ApiError } from '@/api/http'
-import { day, landApi, rupees, type CropUpdate, type Reservation } from './land'
+import { day, landApi, rupees, type CropUpdate, type HarvestOrder, type Reservation } from './land'
 
-const STATUS_TEXT: Record<string, { label: string; tone: string }> = {
-  PENDING: { label: 'Waiting for the farmer', tone: 'bg-amber-950/40 text-amber-300' },
-  ACCEPTED: { label: 'Accepted: deposit due', tone: 'bg-blue-950/40 text-blue-300' },
-  ACTIVE: { label: 'Growing', tone: 'bg-green-950/40 text-green-400' },
-  HARVEST_READY: { label: 'Harvest ready', tone: 'bg-green-900/50 text-green-300' },
-  FULFILLING: { label: 'Harvest on its way', tone: 'bg-green-900/50 text-green-300' },
-  REJECTED: { label: 'Declined', tone: 'bg-neutral-800' },
-  CANCELLED: { label: 'Cancelled', tone: 'bg-neutral-800' },
-  EXPIRED: { label: 'Expired', tone: 'bg-neutral-800' },
+const STATUS_TEXT: Record<string, { label: string; tone: Tone }> = {
+  PENDING: { label: 'Waiting for the farmer', tone: 'warn' },
+  ACCEPTED: { label: 'Accepted: deposit due', tone: 'info' },
+  ACTIVE: { label: 'Growing', tone: 'good' },
+  HARVEST_READY: { label: 'Harvested', tone: 'good' },
+  FULFILLING: { label: 'Harvest ready', tone: 'good' },
+  COMPLETED: { label: 'Completed', tone: 'good' },
+  REJECTED: { label: 'Declined', tone: 'neutral' },
+  CANCELLED: { label: 'Cancelled', tone: 'neutral' },
+  EXPIRED: { label: 'Expired', tone: 'neutral' },
 }
 const STAGE_TEXT = { SOWN: 'Sown', GROWING: 'Growing', FLOWERING: 'Flowering' } as const
-const FOLLOWED = ['ACTIVE', 'HARVEST_READY', 'FULFILLING']
+const FOLLOWED = ['ACTIVE', 'HARVEST_READY', 'FULFILLING', 'COMPLETED']
 
 const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not reach the server. Try again.')
 
@@ -25,10 +27,10 @@ export function ReservationsPage() {
   const crops = useQuery({ queryKey: ['crops'], queryFn: landApi.crops, staleTime: 3_600_000 })
   const names = new Map((crops.data ?? []).map((c) => [c.id, c.name]))
 
-  if (list.isPending) return <p className="mt-8 text-ink-soft">Loading your reservations…</p>
+  if (list.isPending) return <ListSkeleton label="Loading your reservations" />
   if (list.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-400">
+      <p role="alert" className="mt-8 font-semibold text-danger">
         Could not load your reservations. Refresh to try again.
       </p>
     )
@@ -36,14 +38,18 @@ export function ReservationsPage() {
     return (
       <p className="mt-8 text-ink-soft">
         No reservations yet.{' '}
-        <Link to="/customer/plots" className="font-semibold text-indigo underline">
+        <Link to="/customer/plots" className="font-semibold text-primary underline">
           Find a plot
         </Link>
       </p>
     )
+  // What needs the customer first: pay a deposit, choose a harvest option, then the rest.
+  const order = ['ACCEPTED', 'FULFILLING', 'HARVEST_READY', 'ACTIVE', 'PENDING']
+  const rank = (r: Reservation) => (order.includes(r.status) ? order.indexOf(r.status) : order.length)
+  const sorted = [...list.data].sort((a, b) => rank(a) - rank(b))
   return (
-    <ul className="mt-8 space-y-4">
-      {list.data.map((r) => (
+    <ul className="mt-8 max-w-3xl space-y-4">
+      {sorted.map((r) => (
         <li key={r.id}>
           <ReservationCard reservation={r} cropName={names.get(r.cropId) ?? r.cropId} />
         </li>
@@ -56,7 +62,10 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
   const queryClient = useQueryClient()
   const [error, setError] = useState<string>()
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['reservations'] })
-  const status = STATUS_TEXT[r.status] ?? { label: r.status, tone: 'bg-neutral-800' }
+  const status = STATUS_TEXT[r.status] ?? { label: r.status, tone: 'neutral' }
+  // Only an accepted reservation has an agreement that names the plot.
+  const named = ['ACCEPTED', 'ACTIVE', 'HARVEST_READY', 'FULFILLING', 'COMPLETED'].includes(r.status)
+  const agreement = useQuery({ queryKey: ['agreement', r.id], queryFn: () => landApi.agreement(r.id), enabled: named, staleTime: 300_000, retry: false })
 
   const cancel = useMutation({ mutationFn: () => landApi.cancel(r.id), onSuccess: refresh, onError: (e) => setError(message(e)) })
   const pay = useMutation({
@@ -76,8 +85,16 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
         <h2 className="font-display text-xl">
           {cropName}, {r.expectedQtyKg} kg
         </h2>
-        <span className={`rounded-full px-3 py-0.5 text-sm font-semibold ${status.tone}`}>{status.label}</span>
+        <StatusChip tone={status.tone}>{status.label}</StatusChip>
       </div>
+      {agreement.data && (
+        <p className="mt-0.5 font-semibold">
+          {agreement.data.plotTitle}
+          <span className="font-normal text-ink-soft">
+            {' '}· {agreement.data.season}, {day(agreement.data.startDate)} to {day(agreement.data.endDate)}
+          </span>
+        </p>
+      )}
       <p className="mt-1 text-sm text-ink-soft">
         {r.total !== null && <>Estimated total {rupees(r.total)}. </>}
         {r.status === 'PENDING' && <>The farmer can answer until {day(r.expiresAt)}.</>}
@@ -85,7 +102,7 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
 
       {r.status === 'ACCEPTED' && r.deposit !== null && (
         <div className="mt-4">
-          <button type="button" disabled={pay.isPending} onClick={() => pay.mutate()} className="rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 disabled:opacity-60">
+          <button type="button" disabled={pay.isPending} onClick={() => pay.mutate()} className="btn-primary">
             {pay.isPending ? 'Paying…' : `Pay deposit ${rupees(r.deposit)}`}
           </button>
           <p className="mt-1 text-sm text-ink-soft">Payments are simulated in this project. Pay before {day(r.expiresAt)}.</p>
@@ -96,12 +113,11 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
           Cancel this reservation
         </button>
       )}
-      {['ACCEPTED', 'ACTIVE', 'HARVEST_READY', 'FULFILLING', 'COMPLETED'].includes(r.status) && <AgreementTerms reservationId={r.id} />}
       {FOLLOWED.includes(r.status) && <Timeline reservationId={r.id} />}
-      {r.status === 'HARVEST_READY' && <HarvestChoice reservationId={r.id} onDone={refresh} />}
-      {r.status === 'FULFILLING' && <p className="mt-4">Your harvest order is in progress. Track it under your orders.</p>}
+      {r.status === 'HARVEST_READY' && <p className="mt-4 text-ink-soft">The farmer has harvested. Your harvest order is being prepared…</p>}
+      {(r.status === 'FULFILLING' || r.status === 'COMPLETED') && <Harvest reservationId={r.id} onDone={refresh} />}
       {error && (
-        <p role="alert" className="mt-3 font-semibold text-red-400">
+        <p role="alert" className="mt-3 font-semibold text-danger">
           {error}
         </p>
       )}
@@ -112,7 +128,7 @@ function ReservationCard({ reservation: r, cropName }: { reservation: Reservatio
 function Timeline({ reservationId }: { reservationId: string }) {
   const updates = useQuery({ queryKey: ['crop-updates', reservationId], queryFn: () => landApi.updates(reservationId) })
   if (updates.isPending) return <p className="mt-4 text-ink-soft">Loading crop updates…</p>
-  if (updates.isError) return <p className="mt-4 text-red-400">Could not load crop updates.</p>
+  if (updates.isError) return <p className="mt-4 text-danger">Could not load crop updates.</p>
   if (updates.data.length === 0) return <p className="mt-4 text-ink-soft">No updates from the farmer yet. They will appear here.</p>
   return (
     <ol aria-label="Crop updates" className="mt-4 space-y-3 border-l-2 border-line pl-4">
@@ -122,14 +138,63 @@ function Timeline({ reservationId }: { reservationId: string }) {
             {STAGE_TEXT[u.stage]} <span className="font-normal text-ink-soft">· {day(u.createdAt)}</span>
           </p>
           {u.note && <p>{u.note}</p>}
-          {u.mediaIds.length > 0 && <p className="text-sm text-ink-soft">{u.mediaIds.length} photo(s) attached</p>}
+          {u.mediaIds.length > 0 && (
+            <div className="mt-2">
+              <OwnerPhotos ownerType="RESERVATION" ownerId={reservationId} only={u.mediaIds} />
+            </div>
+          )}
         </li>
       ))}
     </ol>
   )
 }
 
-function HarvestChoice({ reservationId, onDone }: { reservationId: string; onDone: () => void }) {
+/** The harvest order: the choice while it waits for one, then where it stands. */
+function Harvest({ reservationId, onDone }: { reservationId: string; onDone: () => void }) {
+  const queryClient = useQueryClient()
+  const harvest = useQuery({ queryKey: ['harvest-order', reservationId], queryFn: () => landApi.harvestOrder(reservationId) })
+  if (harvest.isPending) return <p className="mt-4 text-ink-soft">Loading your harvest order…</p>
+  if (harvest.isError || !harvest.data) return <p className="mt-4 text-ink-soft">Your harvest order is being prepared. Refresh in a moment.</p>
+  const h = harvest.data
+  const item = h.items[0]
+  const summary = item && (
+    <p className="mt-4">
+      <strong>{item.qty} kg harvested</strong>, worth {rupees(item.qty * item.unitPrice)} at {rupees(item.unitPrice)} a kg.
+    </p>
+  )
+  if (h.harvestOption === null && h.status === 'PLACED')
+    return (
+      <>
+        {summary}
+        <HarvestChoice
+          reservationId={reservationId}
+          order={h}
+          onDone={() => {
+            void queryClient.invalidateQueries({ queryKey: ['harvest-order', reservationId] })
+            onDone()
+          }}
+        />
+      </>
+    )
+  const done = h.status === 'COMPLETED'
+  return (
+    <>
+      {summary}
+      <p className="mt-1">
+        {h.harvestOption === 'BUYBACK'
+          ? 'You chose buy-back: the farmer sold the harvest and you were credited.'
+          : done
+            ? 'Your harvest was delivered.'
+            : 'Your harvest is on its way.'}{' '}
+        <Link to="/customer/orders" className="font-semibold text-primary underline">
+          {done ? 'See the order and rate it' : 'Track it under your orders'}
+        </Link>
+      </p>
+    </>
+  )
+}
+
+function HarvestChoice({ reservationId, order, onDone }: { reservationId: string; order: HarvestOrder; onDone: () => void }) {
   const [option, setOption] = useState<'DELIVERY' | 'BUYBACK'>('DELIVERY')
   const [f, setF] = useState({ line1: '', city: '', pincode: '', phone: '', lat: '', lng: '' })
   const [error, setError] = useState<string>()
@@ -171,7 +236,7 @@ function HarvestChoice({ reservationId, onDone }: { reservationId: string; onDon
     choose.mutate()
   }
 
-  const input = 'mt-1 w-full rounded-lg border border-line px-3 py-2'
+  const input = 'mt-1 w-full input'
   return (
     <form onSubmit={onSubmit} noValidate className="mt-5 space-y-3 rounded-lg bg-paper p-4">
       <fieldset>
@@ -180,14 +245,16 @@ function HarvestChoice({ reservationId, onDone }: { reservationId: string; onDon
           <input type="radio" name={`opt-${reservationId}`} checked={option === 'DELIVERY'} onChange={() => setOption('DELIVERY')} className="mt-1.5" />
           <span>
             <span className="block font-semibold">Deliver it to me</span>
-            <span className="text-sm text-ink-soft">Pooled delivery; the balance is paid when it arrives.</span>
+            <span className="text-sm text-ink-soft">Pooled delivery; the balance of {rupees(order.balanceDue)} plus delivery is paid when it arrives.</span>
           </span>
         </label>
         <label className="mt-2 flex items-start gap-3">
           <input type="radio" name={`opt-${reservationId}`} checked={option === 'BUYBACK'} onChange={() => setOption('BUYBACK')} className="mt-1.5" />
           <span>
             <span className="block font-semibold">Let the farmer buy it back</span>
-            <span className="text-sm text-ink-soft">The farmer buys the harvest and you are credited.</span>
+            <span className="text-sm text-ink-soft">
+              You pay the balance of {rupees(order.balanceDue)} now; the farmer sells the harvest and credits you {rupees(Math.round(order.total * 90) / 100)} (90%).
+            </span>
           </span>
         </label>
       </fieldset>
@@ -213,17 +280,17 @@ function HarvestChoice({ reservationId, onDone }: { reservationId: string; onDon
             <span className="font-semibold">Longitude</span>
             <input value={f.lng} onChange={set('lng')} inputMode="decimal" className={input} />
           </label>
-          <button type="button" onClick={useMyLocation} className="text-left font-semibold text-indigo underline sm:col-span-2">
+          <button type="button" onClick={useMyLocation} className="text-left font-semibold text-primary underline sm:col-span-2">
             Use my location
           </button>
         </div>
       )}
       {error && (
-        <p role="alert" className="font-semibold text-red-400">
+        <p role="alert" className="font-semibold text-danger">
           {error}
         </p>
       )}
-      <button type="submit" disabled={choose.isPending} className="rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 disabled:opacity-60">
+      <button type="submit" disabled={choose.isPending} className="btn-primary">
         {choose.isPending ? 'Saving…' : 'Confirm my choice'}
       </button>
     </form>

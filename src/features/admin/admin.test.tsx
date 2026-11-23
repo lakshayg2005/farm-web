@@ -1,8 +1,9 @@
 import { screen, waitFor, within } from '@testing-library/react'
+import { vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { session } from '@/features/auth/session'
 import { jsonResponse, makeUser, mockApi, renderAt, tokens } from '@/test/auth'
-import { orderedStops, passRate, poolSummary, toPool, totalSavedKm, type Pool } from './admin'
+import { averageRating, dailyStats, orderedStops, poolSummary, toPool, totalSavedKm, type Pool } from './admin'
 
 const FARMER = { ...makeUser(['farmer']), id: 'f1', name: 'Ravi Patel', phone: '+919811111111', createdAt: '2026-11-10T08:00:00Z' }
 const adminLogin = () => jsonResponse(tokens(['admin']))
@@ -13,15 +14,9 @@ beforeEach(() => {
 })
 
 describe('numbers', () => {
-  it('passRate counts only finished inspections', () => {
-    expect(passRate([])).toBeNull()
-    expect(
-      passRate([
-        { id: '1', status: 'REPORTED', result: 'PASS', grade: 'A' },
-        { id: '2', status: 'REPORTED', result: 'FAIL', grade: 'C' },
-        { id: '3', status: 'PENDING', result: null, grade: null },
-      ]),
-    ).toBe(50)
+  it('averageRating counts only rated orders', () => {
+    expect(averageRating([])).toBeNull()
+    expect(averageRating([{ ratingScore: 5 }, { ratingScore: 4 }, { ratingScore: null }, {}])).toEqual({ average: 4.5, count: 2 })
   })
   it('totalSavedKm adds the pools up', () => {
     const pool = { id: 'p', date: 'd', partnerId: null, status: 'ASSIGNED', totalKm: 9, route: null, stops: [] }
@@ -141,5 +136,45 @@ describe('pool numbers', () => {
 
   it('orders stops by sequence', () => {
     expect(orderedStops(POOL).map((s) => s.sequence)).toEqual([1, 2, 3])
+  })
+})
+
+describe('order stats', () => {
+  it('counts orders and sales per day and leaves cancelled orders out', () => {
+    const now = new Date(2026, 10, 22, 12)
+    const at = (d: number) => new Date(2026, 10, d, 9).toISOString()
+    const order = (id: string, d: number, total: number, status = 'CONFIRMED') =>
+      ({ id, orderType: 'PRODUCE', status, itemCount: 1, total, createdAt: at(d) }) as never
+    const stats = dailyStats([order('a', 22, 100), order('b', 22, 50.5), order('c', 21, 70), order('d', 22, 999, 'CANCELLED'), order('e', 1, 5)], 3, now)
+    expect(stats.map((s) => s.date)).toEqual(['2026-11-20', '2026-11-21', '2026-11-22'])
+    expect(stats.map((s) => s.orders)).toEqual([0, 1, 2])
+    expect(stats[2]!.sales).toBe(150.5)
+  })
+})
+
+describe('admin orders page', () => {
+  const row = (id: string, status: string) => ({ id, orderType: 'PRODUCE', status, itemCount: 2, total: 250, createdAt: '2026-11-21T09:00:00Z' })
+
+  it('filters by status and cancels an order after confirmation', async () => {
+    let cancelled = false
+    const calls = mockApi({
+      'POST /identity/refresh': () => jsonResponse(tokens(['admin'])),
+      'GET /order/orders': () =>
+        jsonResponse({ items: [row('11111111-aaaa', cancelled ? 'CANCELLED' : 'CONFIRMED'), row('22222222-bbbb', 'COMPLETED')], nextCursor: null }),
+      'POST /order/orders/11111111-aaaa/cancel': () => {
+        cancelled = true
+        return jsonResponse({})
+      },
+    })
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    renderAt('/admin/orders')
+    expect(await screen.findByText(/Order 11111111/)).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('tab', { name: /^Delivered/ }))
+    expect(screen.queryByText(/Order 11111111/)).not.toBeInTheDocument()
+    expect(screen.getByText(/Order 22222222/)).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('tab', { name: /^All/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel and refund' }))
+    await waitFor(() => expect(calls.some((c) => c.key === 'POST /order/orders/11111111-aaaa/cancel')).toBe(true))
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Cancel and refund' })).not.toBeInTheDocument())
   })
 })

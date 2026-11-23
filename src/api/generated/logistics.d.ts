@@ -62,7 +62,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Live tracking for a customer order */
+        /**
+         * Live tracking for a customer order
+         * @description Where the order is, who brings it and the delivery code. Only the customer of the order
+         *     (and an admin) may see this; anyone else gets 404, as if the order had no route.
+         */
         get: operations["track_order_orders__order_id__track_get"];
         put?: never;
         post?: never;
@@ -309,7 +313,10 @@ export interface components {
              * Format: uuid
              */
             orderId: string;
-            /** Otp */
+            /**
+             * Otp
+             * @description The 4-digit delivery code of a DROP stop. Only the order's customer sees it (in GET /orders/{id}/track) and tells it to the partner at the door; it is never sent to the partner or in pool lists.
+             */
             otp?: string | null;
             /**
              * Otpverified
@@ -513,7 +520,7 @@ export interface operations {
     list_pools_pools_get: {
         parameters: {
             query?: {
-                /** @description Date to list pools for */
+                /** @description Date to list pools for (default: today in India) */
                 pool_date?: string;
             };
             header?: never;
@@ -545,7 +552,7 @@ export interface operations {
     run_pools_pools_run_post: {
         parameters: {
             query?: {
-                /** @description Date to pool orders for */
+                /** @description Date to pool orders for (default: today in India) */
                 pool_date?: string;
             };
             header?: never;

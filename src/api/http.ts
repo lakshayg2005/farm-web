@@ -61,12 +61,22 @@ async function toError(response: Response) {
   return new ApiError(response.status, code, message, details)
 }
 
-/** Calls the gateway, e.g. api('/identity/me'). On a 401 it renews the access token once and retries. */
+/**
+ * Calls the gateway, e.g. api('/identity/me'). On a 401 it renews the access token once and retries.
+ * A 403 FARMER_NOT_VERIFIED is retried once with a fresh token too: the token says whether the farmer
+ * is verified, so one issued before an admin verified them is out of date.
+ */
 export async function api<T>(path: string, options: RequestOptions = {}): Promise<T> {
   let response = await send(path, options, hooks.getAccessToken())
   if (response.status === 401 && !options.anonymous) {
     const fresh = await hooks.refresh()
     if (fresh) response = await send(path, options, fresh)
+  } else if (response.status === 403 && !options.anonymous) {
+    const error = await toError(response.clone())
+    if (error.code === 'FARMER_NOT_VERIFIED') {
+      const fresh = await hooks.refresh()
+      if (fresh) response = await send(path, options, fresh)
+    }
   }
   if (!response.ok) throw await toError(response)
   return response.status === 204 ? (undefined as T) : ((await response.json()) as T)

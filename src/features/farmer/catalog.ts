@@ -1,4 +1,6 @@
+import type { Tone } from '@/components/ui'
 import { api } from '@/api/http'
+import { newId } from '@/api/id'
 
 export type Unit = 'kg' | 'quintal' | 'dozen' | 'piece' | 'bunch' | 'litre'
 export const UNITS: Unit[] = ['kg', 'quintal', 'dozen', 'piece', 'bunch', 'litre']
@@ -23,12 +25,17 @@ export interface Farm {
   district: string
   state: string | null
   location: GeoPoint
+  /** Average score from customers, 1 to 5; null until the farm has been rated */
+  rating?: number | null
+  ratingCount?: number
 }
 
 export interface Listing {
   id: string
   farmId: string
   farmName: string
+  farmRating?: number | null
+  farmRatingCount?: number
   cropId: string
   cropName: string
   variety: string | null
@@ -37,7 +44,6 @@ export interface Listing {
   unit: Unit
   pricePerUnit: number
   harvestDate: string
-  grade: 'A' | 'B' | 'C' | null
   isOrganic: boolean
   status: ListingStatus
   mediaIds: string[]
@@ -85,7 +91,7 @@ export const catalogApi = {
   crops: () => api<CatalogCrop[]>('/catalog/crops'),
   myFarms: () => api<Page<Farm>>('/catalog/farms/mine?limit=50').then((r) => r.items),
   createFarm: (body: FarmInput) =>
-    api<Farm>('/catalog/farms', { method: 'POST', body, headers: { 'Idempotency-Key': crypto.randomUUID() } }),
+    api<Farm>('/catalog/farms', { method: 'POST', body, headers: { 'Idempotency-Key': newId() } }),
   myListings: () => api<Page<Listing>>('/catalog/listings/mine?limit=100').then((r) => r.items),
   createListing: (body: ListingInput, idempotencyKey: string) =>
     api<Listing>('/catalog/listings', { method: 'POST', body, headers: { 'Idempotency-Key': idempotencyKey } }),
@@ -164,12 +170,17 @@ export function farmPayload(f: FarmForm): FarmInput | string {
   return body
 }
 
-export const STATUS_TEXT: Record<ListingStatus, { label: string; tone: string }> = {
-  ACTIVE: { label: 'On sale', tone: 'bg-green-950/40 text-green-400 border border-green-900' },
-  PAUSED: { label: 'Paused', tone: 'bg-neutral-800 text-ink' },
-  SOLD_OUT: { label: 'Sold out', tone: 'bg-amber-950/40 text-amber-300 text-amber-900' },
-  ARCHIVED: { label: 'Removed', tone: 'bg-neutral-800 text-ink-soft' },
+export const STATUS_TEXT: Record<ListingStatus, { label: string; tone: Tone }> = {
+  ACTIVE: { label: 'On sale', tone: 'good' },
+  PAUSED: { label: 'Paused', tone: 'neutral' },
+  SOLD_OUT: { label: 'Sold out', tone: 'warn' },
+  ARCHIVED: { label: 'Removed', tone: 'neutral' },
 }
+
+/** Mirrors the backend line: a listing at or below this is "low" and the farmer is told once. */
+export const LOW_STOCK: Record<Unit, number> = { kg: 10, quintal: 1, dozen: 3, piece: 10, bunch: 10, litre: 10 }
+export const isLowStock = (l: Pick<Listing, 'status' | 'qtyAvailable' | 'unit'>) =>
+  l.status === 'ACTIVE' && l.qtyAvailable > 0 && l.qtyAvailable <= LOW_STOCK[l.unit]
 
 export const rupees = (n: number) => `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
 export const day = (iso: string) =>

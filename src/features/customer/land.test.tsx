@@ -74,6 +74,24 @@ describe('find land', () => {
     expect(post.body).toEqual({ plotSeasonId: 'ps-1', cropId: 'onion', expectedQtyKg: 50 })
   })
 
+  it('reserves the season that was clicked when a plot has several seasons', async () => {
+    signedInAs(['customer'])
+    const rabi = { ...PLOT, properties: { ...PLOT.properties, plotSeasonId: 'ps-2', season: 'Rabi', price: 25 } }
+    const calls = mockApi({
+      'POST /identity/refresh': () => jsonResponse({ accessToken: 'a', refreshToken: 'r', expiresIn: 900, user: { id: 'u1', name: 'A', phone: '+919876543210', email: null, roles: ['customer'], phoneVerified: true, farmerVerified: false } }),
+      'GET /catalog/crops': () => jsonResponse(CROPS),
+      // The same plot id comes back once per season.
+      'GET /land/plots/search': () => jsonResponse({ type: 'FeatureCollection', features: [PLOT, rabi] }),
+      'POST /land/reservations': () => jsonResponse({ ...RESERVATION, plotSeasonId: 'ps-2' }, 201),
+    })
+    renderAt('/customer/plots')
+    await userEvent.click(await screen.findByRole('button', { name: /Rabi/ }))
+    await userEvent.type(screen.getByLabelText('Expected harvest (kg)'), '10')
+    await userEvent.click(screen.getByRole('button', { name: 'Request this plot' }))
+    await screen.findByText('Request sent')
+    expect(calls.find((c) => c.key === 'POST /land/reservations')!.body).toMatchObject({ plotSeasonId: 'ps-2' })
+  })
+
   it('shows the server message when the plot was taken meanwhile', async () => {
     signedInAs(['customer'])
     mockApi({
@@ -130,20 +148,55 @@ describe('my reservations', () => {
           { id: 'u1', stage: 'SOWN', note: 'Seeds in the ground', mediaIds: [], createdAt: '2026-07-01T08:00:00Z' },
           { id: 'u2', stage: 'FLOWERING', note: null, mediaIds: ['m1', 'm2'], createdAt: '2026-08-20T08:00:00Z' },
         ]),
+      'GET /media/owners/RESERVATION/r1': () =>
+        jsonResponse({
+          items: ['m1', 'm2'].map((id) => ({
+            id, ownerType: 'RESERVATION', ownerId: 'r1', status: 'READY', url: `http://img.test/${id}`, thumbUrl: `http://img.test/${id}-t`,
+            gpsVerified: true, gpsDistanceM: 10,
+          })),
+          nextCursor: null,
+        }),
     })
     renderAt('/customer/reservations')
     const timeline = await screen.findByRole('list', { name: 'Crop updates' })
     expect(within(timeline).getByText('Seeds in the ground')).toBeInTheDocument()
-    expect(within(timeline).getByText('2 photo(s) attached')).toBeInTheDocument()
+    expect(await within(timeline).findByRole('list', { name: 'Photos' })).toBeInTheDocument()
   })
 
-  it('sends a buy-back choice without an address', async () => {
-    const calls = customerSession({
-      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'HARVEST_READY', deposit: 800 }]),
+  const HARVEST = {
+    id: 'o1',
+    reservationId: 'r1',
+    harvestOption: null,
+    status: 'PLACED',
+    total: 2700,
+    balanceDue: 1900,
+    items: [{ name: 'Harvest: Wheat', qty: 90, unitPrice: 30 }],
+  }
+  const harvestOrder = {
+    'GET /order/orders': () => jsonResponse({ items: [{ id: 'o1', reservationId: 'r1' }], nextCursor: null }),
+    'GET /order/orders/o1': () => jsonResponse(HARVEST),
+  }
+
+  it('while the harvest order is being made, offers no choice yet', async () => {
+    customerSession({
+      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'HARVEST_READY' }]),
       'GET /land/reservations/r1/updates': () => jsonResponse([]),
+    })
+    renderAt('/customer/reservations')
+    expect(await screen.findByText(/Your harvest order is being prepared/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Confirm my choice' })).not.toBeInTheDocument()
+  })
+
+  it('sends a buy-back choice without an address, and says what it costs', async () => {
+    const calls = customerSession({
+      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'FULFILLING', deposit: 800 }]),
+      'GET /land/reservations/r1/updates': () => jsonResponse([]),
+      ...harvestOrder,
       'POST /order/orders/harvest': () => jsonResponse({ id: 'o1' }, 201),
     })
     renderAt('/customer/reservations')
+    expect(await screen.findByText('90 kg harvested')).toBeInTheDocument()
+    expect(screen.getByText(/You pay the balance of ₹1,900 now; the farmer sells the harvest and credits you ₹2,430/)).toBeInTheDocument()
     await userEvent.click(await screen.findByLabelText(/Let the farmer buy it back/))
     await userEvent.click(screen.getByRole('button', { name: 'Confirm my choice' }))
     await waitFor(() => expect(calls.some((c) => c.key === 'POST /order/orders/harvest')).toBe(true))
@@ -152,13 +205,26 @@ describe('my reservations', () => {
 
   it('asks for a valid address before choosing delivery', async () => {
     const calls = customerSession({
-      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'HARVEST_READY' }]),
+      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'FULFILLING' }]),
       'GET /land/reservations/r1/updates': () => jsonResponse([]),
+      ...harvestOrder,
     })
     renderAt('/customer/reservations')
     await userEvent.click(await screen.findByRole('button', { name: 'Confirm my choice' }))
     expect(screen.getByText('Enter the delivery address.')).toBeInTheDocument()
     expect(calls.some((c) => c.key === 'POST /order/orders/harvest')).toBe(false)
+  })
+
+  it('once chosen, shows where the harvest is instead of the choice', async () => {
+    customerSession({
+      'GET /land/reservations/mine': () => jsonResponse([{ ...RESERVATION, status: 'FULFILLING' }]),
+      'GET /land/reservations/r1/updates': () => jsonResponse([]),
+      'GET /order/orders': harvestOrder['GET /order/orders'],
+      'GET /order/orders/o1': () => jsonResponse({ ...HARVEST, harvestOption: 'DELIVERY', status: 'POOLED' }),
+    })
+    renderAt('/customer/reservations')
+    expect(await screen.findByText(/Your harvest is on its way/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Confirm my choice' })).not.toBeInTheDocument()
   })
 
   it('cancels a pending request', async () => {

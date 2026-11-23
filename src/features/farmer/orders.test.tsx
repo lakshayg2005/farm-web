@@ -32,15 +32,39 @@ describe('farmer orders page', () => {
       'POST /identity/refresh': () => jsonResponse(tokens(['farmer'])),
       'GET /order/orders': () => jsonResponse({ items: [order('o1', status, 300)], nextCursor: null }),
       'POST /order/orders/o1/pack': () => {
-        status = 'PACKED'
-        return jsonResponse({ ...order('o1', 'PACKED', 300), items: [], events: [], deliveryDate: null })
+        status = 'READY_FOR_DISPATCH' // packing hands the order to logistics: no quality check
+        return jsonResponse({ ...order('o1', 'READY_FOR_DISPATCH', 300), items: [], events: [], deliveryDate: null })
       },
     })
     renderAt('/farmer/orders')
-    await userEvent.click(await screen.findByRole('button', { name: /Mark packed/ }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Mark packed' }))
     await waitFor(() => expect(calls.some((c) => c.key === 'POST /order/orders/o1/pack')).toBe(true))
-    expect(await screen.findByText(/Packed: waiting for quality check/)).toBeInTheDocument()
+    await userEvent.click(await screen.findByRole('tab', { name: /In progress \(1\)/ }))
+    expect(await screen.findByText(/Packed: waiting for a delivery partner/)).toBeInTheDocument()
     expect(calls.find((c) => c.key === 'GET /order/orders')).toBeDefined()
+  })
+
+  it('shows what has been paid out from the payouts endpoint', async () => {
+    mockApi({
+      'POST /identity/refresh': () => jsonResponse(tokens(['farmer'])),
+      'GET /order/orders': () => jsonResponse({ items: [order('o1', 'COMPLETED', 300)], nextCursor: null }),
+      'GET /order/orders/payouts': () =>
+        jsonResponse({ items: [{ orderId: 'abcdef12-0000', amount: 285, currency: 'INR', paidAt: '2026-11-18T10:00:00Z' }], total: 285 }),
+    })
+    renderAt('/farmer/orders')
+    expect(await screen.findByText('Paid out to you')).toBeInTheDocument()
+    expect(await screen.findByText(/Order abcdef12/)).toBeInTheDocument()
+    expect(screen.getAllByText('₹285').length).toBeGreaterThan(0)
+  })
+
+  it('says so when payouts cannot be loaded, instead of showing a made-up total', async () => {
+    mockApi({
+      'POST /identity/refresh': () => jsonResponse(tokens(['farmer'])),
+      'GET /order/orders': () => jsonResponse({ items: [], nextCursor: null }),
+      'GET /order/orders/payouts': () => jsonResponse({ error: { code: 'INTERNAL_ERROR', message: 'Something went wrong' } }, 500),
+    })
+    renderAt('/farmer/orders')
+    expect(await screen.findByText(/Could not load payouts/)).toBeInTheDocument()
   })
 
   it('shows the items and timeline in details', async () => {
@@ -56,7 +80,7 @@ describe('farmer orders page', () => {
         }),
     })
     renderAt('/farmer/orders')
-    await userEvent.click(await screen.findByRole('button', { name: /Details/ }))
-    expect(await screen.findByText(/Tomato · 5 kg/)).toBeInTheDocument()
+    await userEvent.click(await screen.findByRole('button', { name: 'Details' }))
+    expect(await screen.findByText(/Tomato: 5 kg/)).toBeInTheDocument()
   })
 })

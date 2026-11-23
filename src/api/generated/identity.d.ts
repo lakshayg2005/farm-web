@@ -274,7 +274,7 @@ export interface paths {
         get?: never;
         /**
          * Set Roles
-         * @description Replace a user's roles (the only way to grant inspector or admin). Ends their sessions.
+         * @description Replace a user's roles (the only way to grant admin). Ends their sessions.
          */
         put: operations["set_roles_users__user_id__roles_put"];
         post?: never;
@@ -382,7 +382,7 @@ export interface components {
          * Role
          * @enum {string}
          */
-        Role: "farmer" | "customer" | "delivery" | "inspector" | "admin";
+        Role: "farmer" | "customer" | "delivery" | "admin";
         /** SetRolesIn */
         SetRolesIn: {
             /** Roles */

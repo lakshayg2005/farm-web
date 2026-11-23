@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ListSkeleton } from '@/components/ui'
 import { useState } from 'react'
 import { ApiError } from '@/api/http'
 import { adminApi, type UserRow } from './admin'
@@ -8,10 +9,10 @@ const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not 
 export function VerificationPage() {
   const waiting = useQuery({ queryKey: ['farmers', 'waiting'], queryFn: () => adminApi.farmers(false) })
 
-  if (waiting.isPending) return <p className="mt-8 text-ink-soft">Loading farmers…</p>
+  if (waiting.isPending) return <ListSkeleton label="Loading farmers" />
   if (waiting.isError)
     return (
-      <p role="alert" className="mt-8 font-semibold text-red-400">
+      <p role="alert" className="mt-8 font-semibold text-danger">
         Could not load the farmers. Refresh to try again.
       </p>
     )
@@ -46,7 +47,7 @@ function FarmerRow({ farmer }: { farmer: UserRow }) {
           {farmer.phoneVerified ? '' : ' · phone not verified'}
         </p>
         {error && (
-          <p role="alert" className="mt-1 text-sm font-semibold text-red-400">
+          <p role="alert" className="mt-1 text-sm font-semibold text-danger">
             {error}
           </p>
         )}
@@ -58,7 +59,7 @@ function FarmerRow({ farmer }: { farmer: UserRow }) {
           setError(undefined)
           verify.mutate()
         }}
-        className="rounded-xl bg-primary px-5 py-2 font-semibold text-on-primary transition-colors hover:brightness-110 disabled:opacity-60"
+        className="btn-primary"
       >
         {verify.isPending ? 'Verifying…' : `Verify ${farmer.name}`}
       </button>

@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import { ApiError } from '@/api/http'
+import { useI18n } from '@/i18n/i18n'
 import { useAuth } from './authContext'
 import { AuthShell, Field, primaryButton } from './AuthShell'
 import { homePathFor } from './roles'
@@ -17,6 +18,7 @@ export function VerifyPage() {
   const navigate = useNavigate()
   const state = (useLocation().state as VerifyState | null) ?? {}
   const phone = state.phone ?? user?.phone
+  const { t } = useI18n()
   const [devCode, setDevCode] = useState(state.devCode)
   const [wait, setWait] = useState(state.resendAfter ?? 0)
   const [code, setCode] = useState('')
@@ -58,25 +60,25 @@ export function VerifyPage() {
   }
 
   return (
-    <AuthShell title="Verify your phone" intro={`We sent a 6-digit code to ${phone}.`}>
+    <AuthShell title="Verify your phone" intro={t('We sent a 6-digit code to {phone}.', { phone: phone ?? '' })}>
       {devCode && (
-        <p className="mb-5 rounded-xl border border-gray-800 bg-neutral-950 px-4 py-3 text-sm text-gray-300" role="note">
-          Test mode: no SMS is sent. Your code is <strong className="font-mono text-base">{devCode}</strong>.
+        <p className="mb-5 rounded-lg bg-white px-3 py-2.5 text-sm" role="note">
+          {t('Test mode: no SMS is sent. Your code is')} <strong className="font-mono text-base">{devCode}</strong>.
         </p>
       )}
       <form onSubmit={onSubmit} noValidate className="space-y-5">
         <Field label="Code" name="code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} error={error} />
         <button type="submit" disabled={busy} className={primaryButton}>
-          {busy ? 'Verifying…' : 'Verify'}
+          {busy ? t('Verifying…') : t('Verify')}
         </button>
       </form>
       <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-ink-soft">
-        <button type="button" onClick={resend} disabled={wait > 0} className="font-semibold text-indigo underline disabled:text-ink-soft disabled:no-underline">
-          {wait > 0 ? `Send a new code in ${wait}s` : 'Send a new code'}
+        <button type="button" onClick={resend} disabled={wait > 0} className="font-semibold text-primary underline disabled:text-ink-soft disabled:no-underline">
+          {wait > 0 ? t('Send a new code in {n}s', { n: wait }) : t('Send a new code')}
         </button>
         {user && (
           <Link to={homePathFor(user)} className="underline">
-            Skip for now
+            {t('Skip for now')}
           </Link>
         )}
       </div>

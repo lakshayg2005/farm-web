@@ -39,6 +39,7 @@ export type ReservationStatus =
   | 'ACTIVE'
   | 'HARVEST_READY'
   | 'FULFILLING'
+  | 'COMPLETED'
   | 'REJECTED'
   | 'CANCELLED'
   | 'EXPIRED'
@@ -55,6 +56,17 @@ export interface Reservation {
   total: number | null
   status: ReservationStatus
   expiresAt: string
+}
+
+/** The terms of an accepted reservation; it names the plot and season, which the reservation itself does not. */
+export interface Agreement {
+  reservationId: string
+  plotId: string
+  plotTitle: string
+  season: string
+  startDate: string
+  endDate: string
+  pricePerKg: number
 }
 
 export interface CropUpdate {
@@ -86,6 +98,17 @@ export interface PaymentIntent {
   id: string
   amount: number
   status: 'PENDING' | 'SUCCEEDED' | 'FAILED'
+}
+
+/** The harvest order of a reservation: made when the farmer marks the harvest ready. */
+export interface HarvestOrder {
+  id: string
+  reservationId: string | null
+  harvestOption: 'DELIVERY' | 'BUYBACK' | null
+  status: string
+  total: number
+  balanceDue: number
+  items: { name: string; qty: number; unitPrice: number }[]
 }
 
 export interface DeliveryAddress {
@@ -122,14 +145,20 @@ export const landApi = {
   reserve: (plotSeasonId: string, cropId: string, expectedQtyKg: number) =>
     api<Reservation>('/land/reservations', { method: 'POST', body: { plotSeasonId, cropId, expectedQtyKg } }),
   myReservations: () => api<Reservation[]>('/land/reservations/mine'),
+  agreement: (id: string) => api<Agreement>(`/land/reservations/${id}/agreement`),
   cancel: (id: string) => api<Reservation>(`/land/reservations/${id}/cancel`, { method: 'POST' }),
   updates: (id: string) => api<CropUpdate[]>(`/land/reservations/${id}/updates`),
-  agreement: (id: string) => api<Agreement>(`/land/reservations/${id}/agreement`),
   payDeposit: (reservationId: string, amount: number) =>
     api<PaymentIntent>('/order/orders/payments/intent', {
       method: 'POST',
       body: { amount, kind: 'DEPOSIT', referenceId: reservationId },
     }),
+  /** The harvest order made for this reservation, or null while it is being made. */
+  harvestOrder: async (reservationId: string): Promise<HarvestOrder | null> => {
+    const page = await api<{ items: { id: string; reservationId?: string | null }[] }>('/order/orders?role=customer&limit=100')
+    const row = page.items.find((o) => o.reservationId === reservationId)
+    return row ? api<HarvestOrder>(`/order/orders/${row.id}`) : null
+  },
   chooseHarvest: (reservationId: string, option: 'DELIVERY' | 'BUYBACK', deliveryAddress?: DeliveryAddress) =>
     api('/order/orders/harvest', {
       method: 'POST',

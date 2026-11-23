@@ -166,6 +166,27 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "HarvestReadyIn": {
+        "description": "Body of POST /reservations/{id}/harvest-ready (optional): how much was really harvested.",
+        "properties": {
+          "harvestedQtyKg": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 1000000.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Weight harvested; the harvest order is priced on it (default: the expected kg)",
+            "title": "Harvestedqtykg"
+          }
+        },
+        "title": "HarvestReadyIn",
+        "type": "object"
+      },
       "PlotCreate": {
         "properties": {
           "boundary": {
@@ -511,6 +532,7 @@
             "type": "string"
           },
           "status": {
+            "description": "PENDING (waiting for the farmer, expires after 48 h), ACCEPTED (waiting for the deposit), ACTIVE (growing), HARVEST_READY (harvested; the order is being made), FULFILLING (the customer chooses delivery or buy-back, then it is delivered), COMPLETED, REJECTED, CANCELLED or EXPIRED",
             "title": "Status",
             "type": "string"
           },
@@ -1656,6 +1678,7 @@
     },
     "/reservations/{reservation_id}/harvest-ready": {
       "post": {
+        "description": "The farmer harvested. The order service turns it into a harvest order at once (there is no\nquality gate); the reservation moves to FULFILLING when that order exists and the customer\npicks delivery or buy-back.",
         "operationId": "harvest_ready_reservations__reservation_id__harvest_ready_post",
         "parameters": [
           {
@@ -1669,6 +1692,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/HarvestReadyIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "content": {

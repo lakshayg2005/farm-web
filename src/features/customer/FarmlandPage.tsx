@@ -46,7 +46,7 @@ export function FarmlandPage() {
     placeholderData: (previous) => previous,
   })
   const plots = search.data ?? []
-  const selected = plots.find((p) => p.id === selectedId) ?? null
+  const selected = plots.find((p) => p.properties.plotSeasonId === selectedId) ?? null
   const acres = plots.reduce((sum, p) => sum + p.properties.areaAcres, 0)
   const avgRate = plots.length ? plots.reduce((sum, p) => sum + p.properties.price, 0) / plots.length : 0
 
@@ -63,7 +63,7 @@ export function FarmlandPage() {
   }
 
   function open(plot: PlotFeature) {
-    setSelectedId(plot.id)
+    setSelectedId(plot.properties.plotSeasonId)
     setModalOpen(true)
   }
 
@@ -245,7 +245,7 @@ export function FarmlandPage() {
                       key={item.id}
                       onClick={() => open(item)}
                       className={`group relative cursor-pointer rounded-2xl bg-surface-container p-4 shadow-md transition-all hover:bg-surface-container-high ${
-                        idx === 0 || item.id === selectedId ? 'bg-gradient-to-r from-surface-container via-surface-container to-primary/5 ring-1 ring-primary/40' : ''
+                        idx === 0 || item.properties.plotSeasonId === selectedId ? 'bg-gradient-to-r from-surface-container via-surface-container to-primary/5 ring-1 ring-primary/40' : ''
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">

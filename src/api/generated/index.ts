@@ -6,4 +6,3 @@ export type { components as LogisticsComponents, paths as LogisticsPaths } from 
 export type { components as MediaComponents, paths as MediaPaths } from './media'
 export type { components as NotificationComponents, paths as NotificationPaths } from './notification'
 export type { components as OrderComponents, paths as OrderPaths } from './order'
-export type { components as QualityComponents, paths as QualityPaths } from './quality'

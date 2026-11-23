@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { ApiError } from '@/api/http'
+import { useI18n } from '@/i18n/i18n'
 import { useAuth } from './authContext'
 import { AuthShell, Field, primaryButton } from './AuthShell'
 import { toE164 } from './phone'
 import type { UserRole } from './types'
 
-/** Inspectors and admins are created by an admin, delivery partners use the app. */
+/** Admins are created by an admin, delivery partners use the app. */
 const choices: { role: UserRole; label: string; body: string }[] = [
   { role: 'farmer', label: 'Farmer', body: 'Sell produce and rent out plots' },
   { role: 'customer', label: 'Customer', body: 'Buy produce and reserve plots' },
@@ -14,6 +15,7 @@ const choices: { role: UserRole; label: string; body: string }[] = [
 
 export function RegisterPage() {
   const { register, requestOtp } = useAuth()
+  const { t } = useI18n()
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', phone: '', email: '', password: '' })
   const [roles, setRoles] = useState<UserRole[]>(['customer'])
@@ -53,37 +55,37 @@ export function RegisterPage() {
         <Field label="Email (optional)" name="email" type="email" autoComplete="email" value={form.email} onChange={set('email')} />
         <Field label="Password" name="password" type="password" autoComplete="new-password" hint="At least 8 characters." value={form.password} onChange={set('password')} error={errors.password} />
         <fieldset>
-          <legend className="font-semibold">I want to</legend>
+          <legend className="font-semibold">{t('I want to')}</legend>
           <div className="mt-2 space-y-2">
             {choices.map((c) => (
-              <label key={c.role} className="flex items-start gap-3 rounded-xl border border-line bg-transparent px-3 py-2.5">
+              <label key={c.role} className="flex items-start gap-3 input">
                 <input type="checkbox" className="mt-1.5" checked={roles.includes(c.role)} onChange={() => toggle(c.role)} />
                 <span>
-                  <span className="block font-semibold">{c.label}</span>
-                  <span className="text-sm text-ink-soft">{c.body}</span>
+                  <span className="block font-semibold">{t(c.label)}</span>
+                  <span className="text-sm text-ink-soft">{t(c.body)}</span>
                 </span>
               </label>
             ))}
           </div>
           {errors.roles && (
-            <p role="alert" className="mt-1 text-sm font-semibold text-red-400">
-              {errors.roles}
+            <p role="alert" className="mt-1 text-sm font-semibold text-danger">
+              {t(errors.roles)}
             </p>
           )}
         </fieldset>
         {errors.form && (
-          <p role="alert" className="font-semibold text-red-400">
-            {errors.form}
+          <p role="alert" className="font-semibold text-danger">
+            {t(errors.form)}
           </p>
         )}
         <button type="submit" disabled={busy} className={primaryButton}>
-          {busy ? 'Creating account…' : 'Create account'}
+          {busy ? t('Creating account…') : t('Create account')}
         </button>
       </form>
       <p className="mt-6 text-ink-soft">
-        Already registered?{' '}
-        <Link to="/login" className="font-semibold text-indigo underline">
-          Sign in
+        {t('Already registered?')}{' '}
+        <Link to="/login" className="font-semibold text-primary underline">
+          {t('Sign in')}
         </Link>
       </p>
     </AuthShell>

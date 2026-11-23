@@ -1,22 +1,40 @@
 import { createElement } from 'react'
-import { CatalogBrowser } from '@/features/catalog/CatalogBrowser'
+import { notificationsPage } from '@/features/notifications/page'
 import type { Section } from '@/routes/types'
 import { PlotSearchPage } from './PlotSearchPage'
 import { ReservationsPage } from './ReservationsPage'
+import { CartPage } from '@/features/shop/CartPage'
+import { CustomerOrdersPage } from '@/features/shop/OrdersPage'
+import { ShopPage } from '@/features/shop/ShopPage'
 
 export const customerSection: Section = {
   role: 'customer',
   label: 'Customer',
-  audience: 'Buy fresh produce, or reserve a plot of farmland and follow your crop.',
-  accent: 'var(--color-indigo)',
+  audience: 'Buy fresh produce from farms near you, or reserve a plot and follow your crop.',
   pages: [
     {
-      path: 'produce',
-      label: 'Fresh produce',
+      path: 'shop',
+      label: 'Shop',
       icon: 'basket',
-      summary: 'What farmers near you are selling, how fresh it is and when it will reach you.',
-      empty: { title: 'No produce yet', body: 'Listings from farmers near you will show here.' },
-      element: createElement('div', { className: 'mt-8' }, createElement(CatalogBrowser)),
+      summary: 'Fresh produce from farms near you, with how fresh it is and how far it travels.',
+      empty: { title: 'Nothing to show yet', body: 'Produce from farms near you shows here.' },
+      element: createElement(ShopPage),
+    },
+    {
+      path: 'cart',
+      label: 'Cart',
+      icon: 'cart',
+      summary: 'Check what you picked, add your address and pay.',
+      empty: { title: 'Your cart is empty', body: 'Add produce from the shop.' },
+      element: createElement(CartPage),
+    },
+    {
+      path: 'orders',
+      label: 'Orders',
+      icon: 'box',
+      summary: 'Follow every order from the farm to your door, and rate it when it arrives.',
+      empty: { title: 'No orders yet', body: 'Orders you place show here.' },
+      element: createElement(CustomerOrdersPage),
     },
     {
       path: 'plots',
@@ -31,7 +49,7 @@ export const customerSection: Section = {
     },
     {
       path: 'reservations',
-      label: 'My reservations',
+      label: 'Reservations',
       icon: 'calendar',
       summary: 'Plots you have reserved, how each crop is growing, and how you get your harvest.',
       empty: {
@@ -40,5 +58,6 @@ export const customerSection: Section = {
       },
       element: createElement(ReservationsPage),
     },
+    notificationsPage('customer'),
   ],
 }

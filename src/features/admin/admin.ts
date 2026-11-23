@@ -1,4 +1,5 @@
 import type { LogisticsComponents } from '@/api/generated'
+import { ordersApi, type OrderSummary } from '@/features/farmer/orders'
 import { api } from '@/api/http'
 import type { User } from '@/features/auth/types'
 
@@ -9,13 +10,6 @@ export interface UserRow extends User {
 export interface UserPage {
   items: UserRow[]
   nextCursor: string | null
-}
-
-export interface InspectionSummary {
-  id: string
-  status: string
-  result: string | null
-  grade: string | null
 }
 
 /** One delivery pool: nearby drop points grouped into a single vehicle route (HLD section 14).
@@ -71,7 +65,6 @@ export const adminApi = {
   farmers: (verified: boolean) =>
     api<UserPage>(`/identity/users?role=farmer&farmerVerified=${verified}&limit=200`),
   verifyFarmer: (userId: string) => api<UserRow>(`/identity/users/${userId}/verify-farmer`, { method: 'POST' }),
-  inspections: () => api<InspectionSummary[]>('/quality/inspections'),
   /** GET /logistics/pools?pool_date (admin): the pools saved for that date. */
   pools: (date: string) => api<PoolOut[]>(`/logistics/pools?pool_date=${date}`).then((rows) => rows.map(toPool)),
   /** POST /logistics/pools/run?pool_date (admin) answers { poolsCreated, pools } for that date. */
@@ -79,11 +72,14 @@ export const adminApi = {
     api<PoolRunResponse>(`/logistics/pools/run?pool_date=${date}`, { method: 'POST' }).then((r) => r.pools.map(toPool)),
 }
 
-/** Share of finished inspections that passed, as a whole percent; null until one is finished. */
-export function passRate(inspections: InspectionSummary[]): number | null {
-  const done = inspections.filter((i) => i.result === 'PASS' || i.result === 'FAIL')
-  if (done.length === 0) return null
-  return Math.round((done.filter((i) => i.result === 'PASS').length / done.length) * 100)
+/**
+ * Customers rate an order after it is delivered; that rating is the platform's quality signal
+ * (there is no inspection step). Average of the rated orders to one decimal, null until one is rated.
+ */
+export function averageRating(orders: { ratingScore?: number | null }[]): { average: number; count: number } | null {
+  const scores = orders.map((o) => o.ratingScore).filter((r): r is number => typeof r === 'number')
+  if (scores.length === 0) return null
+  return { average: Math.round((scores.reduce((t, r) => t + r, 0) / scores.length) * 10) / 10, count: scores.length }
 }
 
 export function totalSavedKm(pools: Pool[]): number {
@@ -114,5 +110,41 @@ export const POOL_STATUS: Record<string, string> = {
   COMPLETED: 'Delivered',
 }
 
-export const todayISO = () => new Date().toISOString().slice(0, 10)
-export const tomorrowISO = () => new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
+/** The calendar date on the admin's clock (not UTC, which is yesterday in India before 5:30 am). */
+const localISO = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+export const todayISO = () => localISO(new Date())
+
+/** The orders the stats below look at: the newest `pages` x 100, enough for a dashboard at this scale. */
+export async function loadAllOrders(pages = 5): Promise<OrderSummary[]> {
+  const out: OrderSummary[] = []
+  let cursor: string | null | undefined
+  for (let i = 0; i < pages; i++) {
+    const page = await ordersApi.all(cursor)
+    out.push(...page.items)
+    cursor = page.nextCursor
+    if (!cursor) break
+  }
+  return out
+}
+
+export interface DayStat {
+  date: string
+  orders: number
+  sales: number
+}
+
+/** Orders placed and sales (cancelled orders excluded) for each of the last `days` days, oldest first. */
+export function dailyStats(orders: OrderSummary[], days = 14, now = new Date()): DayStat[] {
+  const stats = new Map<string, DayStat>()
+  for (let i = days - 1; i >= 0; i--) {
+    const date = localISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - i))
+    stats.set(date, { date, orders: 0, sales: 0 })
+  }
+  for (const o of orders) {
+    const stat = stats.get(localISO(new Date(o.createdAt)))
+    if (!stat || o.status === 'CANCELLED') continue
+    stat.orders += 1
+    stat.sales += o.total
+  }
+  return [...stats.values()].map((d) => ({ ...d, sales: Math.round(d.sales * 100) / 100 }))
+}

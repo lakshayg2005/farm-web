@@ -6,14 +6,14 @@ import { sections } from './sections'
 
 beforeEach(() => {
   session.clear()
-  signedInAs(['farmer', 'customer', 'inspector', 'admin'])
+  signedInAs(['farmer', 'customer', 'admin'])
 })
 
 describe('routes', () => {
-  it('lists every section on the start page', () => {
+  it('offers every section the user may open on the start page', async () => {
     renderAt('/')
     for (const section of sections) {
-      expect(screen.getByRole('link', { name: new RegExp(section.label) })).toHaveAttribute('href', `/${section.role}`)
+      expect(await screen.findByRole('link', { name: `Open ${section.label}` })).toHaveAttribute('href', `/${section.role}`)
     }
   })
 
