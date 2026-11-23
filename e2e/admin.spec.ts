@@ -7,7 +7,7 @@ test.describe('admin', () => {
 
   test('dashboard shows real numbers, not dashes', async ({ page, problems }) => {
     await expect(page).toHaveURL(/\/admin\/dashboard/)
-    for (const label of ['Farmers waiting to be verified', 'Verified farmers', 'Inspection pass rate', 'Kilometres saved today']) {
+    for (const label of ['Farmers waiting to be verified', 'Verified farmers', 'Customer rating', 'Kilometres saved today']) {
       await expect(page.getByText(label)).toBeVisible()
     }
     await expect(page.getByText('–')).toHaveCount(0)
@@ -24,7 +24,7 @@ test.describe('admin', () => {
     await nav(page).getByRole('link', { name: 'Orders' }).click()
     await expect(page.getByRole('tab', { name: /^All/ })).toBeVisible()
     await page.getByRole('tab', { name: /^Delivered/ }).click()
-    await expect(page.getByRole('img', { name: /Stage 8 of 8/ }).first()).toBeVisible()
+    await expect(page.getByRole('img', { name: /Stage 6 of 6/ }).first()).toBeVisible()
     await page.getByRole('tab', { name: /^Needs a step/ }).click()
     await expect(page.getByRole('button', { name: 'Cancel and refund' }).first()).toBeVisible()
     await page.getByRole('button', { name: 'Details' }).first().click()
