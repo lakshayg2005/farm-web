@@ -177,4 +177,19 @@ describe('admin orders page', () => {
     await waitFor(() => expect(calls.some((c) => c.key === 'POST /order/orders/11111111-aaaa/cancel')).toBe(true))
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Cancel and refund' })).not.toBeInTheDocument())
   })
+
+  it.each([
+    ['READY_FOR_DISPATCH', true],
+    ['POOLED', true],
+    ['IN_TRANSIT', false],
+    ['DELIVERED', false],
+  ])('%s: cancel button shown is %s', async (status, shown) => {
+    mockApi({
+      'POST /identity/refresh': () => jsonResponse(tokens(['admin'])),
+      'GET /order/orders': () => jsonResponse({ items: [row('33333333-cccc', status)], nextCursor: null }),
+    })
+    renderAt('/admin/orders')
+    expect(await screen.findByText(/Order 33333333/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancel and refund' }) !== null).toBe(shown)
+  })
 })
