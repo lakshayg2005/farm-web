@@ -17,6 +17,9 @@ const FILTERS: { id: string; label: string; statuses: OrderStatus[] | null }[] =
 const tone = (s: OrderStatus): Tone =>
   s === 'CANCELLED' ? 'danger' : s === 'DELIVERED' || s === 'COMPLETED' ? 'good' : s === 'CONFIRMED' || s === 'PACKED' ? 'warn' : 'info'
 
+/** The order service lets an admin cancel until the delivery partner collects the order. */
+const CANCELLABLE: OrderStatus[] = ['PLACED', 'CONFIRMED', 'PACKED', 'READY_FOR_DISPATCH', 'POOLED']
+
 const message = (e: unknown) => (e instanceof ApiError ? e.message : 'Could not reach the server. Try again.')
 
 /** Every order on the platform, with a way to cancel one (the customer is refunded). */
@@ -82,8 +85,8 @@ function Row({ order }: { order: OrderSummary }) {
     },
     onError: (e) => setError(message(e)),
   })
-  // the order service refunds and cancels until the farmer packs (packing hands it to logistics)
-  const cancellable = ['PLACED', 'CONFIRMED', 'PACKED'].includes(order.status)
+  const cancellable = CANCELLABLE.includes(order.status)
+  const onARoute = order.status === 'READY_FOR_DISPATCH' || order.status === 'POOLED'
   const stage = stageOf(order.status)
 
   return (
@@ -113,7 +116,10 @@ function Row({ order }: { order: OrderSummary }) {
             type="button"
             disabled={cancel.isPending}
             onClick={() => {
-              if (window.confirm(`Cancel order ${order.id.slice(0, 8)}? The customer is refunded.`)) {
+              if (window.confirm(
+                  `Cancel order ${order.id.slice(0, 8)}? The customer is refunded.` +
+                    (onARoute ? ' The order is packed, so it is taken off its delivery route.' : ''),
+                )) {
                 setError(undefined)
                 cancel.mutate()
               }
