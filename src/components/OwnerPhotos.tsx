@@ -1,7 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
-import { isProcessing, mediaApi, type Media, type OwnerType } from '@/api/media'
+import { isProcessing, mediaApi, photoBadge, type Media, type OwnerType } from '@/api/media'
 
-/** The photos attached to a listing, reservation, .... */
+const BADGE_TONE = {
+  verified: 'bg-primary text-on-primary',
+  unverified: 'bg-danger text-white',
+  checking: 'bg-white/90 text-ink',
+  failed: 'bg-danger/10 text-danger',
+} as const
+
+/** The photos attached to a listing, reservation, ...; each shows whether it was taken at the farm or plot. */
 export function OwnerPhotos({
   ownerType,
   ownerId,
@@ -34,6 +41,7 @@ export function OwnerPhotos({
   return (
     <ul className="flex flex-wrap gap-2" aria-label="Photos">
       {list.map((m) => {
+        const badge = photoBadge(m)
         return (
           <li key={m.id} className={`relative ${box} shrink-0 overflow-hidden rounded-lg bg-paper-deep`}>
             {m.thumbUrl ?? m.url ? (
@@ -41,6 +49,13 @@ export function OwnerPhotos({
             ) : (
               <span className="block size-full animate-pulse bg-paper-deep motion-reduce:animate-none" />
             )}
+            <span
+              title={badge.detail}
+              className={`absolute bottom-1 left-1 rounded-full px-1.5 py-px text-[0.7rem] font-semibold leading-tight ${BADGE_TONE[badge.kind]}`}
+            >
+              {badge.label}
+              <span className="sr-only">: {badge.detail}</span>
+            </span>
             {onRemove && (
               <button
                 type="button"

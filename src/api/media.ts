@@ -52,6 +52,41 @@ export const mediaApi = {
 /** Still being checked: poll until every photo has a verdict. */
 export const isProcessing = (m: Media) => m.status === 'PENDING_UPLOAD' || m.status === 'PROCESSING'
 
+/** How close (metres) a photo's GPS must be to the farm or plot to count as taken there (the server's rule). */
+export const VERIFY_RADIUS_M = 2000
+
+/**
+ * The badge a photo carries. "Verified" only when the camera's GPS point in the photo lies within
+ * 2 km of the farm (or inside / near the plot). A photo without a location — a screenshot, an
+ * edited or a downloaded image — or one taken somewhere else is "Unverified", with the reason.
+ */
+export function photoBadge(m: Media): { kind: 'checking' | 'verified' | 'unverified' | 'failed'; label: string; detail: string } {
+  if (isProcessing(m)) return { kind: 'checking', label: 'Checking', detail: 'Reading the photo’s location.' }
+  if (m.status !== 'READY') return { kind: 'failed', label: 'Not accepted', detail: m.rejectReason ?? 'The photo could not be processed.' }
+  // Listing and farm photos are checked against the farm, crop photos against the plot.
+  const place = m.ownerType === 'PLOT' || m.ownerType === 'RESERVATION' ? 'plot' : 'farm'
+  if (m.isGeoVerified) {
+    return { kind: 'verified', label: 'Verified', detail: `Taken at the ${place}: the camera’s location matches the ${place}.` }
+  }
+  const detail =
+    m.geoStatus === 'TOO_FAR' && m.distanceM !== null
+      ? `Taken ${formatDistance(m.distanceM)} from the ${place}, not at it.`
+      : m.geoStatus === 'NO_GPS'
+        ? 'The photo has no camera location (a screenshot, edited or downloaded image), so it cannot be matched to the ' + place + '.'
+        : m.geoStatus === 'NO_REFERENCE'
+          ? `The ${place}’s location is not set, so the photo could not be checked.`
+          : 'The location could not be checked.'
+  return { kind: 'unverified', label: 'Unverified', detail }
+}
+
+/** What the upload form says about a photo before it is sent, from its own GPS data. */
+export function photoLocationHint(hasGps: boolean | undefined): { ok: boolean; text: string } | null {
+  if (hasGps === undefined) return null
+  return hasGps
+    ? { ok: true, text: 'Has a camera location: it will be checked against the farm.' }
+    : { ok: false, text: 'No camera location (screenshot or downloaded image): it will show as Unverified.' }
+}
+
 export function formatDistance(metres: number) {
   return metres >= 1000 ? `${(metres / 1000).toFixed(1)} km` : `${Math.round(metres)} m`
 }

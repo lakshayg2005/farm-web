@@ -180,7 +180,7 @@ describe('farmer listings page', () => {
     await userEvent.type(within(form).getByLabelText('In stock'), '40')
     await userEvent.type(within(form).getByLabelText('Price per dozen (₹)'), '55')
     const photo = new File(['jpeg'], 'bananas.jpg', { type: 'image/jpeg' })
-    await userEvent.upload(within(form).getByLabelText('Add photos'), photo)
+    await userEvent.upload(within(form).getByLabelText('Choose photos'), photo)
     await userEvent.click(within(form).getByRole('button', { name: 'List this produce' }))
 
     await waitFor(() => expect(calls.some((c) => c.key === 'PATCH /catalog/listings/l9')).toBe(true))
@@ -204,7 +204,7 @@ describe('farmer listings page', () => {
     await userEvent.selectOptions(within(form).getByLabelText('Crop'), 'tomato')
     await userEvent.type(within(form).getByLabelText('In stock'), '10')
     await userEvent.type(within(form).getByLabelText('Price per kg (₹)'), '20')
-    await userEvent.upload(within(form).getByLabelText('Add photos'), new File(['x'], 'a.jpg', { type: 'image/jpeg' }))
+    await userEvent.upload(within(form).getByLabelText('Choose photos'), new File(['x'], 'a.jpg', { type: 'image/jpeg' }))
     await userEvent.click(within(form).getByRole('button', { name: 'List this produce' }))
 
     expect(await screen.findByRole('form', { name: 'Edit Tomato' })).toBeInTheDocument()

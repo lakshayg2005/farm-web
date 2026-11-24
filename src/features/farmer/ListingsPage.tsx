@@ -9,6 +9,7 @@ import { geoProblem } from '@/api/geo'
 import { newId } from '@/api/id'
 import { MAX_PHOTOS, photoProblem, uploadPhoto } from '@/api/media'
 import { OwnerPhotos } from '@/components/OwnerPhotos'
+import { PhotoLocationNote, PhotoPickButtons, VERIFY_RULE } from '@/components/PhotoPick'
 import {
   catalogApi,
   day,
@@ -475,7 +476,7 @@ export function ListingEditor({
         <fieldset className="sm:col-span-2">
           <legend className="font-semibold">Photos</legend>
           <p className="text-sm text-ink-soft">
-            Take them at the farm with location turned on. Photos taken there get a Verified badge that customers see.
+            {VERIFY_RULE}
           </p>
           {listing && kept.length > 0 && (
             <div className="mt-3">
@@ -485,30 +486,17 @@ export function ListingEditor({
           {files.length > 0 && (
             <ul className="mt-3 space-y-1 text-sm" aria-label="Photos to upload">
               {files.map((file, i) => (
-                <li key={`${file.name}-${i}`} className="flex items-center gap-2">
+                <li key={`${file.name}-${i}`} className="flex flex-wrap items-center gap-x-2">
                   <span className="truncate">{file.name}</span>
                   <button type="button" className="underline" onClick={() => setFiles((cur) => cur.filter((_, j) => j !== i))}>
                     Remove
                   </button>
+                  <PhotoLocationNote file={file} />
                 </li>
               ))}
             </ul>
           )}
-          {kept.length + files.length < MAX_PHOTOS && (
-            <label className="mt-3 inline-block cursor-pointer rounded-lg border border-dashed border-ink-soft px-4 py-2 font-semibold hover:bg-paper">
-              Add photos
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-                className="sr-only"
-                onChange={(e) => {
-                  addFiles(e.target.files)
-                  e.target.value = ''
-                }}
-              />
-            </label>
-          )}
+          {kept.length + files.length < MAX_PHOTOS && <PhotoPickButtons onFiles={addFiles} />}
           <p className="mt-1 text-sm text-ink-soft">Up to {MAX_PHOTOS} photos, JPEG, PNG or WebP, 5 MB each.</p>
         </fieldset>
       </div>

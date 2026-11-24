@@ -188,7 +188,7 @@ export interface components {
             id: string;
             /**
              * Isgeoverified
-             * @description Whether the photo's GPS lies near the farm or plot. Informational; clients do not show it
+             * @description True only when the photo's camera GPS point lies within 2 km of the farm or plot. False (no GPS, as in screenshots and downloaded images, or taken elsewhere) shows an 'Unverified' badge
              */
             isGeoVerified: boolean;
             /** Originalurl */
@@ -258,7 +258,7 @@ export interface components {
             id: string;
             /**
              * Isgeoverified
-             * @description Whether the photo's GPS lies near the farm or plot. Informational; clients do not show it
+             * @description True only when the photo's camera GPS point lies within 2 km of the farm or plot. False (no GPS, as in screenshots and downloaded images, or taken elsewhere) shows an 'Unverified' badge
              */
             isGeoVerified: boolean;
             /**

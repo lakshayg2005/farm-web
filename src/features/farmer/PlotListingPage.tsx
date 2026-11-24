@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { api, ApiError } from '@/api/http'
 import { OwnerPhotos } from '@/components/OwnerPhotos'
+import { PhotoLocationNote } from '@/components/PhotoPick'
 import { PlaceSearch } from '@/components/PlaceSearch'
 import { ErrorState, ListSkeleton, StatusChip } from '@/components/ui'
 import { useAuth } from '@/features/auth/authContext'
@@ -480,7 +481,10 @@ function NewPlotForm({
         <label className="mt-4 grid gap-1 text-sm font-semibold">
           Plot photo (optional)
           <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} className="input font-normal" />
-          <span className="text-xs font-normal text-ink-soft">JPEG, PNG or WebP, up to 5 MB. Take it at the plot so it shows as verified.</span>
+          <span className="text-xs font-normal text-ink-soft">
+            JPEG, PNG or WebP, up to 5 MB. Take it at the plot with the camera’s location on so it shows as Verified; screenshots and downloaded images show as Unverified.
+          </span>
+          {photo && <PhotoLocationNote file={photo} />}
         </label>
         {message && (
           <p role="alert" className="mt-4 rounded-lg bg-error/15 p-3 text-sm font-semibold text-error">

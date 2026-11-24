@@ -82,7 +82,7 @@ describe('farmer crop updates', () => {
     const form = screen.getByRole('form', { name: 'Post an update' })
     expect(within(form).getByLabelText('Sown')).toBeChecked()
     await userEvent.type(within(form).getByLabelText(/Note/), 'Sowing done')
-    await userEvent.upload(within(form).getByLabelText('Add photos'), new File(['x'], 'field.jpg', { type: 'image/jpeg' }))
+    await userEvent.upload(within(form).getByLabelText('Choose photos'), new File(['x'], 'field.jpg', { type: 'image/jpeg' }))
     await userEvent.click(within(form).getByRole('button', { name: 'Post update' }))
 
     await waitFor(() => expect(calls.some((c) => c.key === 'POST /land/reservations/r1/updates')).toBe(true))
@@ -105,7 +105,7 @@ describe('farmer crop updates', () => {
     renderAt('/farmer/crops')
     await userEvent.click(await screen.findByRole('button', { name: 'Post an update' }))
     const form = screen.getByRole('form', { name: 'Post an update' })
-    await userEvent.upload(within(form).getByLabelText('Add photos'), new File(['x'], 'field.jpg', { type: 'image/jpeg' }))
+    await userEvent.upload(within(form).getByLabelText('Choose photos'), new File(['x'], 'field.jpg', { type: 'image/jpeg' }))
     await userEvent.click(within(form).getByRole('button', { name: 'Post update' }))
     expect(await within(form).findByRole('alert')).toHaveTextContent('Try again later.')
     await userEvent.click(within(form).getByRole('button', { name: 'Post update' }))

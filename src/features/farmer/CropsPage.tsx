@@ -6,6 +6,7 @@ import { Link } from 'react-router'
 import { ApiError } from '@/api/http'
 import { MAX_PHOTOS, photoProblem, uploadPhoto } from '@/api/media'
 import { OwnerPhotos } from '@/components/OwnerPhotos'
+import { PhotoLocationNote, PhotoPickButtons } from '@/components/PhotoPick'
 import { day, landApi, type CropUpdate, type Reservation } from '@/features/customer/land'
 import {
   farmerLandApi,
@@ -323,12 +324,15 @@ function UpdateForm({
       </label>
       <div>
         <p className="font-semibold">Photos</p>
-        <p className="text-sm text-ink-soft">Taken on the plot with location on, they get a Verified badge for the customer.</p>
+        <p className="text-sm text-ink-soft">
+          Taken on the plot with the camera’s location on, they get a Verified badge for the customer. Screenshots and downloaded images show as Unverified.
+        </p>
         {files.length > 0 && (
           <ul className="mt-2 space-y-1 text-sm" aria-label="Photos to upload">
             {files.map((file, i) => (
-              <li key={`${file.name}-${i}`} className="flex items-center gap-2">
+              <li key={`${file.name}-${i}`} className="flex flex-wrap items-center gap-x-2">
                 <span className="truncate">{file.name}</span>
+                <PhotoLocationNote file={file} />
                 {uploaded.some((d) => d.file === file) ? (
                   <span className="text-ink-soft">uploaded</span>
                 ) : (
@@ -340,21 +344,7 @@ function UpdateForm({
             ))}
           </ul>
         )}
-        {files.length < MAX_PHOTOS && (
-          <label className="mt-2 inline-block cursor-pointer rounded-lg border border-dashed border-ink-soft bg-surface-card px-4 py-2 font-semibold hover:bg-paper-deep">
-            Add photos
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              multiple
-              className="sr-only"
-              onChange={(e) => {
-                addFiles(e.target.files)
-                e.target.value = ''
-              }}
-            />
-          </label>
-        )}
+        {files.length < MAX_PHOTOS && <PhotoPickButtons onFiles={addFiles} />}
       </div>
       <p className="text-sm">
         {location ? (
